@@ -4,10 +4,31 @@
 	import { getUser } from "../backend/auth.svelte";
 	import Post from "./Post.svelte";
 	import theme from "../themes/theme.svelte";
+	import Rating from "./Rating.svelte";
+	import type { User } from "../backend/backend";
+	import BookIcon from "../assets/images/icons/BookIcon.svelte";
+	import LocationIcon from "../assets/images/icons/LocationIcon.svelte";
+	import BirthdayIcon from "../assets/images/icons/BirthdayIcon.svelte";
+	import StarIcon from "../assets/images/icons/Star.svelte";
+	import { getBook } from "../api/api";
+	import ClockIcon from "../assets/images/icons/ClockIcon.svelte";
+	import SortIcon from "../assets/images/icons/SortIcon.svelte";
+	import ReadingListItem from "./ReadingListItem.svelte";
 
-	let { user } = $props();
+	let { user }: { user: User } = $props();
 
-	let isCurrentUser = false;
+	let view = $state("ratings");
+
+	let books = $derived(user.books.toSorted((a, b) => b.rating - a.rating));
+	let favorite = $state("");
+	let current = $state("");
+
+	let isCurrentUser = $derived(getUser()?.id === user.id);
+
+	(async () => {
+		favorite = (await getBook(books[0].isbn)).title;
+		current = (await getBook(user.currentBook)).title;
+	})();
 </script>
 
 <main style:background-color={theme().background}>
@@ -43,22 +64,126 @@
 			{/if}
 		</div>
 		<p class="bio">{user.bio}</p>
+
+		<!-- Line 3: Profile stats -->
+		<div class="profile-line-2">
+			<span>
+				<StarIcon
+					stroke={theme().textDull}
+					style="width: 1.25rem; height: 1.25rem;"
+				/>
+				<span class="truncate" style:color={theme().textDull}
+					>{favorite}</span
+				>
+			</span>
+			<span>
+				<ClockIcon
+					stroke={theme().textDull}
+					style="width: 1.25rem; height: 1.25rem;"
+				/>
+				<span class="truncate" style:color={theme().textDull}
+					>{current}</span
+				>
+			</span>
+			<span>
+				<BookIcon
+					stroke={theme().textDull}
+					style="width: 1.25rem; height: 1.25rem;"
+				/>
+				<span style:color={theme().textDull}>{books.length}</span>
+			</span>
+		</div>
+
+		<!-- Line 4: Views (all, discussion, ratings, list) -->
 		<div class="views">
-			<button>Posts</button>
-			<button>Ratings</button>
-			<button>Reading List</button>
+			<button
+				style:color={view === "all" ? theme().text : theme().textDim}
+				style:border-bottom={view === "all"
+					? `3px solid ${theme().accent}`
+					: "3px solid transparent"}
+				onclick={() => (view = "all")}>All</button
+			>
+			<button
+				style:color={view === "discussion"
+					? theme().text
+					: theme().textDim}
+				style:border-bottom={view === "discussion"
+					? `3px solid ${theme().accent}`
+					: "3px solid transparent"}
+				onclick={() => (view = "discussion")}>Discussion</button
+			>
+			<button
+				style:color={view === "ratings"
+					? theme().text
+					: theme().textDim}
+				style:border-bottom={view === "ratings"
+					? `3px solid ${theme().accent}`
+					: "3px solid transparent"}
+				onclick={() => (view = "ratings")}>Ratings</button
+			>
+			<button
+				style:color={view === "list" ? theme().text : theme().textDim}
+				style:border-bottom={view === "list"
+					? `3px solid ${theme().accent}`
+					: "3px solid transparent"}
+				onclick={() => (view = "list")}>List</button
+			>
 		</div>
 	</div>
 
-	{#each user.posts as post}
-		<Post {post} />
-	{/each}
+	{#if view === "discussion"}
+		{#each user.posts as post}
+			<Post {post} />
+		{/each}
+	{:else if view === "ratings"}
+		<div class="ratings">
+			<span style:color={theme().text} class="rating-sort">
+				<SortIcon
+					stroke={theme().text}
+					style="width: 1.75rem; height: 1.75rem;"
+				/>
+				Best
+			</span>
+			{#each books as book}
+				<Rating
+					isbn={book.isbn}
+					rating={book.rating}
+					review={book.review}
+					{user}
+				/>
+			{/each}
+		</div>
+	{:else if view === "list"}
+		{#each user.readingList as isbn}
+			<ReadingListItem {isbn} {user} />
+		{/each}
+	{/if}
 </main>
 
 <style>
 	main {
 		min-height: 100%;
 		position: relative;
+	}
+
+	.truncate {
+		max-width: 8rem;
+		text-overflow: ellipsis;
+		display: inline-block;
+		overflow-x: hidden;
+	}
+
+	.ratings {
+		position: relative;
+	}
+
+	.rating-sort {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		display: flex;
+		align-items: center;
+		gap: 0.3rem;
 	}
 
 	.back-arrow {
@@ -82,10 +207,15 @@
 	.views {
 		color: var(--surface-2);
 		display: flex;
-		gap: 5rem;
-		padding-left: 2rem;
+		justify-content: space-between;
+		padding-right: 2rem;
+		padding-left: 1rem;
+
 		button {
-			font-size: 1.25rem;
+			font-size: 1rem;
+			white-space: nowrap;
+			padding-top: 0.5rem;
+			padding-bottom: 0.5rem;
 		}
 	}
 
@@ -94,12 +224,26 @@
 	}
 
 	.profile {
-		margin-left: 2rem;
+		margin-left: 1rem;
 		border-bottom: 1px solid var(--surface-0);
-		padding-bottom: 1rem;
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+	}
+
+	.profile-line-2 {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		padding-bottom: 0.5rem;
+		padding-top: 0.5rem;
+
+		> span {
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+			white-space: nowrap;
+		}
 	}
 
 	.profile-line-1 {
@@ -111,7 +255,11 @@
 		}
 
 		.edit-profile {
-			margin-left: auto;
+			position: absolute;
+			right: 0px;
+			top: 8.5rem;
+			width: 7rem;
+			height: 2rem;
 			margin-right: 1rem;
 			background-image: linear-gradient(
 				to bottom right,

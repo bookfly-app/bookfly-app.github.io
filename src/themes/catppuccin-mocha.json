@@ -5,6 +5,8 @@
 	"backgroundDark": "#11111b",
 	"textBright": "#cdd6f4",
 	"text": "#bac2de",
+	"textDull": "#7f849c",
 	"textDim": "#585b70",
+	"textDark": "#313244",
 	"accent": "#b4befe"
 }

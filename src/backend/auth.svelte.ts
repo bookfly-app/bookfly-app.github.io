@@ -52,7 +52,10 @@ export async function signUp(email: string, password: string, username: string):
 			id: userInfo.user.uid,
 			banner: "https://i0.wp.com/www.lifecaretechnology.com/wp-content/uploads/2018/12/default-banner.jpg?ssl=1",
 			tags: [],
-			links: []
+			links: [],
+			books: [],
+			currentBook: null,
+			readingList: []
 		};
 		await setDoc(doc(db, "users", username), user);
 		return null;

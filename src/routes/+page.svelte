@@ -5,6 +5,7 @@
 	import search from "../assets/images/search.svg";
 	import Sidebar, { showSidebar } from "../components/Sidebar.svelte";
 	import { getUser } from "../backend/auth.svelte";
+	import { getBook } from "../api/api";
 
 	initializeFirebase();
 
@@ -12,6 +13,7 @@
 	(async function () {
 		posts = await getPosts();
 		console.log(posts.length);
+		console.log(await getBook("9781444758993"));
 	})();
 </script>
 

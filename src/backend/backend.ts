@@ -1,5 +1,5 @@
 import { initializeApp, type FirebaseApp } from "firebase/app";
-import { collection, doc, Firestore, getDoc, getDocs, getFirestore, setDoc } from "firebase/firestore";
+import { collection, doc, Firestore, getDoc, getDocs, getFirestore } from "firebase/firestore";
 import env from "../env.json";
 
 let app: FirebaseApp;
@@ -38,6 +38,8 @@ export async function getPosts(): Promise<Post[]> {
 	}));
 }
 
+export type ISBN = string;
+
 export type User = {
 	username: string,
 	displayName: string,
@@ -50,6 +52,9 @@ export type User = {
 	banner: string,
 	tags: string[],
 	links: {}[]
+	books: { isbn: ISBN, rating: number, review: string }[],
+	currentBook: string | null,
+	readingList: ISBN[],
 };
 
 export async function getUser(username: string): Promise<User> {

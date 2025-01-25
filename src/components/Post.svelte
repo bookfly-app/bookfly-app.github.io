@@ -189,8 +189,8 @@
 		align-items: center;
 
 		button {
-			width: 4rem;
-			height: 4rem;
+			width: 3rem;
+			height: 3rem;
 			border-radius: 50%;
 			margin-right: 1rem;
 			margin-left: 1rem;

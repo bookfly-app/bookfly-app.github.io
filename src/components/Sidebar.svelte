@@ -3,6 +3,7 @@
 	import CloseIcon from "../assets/images/icons/CloseIcon.svelte";
 	import GearIcon from "../assets/images/icons/GearIcon.svelte";
 	import HomeIcon from "../assets/images/icons/HomeIcon.svelte";
+	import PeopleIcon from "../assets/images/icons/PeopleIcon.svelte";
 	import { getUser } from "../backend/auth.svelte";
 
 	let sidebar: HTMLElement;
@@ -37,12 +38,20 @@
 			/>
 		</button>
 	</div>
-	<button onclick={nav("/")}
-		><HomeIcon stroke="#FFFFFF" style="width: 2rem;" />Home</button
-	>
-	<button onclick={nav("/settings")}
-		><GearIcon stroke="#FFFFFF" style="width: 2rem;" />Settings</button
-	>
+
+	<!-- Navigation buttons -->
+	<button onclick={nav("/")}>
+		<HomeIcon stroke="#FFFFFF" style="width: 2rem;" />
+		Home
+	</button>
+	<button onclick={nav("/community")}>
+		<PeopleIcon stroke="#FFFFFF" style="width: 2rem;" />
+		Community
+	</button>
+	<button onclick={nav("/settings")}>
+		<GearIcon stroke="#FFFFFF" style="width: 2rem;" />
+		Settings
+	</button>
 </section>
 
 <style>
@@ -65,8 +74,8 @@
 			width: fit-content;
 			gap: 2rem;
 			padding-left: 2rem;
-			padding-top: 0.5rem;
-			padding-bottom: 0.5rem;
+			padding-top: 1rem;
+			padding-bottom: 1rem;
 		}
 	}
 

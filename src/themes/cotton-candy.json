@@ -1,0 +1,14 @@
+{
+	"name": "Cotton Candy",
+	"id": "cotton-candy",
+	"background": "#FFCCEE",
+	"backgroundDim": "#CCDDFF",
+	"backgroundDark": "#11111b",
+	"textBright": "#000000",
+	"text": "#000000CC",
+	"textDull": "#00000099",
+	"textDim": "#00000055",
+	"textDark": "#00000028",
+	"accent": "#222233",
+	"accent2": "#111122"
+}

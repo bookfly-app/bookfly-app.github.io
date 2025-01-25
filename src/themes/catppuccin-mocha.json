@@ -1,12 +1,14 @@
 {
 	"name": "Catppuccin Mocha",
+	"id": "catppuccin-mocha",
 	"background": "#1e1e2e",
 	"backgroundDim": "#181825",
 	"backgroundDark": "#11111b",
 	"textBright": "#cdd6f4",
 	"text": "#bac2de",
-	"textDull": "#7f849c",
+	"textDull": "#7f84ac",
 	"textDim": "#585b70",
 	"textDark": "#313244",
-	"accent": "#b4befe"
+	"accent": "#b4befe",
+	"accent2": "#89b4fa"
 }

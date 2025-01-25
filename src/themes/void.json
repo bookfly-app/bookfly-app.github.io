@@ -1,0 +1,14 @@
+{
+	"name": "Void",
+	"id": "void",
+	"background": "#000000",
+	"backgroundDim": "#030303",
+	"backgroundDark": "#090909",
+	"textBright": "#FFFFFF",
+	"text": "#CCCCCC",
+	"textDull": "#AAAAAA",
+	"textDim": "#555555",
+	"textDark": "#222222",
+	"accent": "#FFFFFF",
+	"accent2": "#FFFFFF"
+}

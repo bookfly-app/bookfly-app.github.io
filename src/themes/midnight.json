@@ -1,0 +1,14 @@
+{
+	"name": "Midnight",
+	"id": "midnight",
+	"background": "#060115",
+	"backgroundDim": "#181825",
+	"backgroundDark": "#11111b",
+	"textBright": "#ccccee",
+	"text": "#bac2de",
+	"textDull": "#7f849c",
+	"textDim": "#585b70",
+	"textDark": "#111122",
+	"accent": "#b4befe",
+	"accent2": "#89b4fa"
+}

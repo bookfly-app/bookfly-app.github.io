@@ -24,7 +24,7 @@
 	<div class="profile">
 		<img
 			src={getUser()?.picture ?? ""}
-			style="width: 6rem; border-radius: 50%; margin-right: 2rem; margin-left: 2rem;"
+			style="width: 5rem; border-radius: 50%; margin-right: 2rem; margin-left: 2rem;"
 			onclick={nav("profile")}
 		/>
 		<div>

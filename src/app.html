@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Tauri + SvelteKit + Typescript App</title>
+		<style>
+			* {
+				border: none;
+				outline: none;
+				background: transparent;
+				margin: 0px;
+				padding: 0px;
+				color: inherit;
+				box-sizing: border-box;
+				font-family: "sans-serif";
+
+				--lavender: #b4befe;
+				--text: #cdd6f4;
+				--overlay-2: #9399b2;
+				--surface-2: #585b70;
+				--surface-0: #313244;
+				--base: #1e1e2e;
+				--crust: #11111b;
+			}
+
+			html,
+			body {
+				width: 100vw;
+				height: 100vh;
+				overflow-x: hidden;
+			}
+
+			button {
+				cursor: pointer;
+			}
+		</style>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>

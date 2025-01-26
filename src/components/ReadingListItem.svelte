@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { getBook, type Book } from "../api/api";
+	import { getBook, type Book } from "../api/bookapi";
 	import theme from "../themes/theme.svelte";
 
 	let { user, isbn } = $props();
@@ -42,7 +42,11 @@
 							.join(", ")}</span
 					>
 				</div>
-				<img class="cover" src={book?.cover} />
+				<img
+					class="cover"
+					src={book?.cover}
+					onclick={() => goto(`/book/${book?.isbn}`)}
+				/>
 			</div>
 			<p class="description" style:color={theme().text}>
 				{book?.description}

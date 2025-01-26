@@ -1,6 +1,7 @@
-import { browserLocalPersistence, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, setPersistence, signInWithEmailAndPassword, } from "firebase/auth";
-import initializeFirebase, { type Post, type User } from "./backend";
-import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
+import { browserLocalPersistence, createUserWithEmailAndPassword, getAuth, onAuthStateChanged, setPersistence, signInWithEmailAndPassword, signOut, } from "firebase/auth";
+import initializeFirebase from "./backend";
+import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { getUserFromId, type User } from "../api/userapi";
 
 let { db } = initializeFirebase();
 const auth = getAuth();
@@ -13,29 +14,37 @@ export function getUser(): User | null {
 }
 
 onAuthStateChanged(auth, async user => {
+	// Logged in
 	if (user) {
-		const querySnapshot = await getDocs(collection(db, "users"));
-		const users: User[] = [];
-		querySnapshot.forEach(user_ => {
-			users.push(user_.data() as User);
-		});
-		let theUser = users.find(user_ => user_.id == user.uid)!;
-		theUser.posts = await Promise.all(theUser.posts.map(async post => {
-			let userPost = (await getDoc(doc(db, "posts", post as unknown as string))).data() as Post;
-			userPost.author = theUser!;
-			return userPost;
-		}));
-		currentUser = theUser;
-		console.log(currentUser);
-	} else {
-		console.log("logged out");
+		currentUser = (await getDocs(query(collection(db, "users"), where("id", "==", user.uid)))).docs[0].data() as User;
+		currentUser.following = await Promise.all(currentUser.following.map(async id => await getUserFromId(id)));
+		currentUser.followers = await Promise.all(currentUser.followers.map(async id => await getUserFromId(id)));
+	}
+
+	// logged out
+	else {
+
 	}
 });
 
+export async function logOut(): Promise<unknown | null> {
+	try {
+		await signOut(auth);
+		return null;
+	} catch (error) {
+		console.log(error);
+		return error;
+	}
+}
+
 export async function updateUser(userInfo: Partial<User>) {
 	let user = { ...currentUser!, ...userInfo, };
-	user.posts = user.posts.map(post => post.id) as unknown as Post[];
-	await setDoc(doc(db, "users", user.username), user);
+	await setDoc(doc(db, "users", user.id), user);
+}
+
+export async function updateOtherUser(user: User, userInfo: Partial<User>) {
+	let newUser = { ...user, ...userInfo, };
+	await setDoc(doc(db, "users", newUser.id), newUser);
 }
 
 export async function signUp(email: string, password: string, username: string): Promise<unknown | null> {
@@ -48,16 +57,16 @@ export async function signUp(email: string, password: string, username: string):
 			picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToiRnzzyrDtkmRzlAvPPbh77E-Mvsk3brlxQ&s",
 			bio: "",
 			likes: [],
-			posts: [],
 			id: userInfo.user.uid,
 			banner: "https://i0.wp.com/www.lifecaretechnology.com/wp-content/uploads/2018/12/default-banner.jpg?ssl=1",
 			tags: [],
 			links: [],
-			books: [],
 			currentBook: null,
-			readingList: []
+			readingList: [],
+			following: [],
+			followers: []
 		};
-		await setDoc(doc(db, "users", username), user);
+		await setDoc(doc(db, "users", user.id), user);
 		return null;
 	} catch (error) {
 		console.log(error);
@@ -73,16 +82,4 @@ export async function logIn(email: string, password: string): Promise<unknown | 
 		console.log(error);
 		return error;
 	}
-}
-
-export async function getUserByUsername(username: string): Promise<User> {
-	let user = (await getDoc(doc(db, "users", username))).data() as User;
-
-	user.posts = await Promise.all(user.posts.map(async post => {
-		let userPost = (await getDoc(doc(db, "posts", post as unknown as string))).data() as Post;
-		userPost.author = user!;
-		return userPost;
-	}));
-
-	return user;
 }

@@ -6,7 +6,7 @@
 		position: absolute;
 		background-color: var(--lavender);
 		color: var(--base);
-		bottom: 2rem;
+		bottom: 6rem;
 		right: 2rem;
 		font-size: 3rem;
 		width: 4rem;
@@ -21,7 +21,7 @@
 		position: absolute;
 		background-color: var(--lavender);
 		color: var(--base);
-		bottom: 2rem;
+		bottom: 6rem;
 		right: 2rem;
 		font-size: 3rem;
 		width: 4rem;

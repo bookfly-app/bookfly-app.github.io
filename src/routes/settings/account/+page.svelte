@@ -1,16 +1,16 @@
 <script>
 	import { goto } from "$app/navigation";
-	import AccountIcon from "../../../assets/images/icons/AccountIcon.svelte";
 	import AuthorIcon from "../../../assets/images/icons/AuthorIcon.svelte";
 	import DeveloperIcon from "../../../assets/images/icons/DeveloperIcon.svelte";
 	import LeftArrowIcon from "../../../assets/images/icons/LeftArrowIcon.svelte";
-	import PaintBrushIcon from "../../../assets/images/icons/PaintBrushIcon.svelte";
 	import TrashIcon from "../../../assets/images/icons/TrashIcon.svelte";
 	import UsernameIcon from "../../../assets/images/icons/UsernameIcon.svelte";
+	import Background from "../../../components/Background.svelte";
 	import theme from "../../../themes/theme.svelte";
 </script>
 
-<main style:background={theme().background}>
+<Background />
+<main>
 	<span class="settings-header">
 		<button
 			onclick={() => goto("/settings")}

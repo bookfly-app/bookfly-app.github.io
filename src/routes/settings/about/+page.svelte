@@ -1,10 +1,12 @@
 <script>
 	import { goto } from "$app/navigation";
 	import LeftArrowIcon from "../../../assets/images/icons/LeftArrowIcon.svelte";
+	import Background from "../../../components/Background.svelte";
 	import theme from "../../../themes/theme.svelte";
 </script>
 
-<main style:background={theme().background}>
+<Background />
+<main>
 	<button
 		onclick={() => goto("/settings")}
 		class="back-button"
@@ -78,7 +80,9 @@
 		mobile with <a href="https://v2.tauri.app/">Tauri</a>.
 	</p>
 	<p style:color={theme().textDull}>
-		In the back, Bookfly uses <a>Firebase</a> to store data and manage authentication.
+		In the back, Bookfly uses <a href="https://firebase.google.com/">
+			Firebase
+		</a> to store data and manage authentication.
 	</p>
 	<p style:color={theme().textDull}>
 		This stack was chosen by

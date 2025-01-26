@@ -1,37 +1,90 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import LeftArrowIcon from "../assets/images/icons/LeftArrowIcon.svelte";
-	import { getUser } from "../backend/auth.svelte";
-	import Post from "./Post.svelte";
+	import {
+		getUser,
+		updateUser,
+		updateOtherUser,
+	} from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
-	import Rating from "./Rating.svelte";
-	import type { User } from "../backend/backend";
+	import { getFavoriteBook, getUserPosts, type User } from "../api/userapi";
 	import BookIcon from "../assets/images/icons/BookIcon.svelte";
-	import LocationIcon from "../assets/images/icons/LocationIcon.svelte";
-	import BirthdayIcon from "../assets/images/icons/BirthdayIcon.svelte";
-	import StarIcon from "../assets/images/icons/Star.svelte";
-	import { getBook } from "../api/api";
+	import StarIcon from "../assets/images/icons/StarIcon.svelte";
 	import ClockIcon from "../assets/images/icons/ClockIcon.svelte";
 	import SortIcon from "../assets/images/icons/SortIcon.svelte";
 	import ReadingListItem from "./ReadingListItem.svelte";
+	import LeftArrowIcon from "../assets/images/icons/LeftArrowIcon.svelte";
+	import AnyPost from "./posts/AnyPost.svelte";
+	import { getBook, type Post } from "../api/bookapi";
+	import Background from "./Background.svelte";
+	import MessageIcon from "../assets/images/icons/MessageIcon.svelte";
+	import AddIcon from "../assets/images/icons/AddIcon.svelte";
+	import CheckIcon from "../assets/images/icons/CheckIcon.svelte";
 
 	let { user }: { user: User } = $props();
 
-	let view = $state("ratings");
+	let posts: Post[] = $state([]);
 
-	let books = $derived(user.books.toSorted((a, b) => b.rating - a.rating));
+	let view = $state("all");
+
 	let favorite = $state("");
-	let current = $state("");
+	let booksRead = $state(0);
+	let current: string | null = $state("");
 
 	let isCurrentUser = $derived(getUser()?.id === user.id);
 
 	(async () => {
-		favorite = (await getBook(books[0].isbn)).title;
-		current = (await getBook(user.currentBook)).title;
+		favorite = (await getFavoriteBook(user))?.title ?? "";
+		current = user.currentBook
+			? (await getBook(user.currentBook)).title
+			: null;
+		let allPosts = await getUserPosts(user);
+		posts = allPosts.toSorted((a, b) => b.timestamp - a.timestamp);
+		booksRead = posts.filter((post) => post.type === "rating").length;
 	})();
+
+	let followingOverride: boolean | null = $state(null);
+	let following = $derived(
+		getUser()?.following.some((following) => following.id === user.id) ??
+			false,
+	);
+
+	function follow() {
+		followingOverride = true;
+		updateUser({
+			following: [
+				...new Set([
+					...getUser()!.following.map((user) => user.id),
+					user.id,
+				]),
+			] as unknown as User[],
+		});
+		updateOtherUser(user, {
+			followers: [
+				...new Set([
+					...user.followers.map((user) => user.id),
+					getUser()!.id,
+				]),
+			] as unknown as User[],
+		});
+	}
+
+	function unfollow() {
+		followingOverride = false;
+		updateUser({
+			following: getUser()!
+				.following.map((user) => user.id)
+				.filter((id) => id !== user.id) as unknown as User[],
+		});
+		updateOtherUser(user, {
+			followers: user.followers
+				.map((user) => user.id)
+				.filter((id) => id !== getUser()!.id) as unknown as User[],
+		});
+	}
 </script>
 
-<main style:background-color={theme().background}>
+<Background />
+<main>
 	<div class="banner" style:background-image={`url("${user.banner}")`}></div>
 	<button class="back-arrow" onclick={() => goto("/")}>
 		<LeftArrowIcon stroke="#FFFFFF" style="width: 2rem; height: 2rem;" />
@@ -44,8 +97,8 @@
 		/>
 		<div class="profile-line-1">
 			<span class="name">
-				<h1>{user.displayName}</h1>
-				<h2>@{user.username}</h2>
+				<h1 style:color={theme().textBright}>{user.displayName}</h1>
+				<h2 style:color={theme().textDim}>@{user.username}</h2>
 				{#if user.tags.includes("dev")}
 					<span class="dev">Dev</span>
 				{/if}
@@ -61,13 +114,45 @@
 					class="edit-profile"
 					onclick={() => goto("/profile/edit")}>Edit Profile</button
 				>
+			{:else}
+				<div class="profile-actions">
+					<button
+						style:border-color={theme().textDull}
+						class="profile-action-follow"
+					>
+						{#if followingOverride || (following && followingOverride !== false)}
+							<CheckIcon
+								stroke={theme().textDull}
+								style="width: 2rem;"
+								onclick={unfollow}
+							/>
+						{:else}
+							<AddIcon
+								stroke={theme().textDull}
+								style="width: 2rem;"
+								onclick={follow}
+							/>
+						{/if}
+					</button>
+					<button
+						style:border-color={theme().textDull}
+						class="profile-action"
+					>
+						<MessageIcon
+							stroke={theme().textDull}
+							style="width: 1rem;"
+						/>
+					</button>
+				</div>
 			{/if}
 		</div>
-		<p class="bio">{user.bio}</p>
+		<p style:color={theme().text} class="bio">{user.bio}</p>
 
-		<!-- Line 3: Profile stats -->
+		<!-- Line 2: Profile stats -->
 		<div class="profile-line-2">
-			<span>
+			<span
+				title={`${user.displayName}'s highest rated book is ${favorite}`}
+			>
 				<StarIcon
 					stroke={theme().textDull}
 					style="width: 1.25rem; height: 1.25rem;"
@@ -76,23 +161,42 @@
 					>{favorite}</span
 				>
 			</span>
-			<span>
-				<ClockIcon
-					stroke={theme().textDull}
-					style="width: 1.25rem; height: 1.25rem;"
-				/>
-				<span class="truncate" style:color={theme().textDull}
-					>{current}</span
+			{#if current}
+				<span
+					title={`${user.displayName} is currently reading ${current}`}
 				>
-			</span>
-			<span>
+					<ClockIcon
+						stroke={theme().textDull}
+						style="width: 1.25rem; height: 1.25rem;"
+					/>
+					<span class="truncate" style:color={theme().textDull}
+						>{current}</span
+					>
+				</span>
+			{/if}
+			<span
+				title={`${user.displayName} has read ${booksRead} book${booksRead === 1 ? "" : "s"}`}
+			>
 				<BookIcon
 					stroke={theme().textDull}
 					style="width: 1.25rem; height: 1.25rem;"
 				/>
-				<span style:color={theme().textDull}>{books.length}</span>
+				<span style:color={theme().textDull}>{booksRead}</span>
 			</span>
 		</div>
+		<a
+			style:border-color={theme().textDull}
+			style:color={theme().textDull}
+			class="follows"
+			href={`/profile/${getUser()!.username}/follows`}
+		>
+			<span>
+				{user.followers.length} Followers
+			</span>
+			<span>
+				{user.following.length} Following
+			</span>
+		</a>
 
 		<!-- Line 4: Views (all, discussion, ratings, list) -->
 		<div class="views">
@@ -119,21 +223,21 @@
 				style:border-bottom={view === "ratings"
 					? `3px solid ${theme().accent}`
 					: "3px solid transparent"}
-				onclick={() => (view = "ratings")}>Ratings</button
+				onclick={() => (view = "ratings")}>Reviews</button
 			>
 			<button
 				style:color={view === "list" ? theme().text : theme().textDim}
 				style:border-bottom={view === "list"
 					? `3px solid ${theme().accent}`
 					: "3px solid transparent"}
-				onclick={() => (view = "list")}>List</button
+				onclick={() => (view = "list")}>Reading List</button
 			>
 		</div>
 	</div>
 
 	{#if view === "discussion"}
-		{#each user.posts as post}
-			<Post {post} />
+		{#each posts.filter((post) => post.type === "general") as post}
+			<AnyPost {post} />
 		{/each}
 	{:else if view === "ratings"}
 		<div class="ratings">
@@ -144,18 +248,17 @@
 				/>
 				Best
 			</span>
-			{#each books as book}
-				<Rating
-					isbn={book.isbn}
-					rating={book.rating}
-					review={book.review}
-					{user}
-				/>
+			{#each posts.filter((post) => post.type === "rating") as post}
+				<AnyPost {post} />
 			{/each}
 		</div>
 	{:else if view === "list"}
 		{#each user.readingList as isbn}
 			<ReadingListItem {isbn} {user} />
+		{/each}
+	{:else if view === "all"}
+		{#each posts as post}
+			<AnyPost {post} />
 		{/each}
 	{/if}
 </main>
@@ -164,6 +267,39 @@
 	main {
 		min-height: 100%;
 		position: relative;
+	}
+
+	.follows {
+		border-radius: 100vmax;
+		font-size: 0.8rem;
+		text-decoration: none;
+		display: flex;
+		padding-left: 1rem;
+		gap: 1rem;
+	}
+
+	.profile-action {
+		border-style: solid;
+		border-width: 2px;
+		border-radius: 50%;
+		width: 2rem;
+		height: 2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.profile-action-follow {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.profile-actions {
+		display: flex;
+		margin-left: auto;
+		margin-right: 1rem;
+		gap: 0.5rem;
 	}
 
 	.truncate {
@@ -205,26 +341,26 @@
 	}
 
 	.views {
-		color: var(--surface-2);
 		display: flex;
-		justify-content: space-between;
-		padding-right: 2rem;
-		padding-left: 1rem;
+		width: 100%;
+		overflow-x: auto;
 
 		button {
-			font-size: 1rem;
+			font-size: 0.8.80.80.80.80.80.80.85rem;
 			white-space: nowrap;
 			padding-top: 0.5rem;
 			padding-bottom: 0.5rem;
+			padding-left: 2rem;
+			padding-right: 2rem;
 		}
 	}
 
 	.bio {
-		color: var(--text);
+		padding-left: 1rem;
+		font-size: 0.85rem;
 	}
 
 	.profile {
-		margin-left: 1rem;
 		border-bottom: 1px solid var(--surface-0);
 		display: flex;
 		flex-direction: column;
@@ -236,21 +372,27 @@
 		align-items: center;
 		gap: 1.5rem;
 		padding-bottom: 0.5rem;
-		padding-top: 0.5rem;
+		margin-left: 1rem;
 
 		> span {
 			display: flex;
 			align-items: center;
 			gap: 0.25rem;
 			white-space: nowrap;
+			font-size: 0.85rem;
 		}
 	}
 
 	.profile-line-1 {
 		display: flex;
+		margin-left: 1rem;
+
+		h1 {
+			font-size: 1.25rem;
+		}
 
 		h2 {
-			color: var(--surface-2);
+			font-size: 1.25rem;
 			font-weight: normal;
 		}
 
@@ -275,6 +417,7 @@
 	}
 
 	.profile-picture {
+		margin-left: 1rem;
 		border-radius: 50%;
 		width: 6rem;
 		height: 6rem;
@@ -284,6 +427,7 @@
 	}
 
 	.name {
+		flex-grow: 1;
 		color: var(--text);
 		display: flex;
 		align-items: center;
@@ -301,6 +445,7 @@
 			padding: 0.3rem;
 			border-radius: 0.5rem;
 			font-weight: 500;
+			font-size: 0.85rem;
 		}
 
 		.author {

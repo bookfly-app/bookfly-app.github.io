@@ -4,10 +4,12 @@
 	import InfoIcon from "../../assets/images/icons/InfoIcon.svelte";
 	import LeftArrowIcon from "../../assets/images/icons/LeftArrowIcon.svelte";
 	import PaintBrushIcon from "../../assets/images/icons/PaintBrushIcon.svelte";
+	import Background from "../../components/Background.svelte";
 	import theme from "../../themes/theme.svelte";
 </script>
 
-<main style:background={theme().background}>
+<Background />
+<main>
 	<span class="settings-header">
 		<button
 			onclick={() => goto("/")}

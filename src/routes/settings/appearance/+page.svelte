@@ -1,11 +1,12 @@
 <script>
 	import { goto } from "$app/navigation";
 	import LeftArrowIcon from "../../../assets/images/icons/LeftArrowIcon.svelte";
-	import PaintBrushIcon from "../../../assets/images/icons/PaintBrushIcon.svelte";
+	import Background from "../../../components/Background.svelte";
 	import theme, { themes, setTheme } from "../../../themes/theme.svelte";
 </script>
 
-<main style:background={theme().background}>
+<Background />
+<main>
 	<span class="settings-header">
 		<button
 			onclick={() => goto("/settings")}

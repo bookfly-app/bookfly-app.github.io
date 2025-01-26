@@ -1,26 +1,33 @@
 <script lang="ts">
-	import initializeFirebase, { getPosts } from "../backend/backend";
-	import Post from "../components/Post.svelte";
+	import initializeFirebase from "../backend/backend";
 	import logo from "../assets/images/logo.svg";
-	import search from "../assets/images/search.svg";
 	import Sidebar, { showSidebar } from "../components/Sidebar.svelte";
 	import { getUser } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
+	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
+	import Footer from "../components/Footer.svelte";
 
 	initializeFirebase();
 
 	let view: "following" | "for you" = $state("following");
 </script>
 
-<nav>
+<nav style:background={theme().backgroundDark}>
 	<div class="banner">
-		<img
-			src={getUser()?.picture ?? ""}
+		<button
+			style:background-image={`url("${getUser()?.picture ?? ""}")`}
 			onclick={showSidebar}
-			style="cursor: pointer;"
+			aria-label="Open sidebar"
+		></button>
+		<button
+			style:background-image={`url("${logo}")`}
+			onclick={showSidebar}
+			aria-label="Open sidebar"
+		></button>
+		<SearchIcon
+			style="width: 2rem; height: 2rem;"
+			stroke={theme().textBright}
 		/>
-		<img src={logo} />
-		<img src={search} />
 	</div>
 </nav>
 
@@ -51,6 +58,8 @@
 	</div>
 </main>
 
+<Footer selected="home" />
+
 <Sidebar />
 
 <style>
@@ -78,11 +87,6 @@
 		font-family: sans-serif;
 		color: #c6d0f5;
 	}
-	nav {
-		display: flex;
-		flex-direction: column;
-		background-color: #11111b;
-	}
 
 	.banner {
 		display: flex;
@@ -90,18 +94,25 @@
 		align-items: center;
 		padding: 1rem;
 
-		img {
+		button {
 			height: 3rem;
 			width: 3rem;
+			border-radius: 50%;
+			background-size: cover;
+			background-position: center;
+		}
+	}
 
-			&:first-child {
-				border-radius: 50%;
-			}
+	nav {
+		display: flex;
+		flex-direction: column;
 
-			&:last-child {
-				height: 2rem;
-				width: 2rem;
-			}
+		h1 {
+			font-size: 1rem;
+		}
+
+		h2 {
+			font-size: 1rem;
 		}
 	}
 </style>

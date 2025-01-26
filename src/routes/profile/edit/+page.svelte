@@ -43,7 +43,7 @@
 			<input
 				type="text"
 				id="display-name"
-				placeholder={getUser()!.name}
+				placeholder={getUser()!.displayName}
 				bind:value={displayName}
 			/>
 			<label for="bio">Bio</label>

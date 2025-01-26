@@ -1,10 +1,14 @@
 <script lang="ts" module>
 	import { goto } from "$app/navigation";
 	import CloseIcon from "../assets/images/icons/CloseIcon.svelte";
+	import ExitIcon from "../assets/images/icons/ExitIcon.svelte";
 	import GearIcon from "../assets/images/icons/GearIcon.svelte";
 	import HomeIcon from "../assets/images/icons/HomeIcon.svelte";
 	import PeopleIcon from "../assets/images/icons/PeopleIcon.svelte";
+	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import { getUser } from "../backend/auth.svelte";
+	import theme from "../themes/theme.svelte";
+	import { logOut } from "../backend/auth.svelte";
 
 	let sidebar: HTMLElement;
 
@@ -18,39 +22,63 @@
 			sidebar.style.left = "-80vw";
 		};
 	}
+
+	function signOut() {
+		logOut();
+	}
 </script>
 
-<section bind:this={sidebar}>
+<section
+	style:background-image={`linear-gradient(${theme().background}, ${theme().backgroundDim})`}
+	bind:this={sidebar}
+>
 	<div class="profile">
-		<img
-			src={getUser()?.picture ?? ""}
-			style="width: 5rem; border-radius: 50%; margin-right: 2rem; margin-left: 2rem;"
-			onclick={nav("profile")}
-		/>
+		<a
+			class="profile-picture"
+			style:background-image={`url("${getUser()?.picture ?? ""}")`}
+			href="/profile"
+			aria-label="Go to profile"
+		></a>
 		<div>
-			<h1>{getUser()?.displayName ?? ""}</h1>
-			<h2>@{getUser()?.username ?? ""}</h2>
+			<a href="/profile"
+				><h1 style:color={theme().textBright}>
+					{getUser()?.displayName ?? ""}
+				</h1></a
+			>
+			<a href="/profile"
+				><h2 style:color={theme().textDim}>
+					@{getUser()?.username ?? ""}
+				</h2></a
+			>
 		</div>
 		<button onclick={() => (sidebar.style.left = "-80vw")}>
 			<CloseIcon
 				stroke="#FFFFFF"
-				style="width: 2rem; height: 2rem; position: absolute; top: 1.5rem; right: 1.5rem;"
+				style="width: 1.5rem; height: 1.5rem; position: absolute; top: 1.5rem; right: 1.5rem;"
 			/>
 		</button>
 	</div>
 
 	<!-- Navigation buttons -->
-	<button onclick={nav("/")}>
-		<HomeIcon stroke="#FFFFFF" style="width: 2rem;" />
+	<button style:color={theme().text} onclick={nav("/")}>
+		<HomeIcon stroke={theme().text} style="width: 2rem;" />
 		Home
 	</button>
-	<button onclick={nav("/community")}>
-		<PeopleIcon stroke="#FFFFFF" style="width: 2rem;" />
+	<button style:color={theme().text} onclick={nav("/profile")}>
+		<PersonIcon stroke={theme().text} style="width: 2rem;" />
+		Profile
+	</button>
+	<button style:color={theme().text} onclick={nav("/community")}>
+		<PeopleIcon stroke={theme().text} style="width: 2rem;" />
 		Community
 	</button>
-	<button onclick={nav("/settings")}>
-		<GearIcon stroke="#FFFFFF" style="width: 2rem;" />
+	<button style:color={theme().text} onclick={nav("/settings")}>
+		<GearIcon stroke={theme().text} style="width: 2rem;" />
 		Settings
+	</button>
+	<button style:color={theme().text} onclick={signOut}>
+		<ExitIcon stroke={theme().text} style="width: 2rem;" />
+		Log Out
 	</button>
 </section>
 
@@ -58,7 +86,6 @@
 	section {
 		position: absolute;
 		left: -80vw;
-		background-color: var(--crust);
 		width: 80vw;
 		height: 100vh;
 		top: 0px;
@@ -68,8 +95,7 @@
 		transition: left 0.25s;
 
 		button {
-			color: var(--text);
-			font-size: 2rem;
+			font-size: 1.5rem;
 			display: flex;
 			width: fit-content;
 			gap: 2rem;
@@ -77,6 +103,21 @@
 			padding-top: 1rem;
 			padding-bottom: 1rem;
 		}
+
+		> *:last-child {
+			margin-top: auto;
+			margin-bottom: 0.5rem;
+		}
+	}
+
+	.profile-picture {
+		width: 5rem;
+		height: 5rem;
+		border-radius: 50%;
+		margin-right: 2rem;
+		margin-left: 2rem;
+		background-size: cover;
+		background-position: center;
 	}
 
 	.profile {
@@ -86,11 +127,13 @@
 		margin-bottom: 0.5rem;
 		display: flex;
 		align-items: center;
-		color: var(--text);
 
 		h2 {
-			color: var(--surface-2);
 			font-weight: normal;
+		}
+
+		a {
+			text-decoration: none;
 		}
 	}
 </style>

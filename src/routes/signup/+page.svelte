@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { logIn, signUp } from "../../backend/auth.svelte";
+	import { signUp } from "../../backend/auth.svelte";
 
 	let email: string;
 	let password: string;
@@ -13,8 +13,6 @@
 			goto("/profile");
 		}
 	}
-
-	async function signIn() {}
 </script>
 
 <main>

@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+bun run build
+touch build/.nojekyll
+git add .
+git commit -m "New build deployment"
+git push
+git subtree push --prefix build origin gh-pages

@@ -9,12 +9,14 @@
 	import { getFollowedPosts } from "../api/postapi";
 	import AnyPost from "../components/posts/AnyPost.svelte";
 	import Background from "../components/Background.svelte";
+	import type { Post } from "../api/postapi";
+	import CatIcon from "../assets/images/icons/CatIcon.svelte";
 
 	initializeFirebase();
 
 	let view: "following" | "for you" = $state("following");
 
-	let followedPosts = $state([]);
+	let followedPosts: Post[] = $state([]);
 
 	$effect(() => {
 		(async () => {
@@ -73,9 +75,31 @@
 	</div>
 
 	{#if view === "following"}
+		{#if followedPosts.length === 0}
+			<div class="nofollowing">
+				<h1 style:color={theme().textBright}>
+					You're not following anyone.
+				</h1>
+				<p style:color={theme().textDull}>
+					When you follow people, their posts will appear here.
+				</p>
+				<CatIcon style="width: 10rem;" stroke={theme().backgroundDim} />
+			</div>
+		{/if}
 		{#each followedPosts as post}
 			<AnyPost {post} />
 		{/each}
+	{:else if view === "for you"}
+		<div class="nofollowing">
+			<h1 style:color={theme().textBright}>
+				We haven't figured you out yet.
+			</h1>
+			<p style:color={theme().textDull}>
+				After enough interactions, we'll start suggesting things we
+				think you'll like here.
+			</p>
+			<CatIcon style="width: 10rem;" stroke={theme().backgroundDim} />
+		</div>
 	{/if}
 	<div class="footer-padding"></div>
 </main>
@@ -85,6 +109,25 @@
 <Sidebar />
 
 <style>
+	.nofollowing {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		padding-top: 3rem;
+		gap: 1rem;
+		padding-left: 2rem;
+		padding-right: 2rem;
+
+		h1 {
+			font-size: 1.5rem;
+		}
+
+		p {
+			font-size: 0.85rem;
+		}
+	}
+
 	.footer-padding {
 		height: 4rem;
 	}

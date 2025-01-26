@@ -15,7 +15,6 @@
 	let discussions: Post[] = $state([]);
 	(async () => {
 		discussions = await getBookDiscussions(book.isbn);
-		console.log($state.snapshot(discussions));
 	})();
 </script>
 

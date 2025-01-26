@@ -1,6 +1,9 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
 import initializeFirebase from "../backend/backend";
-import { getBook, type Book, type ISBN, type Post } from "./bookapi";
+import { getBook, type Book, type ISBN } from "./bookapi";
+import { internalPostToPost, type InternalPost, type Post } from "./postapi";
+
+export type UserId = string;
 
 export type InternalUser = {
 
@@ -26,8 +29,8 @@ export type InternalUser = {
 
 	likes: string[],
 
-	followers: string[],
-	following: string[],
+	followers: UserId[],
+	following: UserId[],
 };
 
 export type User = {
@@ -54,19 +57,11 @@ export type User = {
 
 	likes: string[],
 
-	followers: User[],
-	following: User[],
+	followers: UserId[],
+	following: UserId[],
 };
 
 let { db } = initializeFirebase();
-
-async function internalUserToUser(user: InternalUser): Promise<User> {
-	return null!;
-}
-
-function userToInternalUser(user: User): InternalUser {
-	return null!;
-}
 
 /**
  * Returns a user's "favorite book" which is defined as the book that
@@ -96,12 +91,8 @@ export async function getFavoriteBook(user: User): Promise<Book | null> {
 }
 
 export async function getUserFromId(id: string): Promise<User> {
-	return (await getDocs(
-		query(
-			collection(db, "users"),
-			where("id", "==", id)
-		)
-	)).docs[0].data() as User;
+	let internalUser = (await getDocs(query(collection(db, "users"), where("id", "==", id)))).docs[0].data() as InternalUser;
+	return internalUser;
 }
 
 export async function getUserFromUsername(username: string): Promise<User> {
@@ -110,9 +101,7 @@ export async function getUserFromUsername(username: string): Promise<User> {
 			collection(db, "users"),
 			where("username", "==", username)
 		)
-	)).docs[0].data() as User;
-	user.following = await Promise.all(user.following.map(async id => await getUserFromId(id)));
-	user.followers = await Promise.all(user.followers.map(async id => await getUserFromId(id)));
+	)).docs[0].data() as InternalUser;
 	return user;
 }
 
@@ -127,19 +116,14 @@ export async function getNumberOfBooksRead(user: User): Promise<number> {
 }
 
 export async function getUserPosts(user: User): Promise<Post[]> {
-	let posts = (await getDocs(
+	let internalPosts = (await getDocs(
 		query(
 			collection(db, "posts"),
 			where("poster", "==", user.id)
 		)
-	)).docs.map(doc => doc.data()) as Post[];
+	)).docs.map(doc => doc.data()) as InternalPost[];
 
-	posts = await Promise.all(posts.map(async post => {
-		post.poster = await getUserFromId(post.poster as unknown as string);
-		post.books = await Promise.all(post.books.map(async isbn => await getBook(isbn as unknown as string)));
-		return post;
-	}));
-
+	let posts = await Promise.all(internalPosts.map(async post => await internalPostToPost(post)));
 	return posts;
 }
 

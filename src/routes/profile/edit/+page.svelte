@@ -7,6 +7,7 @@
 	let bio: string;
 
 	function update() {
+		console.log(bio);
 		updateUser({ displayName, bio });
 		goto("/profile");
 	}

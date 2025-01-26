@@ -14,11 +14,12 @@
 	import ReadingListItem from "./ReadingListItem.svelte";
 	import LeftArrowIcon from "../assets/images/icons/LeftArrowIcon.svelte";
 	import AnyPost from "./posts/AnyPost.svelte";
-	import { getBook, type Post } from "../api/bookapi";
+	import { getBook } from "../api/bookapi";
 	import Background from "./Background.svelte";
 	import MessageIcon from "../assets/images/icons/MessageIcon.svelte";
 	import AddIcon from "../assets/images/icons/AddIcon.svelte";
 	import CheckIcon from "../assets/images/icons/CheckIcon.svelte";
+	import { format, type Post } from "../api/postapi";
 
 	let { user }: { user: User } = $props();
 
@@ -44,41 +45,27 @@
 
 	let followingOverride: boolean | null = $state(null);
 	let following = $derived(
-		getUser()?.following.some((following) => following.id === user.id) ??
+		getUser()?.following.some((following) => following === user.id) ??
 			false,
 	);
 
 	function follow() {
 		followingOverride = true;
 		updateUser({
-			following: [
-				...new Set([
-					...getUser()!.following.map((user) => user.id),
-					user.id,
-				]),
-			] as unknown as User[],
+			following: [...new Set([...getUser()!.following, user.id])],
 		});
 		updateOtherUser(user, {
-			followers: [
-				...new Set([
-					...user.followers.map((user) => user.id),
-					getUser()!.id,
-				]),
-			] as unknown as User[],
+			followers: [...new Set([...user.followers, getUser()!.id])],
 		});
 	}
 
 	function unfollow() {
 		followingOverride = false;
 		updateUser({
-			following: getUser()!
-				.following.map((user) => user.id)
-				.filter((id) => id !== user.id) as unknown as User[],
+			following: getUser()!.following.filter((id) => id !== user.id),
 		});
 		updateOtherUser(user, {
-			followers: user.followers
-				.map((user) => user.id)
-				.filter((id) => id !== getUser()!.id) as unknown as User[],
+			followers: user.followers.filter((id) => id !== getUser()!.id),
 		});
 	}
 </script>
@@ -87,13 +74,17 @@
 <main>
 	<div class="banner" style:background-image={`url("${user.banner}")`}></div>
 	<button class="back-arrow" onclick={() => goto("/")}>
-		<LeftArrowIcon stroke="#FFFFFF" style="width: 2rem; height: 2rem;" />
+		<LeftArrowIcon
+			stroke="#FFFFFF"
+			style="width: 1.5rem; height: 1.5rem;"
+		/>
 	</button>
-	<div class="profile">
+	<div class="profile" style:background={theme().backgroundDark}>
 		<img
 			class="profile-picture"
 			src={user.picture}
 			alt={`${user.displayName} profile picture`}
+			style:border-color={theme().backgroundDark}
 		/>
 		<div class="profile-line-1">
 			<span class="name">
@@ -146,7 +137,7 @@
 				</div>
 			{/if}
 		</div>
-		<p style:color={theme().text} class="bio">{user.bio}</p>
+		<p style:color={theme().text} class="bio">{@html format(user.bio)}</p>
 
 		<!-- Line 2: Profile stats -->
 		<div class="profile-line-2">
@@ -303,7 +294,7 @@
 	}
 
 	.truncate {
-		max-width: 8rem;
+		max-width: 10rem;
 		text-overflow: ellipsis;
 		display: inline-block;
 		overflow-x: hidden;
@@ -330,6 +321,9 @@
 		clip-path: circle();
 		left: 1rem;
 		top: 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.banner {
@@ -358,10 +352,16 @@
 	.bio {
 		padding-left: 1rem;
 		font-size: 0.85rem;
+		white-space: pre-wrap;
+
+		:global(a) {
+			color: cornflowerblue;
+		}
 	}
 
 	.profile {
-		border-bottom: 1px solid var(--surface-0);
+		border-bottom-width: 1px;
+		border-bottom-style: solid;
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
@@ -423,7 +423,8 @@
 		height: 6rem;
 		margin-top: 4.7rem;
 		z-index: 2;
-		border: 0.5rem solid var(--base);
+		border-width: 0.5rem;
+		border-style: solid;
 	}
 
 	.name {

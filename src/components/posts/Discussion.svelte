@@ -1,11 +1,12 @@
 <script lang="ts">
 	import theme from "../../themes/theme.svelte";
+	import { format } from "../../api/postapi";
 
 	let { body, images } = $props();
 </script>
 
 <section>
-	<p class="body" style:color={theme().text}>{body}</p>
+	<p class="body" style:color={theme().text}>{@html format(body)}</p>
 	{#if images.length > 0}
 		<div class="image" style:background-image={`url("${images[0]}")`}>
 			{#each images}
@@ -28,6 +29,18 @@
 
 	.body {
 		font-size: 0.85rem;
+
+		:global(a) {
+			color: cornflowerblue;
+		}
+
+		:global(code) {
+			font-family: monospace;
+			background-color: #11111b;
+			padding-left: 1ch;
+			padding-right: 1ch;
+			border-radius: 0.25rem;
+		}
 	}
 
 	.dot {

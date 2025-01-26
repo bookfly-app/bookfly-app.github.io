@@ -1,6 +1,7 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
 import initializeFirebase from "../backend/backend";
-import { getUserFromId, type User } from "./userapi";
+import { getUserFromId, } from "./userapi";
+import type { Post } from "./postapi";
 
 export type ISBN = string;
 
@@ -12,31 +13,6 @@ export type Book = {
 	pageCount: number,
 	cover: string,
 	description: string,
-};
-
-export type PostType = "general" | "rating" | "update";
-
-export type Post<T extends PostType = PostType> = {
-	type: T,
-	id: string,
-	poster: User,
-	body: string,
-	timestamp: number,
-
-	books: Book[],
-	authors: string[],
-	pictures: string[],
-
-	// Stats
-
-	views: number,
-	likes: number,
-	shares: number,
-	comments: number,
-	reposts: number,
-
-	rating: T extends "rating" ? number : undefined,
-	updateType: T extends "update" ? "start" : undefined,
 };
 
 let { db } = initializeFirebase();
@@ -85,6 +61,6 @@ export async function searchBooks(searchTerm: string): Promise<Book[]> {
 	let response = await fetch(
 		`https://openlibrary.org/search.json?q=${searchTerm}`
 	);
-	let books = (await response.json()).docs.filter((book: { title: string }) => book.title.toLowerCase().includes(searchTerm.replace("+", " ")) && book.isbn);
+	let books = (await response.json()).docs.filter((book: { title: string, isbn?: unknown[] }) => book.title.toLowerCase().includes(searchTerm.replace("+", " ")) && book.isbn);
 	return (await Promise.all(books.map((book: Book) => getBook(book.isbn[0])))).filter(book => book.cover);
 }

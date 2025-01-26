@@ -22,7 +22,7 @@
 		<input type="text" placeholder="Email" bind:value={email} />
 		<input type="password" placeholder="Password" bind:value={password} />
 	</div>
-	<button onclick={createAccount}>Log In</button>
+	<button onclick={createAccount}>Create Account</button>
 </main>
 
 <style>

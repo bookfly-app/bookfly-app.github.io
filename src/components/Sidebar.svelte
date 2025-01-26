@@ -19,7 +19,7 @@
 	function nav(to: string) {
 		return function () {
 			goto(to);
-			sidebar.style.left = "-80vw";
+			sidebar.style.left = "-83vw";
 		};
 	}
 
@@ -31,9 +31,10 @@
 
 <section
 	style:background-image={`linear-gradient(${theme().background}, ${theme().backgroundDim})`}
+	style:border-color={theme().textDark}
 	bind:this={sidebar}
 >
-	<div class="profile">
+	<div class="profile" style:border-color={theme().textDark}>
 		<a
 			class="profile-picture"
 			style:background-image={`url("${getUser()?.picture ?? ""}")`}
@@ -52,7 +53,7 @@
 				</h2></a
 			>
 		</div>
-		<button onclick={() => (sidebar.style.left = "-80vw")}>
+		<button onclick={() => (sidebar.style.left = "-83vw")}>
 			<CloseIcon
 				stroke="#FFFFFF"
 				style="width: 1.5rem; height: 1.5rem; position: absolute; top: 1.5rem; right: 1.5rem;"
@@ -86,14 +87,16 @@
 <style>
 	section {
 		position: absolute;
-		left: -80vw;
+		left: -83vw;
 		width: 80vw;
 		height: 100vh;
 		top: 0px;
 		display: flex;
 		flex-direction: column;
-		border-right: 2px solid var(--surface-0);
+		border-right-width: 1px;
+		border-right-style: solid;
 		transition: left 0.25s;
+		box-shadow: 0px 0px 10px black;
 
 		button {
 			font-size: 1.5rem;
@@ -123,7 +126,8 @@
 
 	.profile {
 		padding-top: 2rem;
-		border-bottom: 1px solid var(--surface-0);
+		border-bottom-style: solid;
+		border-bottom-width: 1px;
 		padding-bottom: 2rem;
 		margin-bottom: 0.5rem;
 		display: flex;

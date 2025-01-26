@@ -1,13 +1,17 @@
-<div></div>
-<button>+</button>
+<script lang="ts">
+	import theme from "../themes/theme.svelte";
+</script>
+
+<div style:background={theme().backgroundDark}></div>
+<button style:background={theme().accent} style:color={theme().backgroundDark}
+	>+</button
+>
 
 <style>
 	button {
 		position: absolute;
-		background-color: var(--lavender);
-		color: var(--base);
-		bottom: 6rem;
-		right: 2rem;
+		bottom: 5rem;
+		right: 1rem;
 		font-size: 3rem;
 		width: 4rem;
 		height: 4rem;
@@ -19,10 +23,8 @@
 
 	div {
 		position: absolute;
-		background-color: var(--lavender);
-		color: var(--base);
-		bottom: 6rem;
-		right: 2rem;
+		bottom: 5rem;
+		right: 1rem;
 		font-size: 3rem;
 		width: 4rem;
 		height: 4rem;

@@ -5,7 +5,7 @@
 </script>
 
 <a
-	href={`profile/${user.username}`}
+	href={`/profile/${user.username}`}
 	class="book"
 	style:border-color={theme().textDark}
 >

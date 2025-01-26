@@ -1,9 +1,9 @@
 {
 	"name": "Midnight",
 	"id": "midnight",
-	"background": "#060115",
-	"backgroundDim": "#181825",
-	"backgroundDark": "#11111b",
+	"background": "#111133",
+	"backgroundDim": "#05050F",
+	"backgroundDark": "#000000",
 	"textBright": "#ccccee",
 	"text": "#bac2de",
 	"textDull": "#7f849c",

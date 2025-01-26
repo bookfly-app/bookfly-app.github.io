@@ -188,7 +188,7 @@
 			style:border-color={theme().textDull}
 			style:color={theme().textDull}
 			class="follows"
-			href={`/profile/${getUser()!.username}/follows`}
+			href={`/profile/${user.username}/follows`}
 		>
 			<span>
 				{user.followers.length} Followers

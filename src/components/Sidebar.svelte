@@ -25,6 +25,7 @@
 
 	function signOut() {
 		logOut();
+		goto("/");
 	}
 </script>
 

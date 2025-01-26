@@ -2,6 +2,34 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN, type Post } from "./bookapi";
 
+export type InternalUser = {
+
+	// Internal
+
+	username: string,
+	email: string,
+	id: string,
+
+	// Profile
+
+	displayName: string,
+	banner: string,
+	picture: string,
+	bio: string,
+	tags: string[],
+	links: {}[]
+	currentBook: string | null,
+
+	readingList: ISBN[],
+
+	// Interactions
+
+	likes: string[],
+
+	followers: string[],
+	following: string[],
+};
+
 export type User = {
 
 	// Internal
@@ -31,6 +59,14 @@ export type User = {
 };
 
 let { db } = initializeFirebase();
+
+async function internalUserToUser(user: InternalUser): Promise<User> {
+	return null!;
+}
+
+function userToInternalUser(user: User): InternalUser {
+	return null!;
+}
 
 /**
  * Returns a user's "favorite book" which is defined as the book that

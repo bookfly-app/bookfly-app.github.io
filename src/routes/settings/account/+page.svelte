@@ -22,25 +22,6 @@
 		<h1 style:color={theme().textBright}>Account</h1>
 	</span>
 
-	<!-- Request name change -->
-	<a
-		href="/settings/account/changeusername"
-		style:border-bottom-color={theme().textDark}
-	>
-		<div>
-			<UsernameIcon
-				style="width: 2rem; height: 2rem;"
-				stroke={theme().textBright}
-			/>
-			<span style:color={theme().textBright}
-				>Request a username change</span
-			>
-		</div>
-		<p style:color={theme().textDull}>
-			Usernames may be changed once a week.
-		</p>
-	</a>
-
 	<!-- Request author verification -->
 	<a
 		href="/settings/account/changeusername"

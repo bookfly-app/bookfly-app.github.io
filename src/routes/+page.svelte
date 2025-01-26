@@ -6,11 +6,26 @@
 	import theme from "../themes/theme.svelte";
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
 	import Footer from "../components/Footer.svelte";
+	import { getFollowedPosts } from "../api/postapi";
+	import AnyPost from "../components/posts/AnyPost.svelte";
+	import Background from "../components/Background.svelte";
 
 	initializeFirebase();
 
 	let view: "following" | "for you" = $state("following");
+
+	let followedPosts = $state([]);
+
+	$effect(() => {
+		(async () => {
+			if (getUser()) {
+				followedPosts = await getFollowedPosts(getUser()!);
+			}
+		})();
+	});
 </script>
+
+<Background />
 
 <nav style:background={theme().backgroundDark}>
 	<div class="banner">
@@ -56,6 +71,13 @@
 			For You
 		</button>
 	</div>
+
+	{#if view === "following"}
+		{#each followedPosts as post}
+			<AnyPost {post} />
+		{/each}
+	{/if}
+	<div class="footer-padding"></div>
 </main>
 
 <Footer selected="home" />
@@ -63,6 +85,10 @@
 <Sidebar />
 
 <style>
+	.footer-padding {
+		height: 4rem;
+	}
+
 	.views {
 		display: flex;
 		justify-content: space-between;
@@ -83,7 +109,6 @@
 	}
 
 	main {
-		background-color: #1e1e2e;
 		font-family: sans-serif;
 		color: #c6d0f5;
 	}

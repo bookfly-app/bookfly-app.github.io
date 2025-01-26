@@ -10,5 +10,12 @@
 		<Profile user={getUser()!} />
 	{/if}
 	<New />
+	<div></div>
 </main>
 <Footer selected="profile" />
+
+<style>
+	div {
+		height: 4rem;
+	}
+</style>

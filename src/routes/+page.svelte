@@ -1,16 +1,16 @@
 <script lang="ts">
-	import initializeFirebase from "../backend/backend";
-	import logo from "../assets/images/logo.svg";
-	import Sidebar, { showSidebar } from "../components/Sidebar.svelte";
-	import { getUser } from "../backend/auth.svelte";
-	import theme from "../themes/theme.svelte";
-	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
-	import Footer from "../components/Footer.svelte";
-	import { getFollowedPosts } from "../api/postapi";
-	import AnyPost from "../components/posts/AnyPost.svelte";
-	import Background from "../components/Background.svelte";
 	import type { Post } from "../api/postapi";
+	import { getFollowedPosts } from "../api/postapi";
 	import CatIcon from "../assets/images/icons/CatIcon.svelte";
+	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
+	import logo from "../assets/images/logo.svg";
+	import { getUser } from "../backend/auth.svelte";
+	import initializeFirebase from "../backend/backend";
+	import Background from "../components/Background.svelte";
+	import Footer from "../components/Footer.svelte";
+	import AnyPost from "../components/posts/AnyPost.svelte";
+	import Sidebar, { showSidebar } from "../components/Sidebar.svelte";
+	import theme from "../themes/theme.svelte";
 
 	initializeFirebase();
 
@@ -31,43 +31,24 @@
 
 <nav style:background={theme().backgroundDark}>
 	<div class="banner">
-		<button
-			style:background-image={`url("${getUser()?.picture ?? ""}")`}
-			onclick={showSidebar}
-			aria-label="Open sidebar"
-		></button>
-		<button
-			style:background-image={`url("${logo}")`}
-			onclick={showSidebar}
-			aria-label="Open sidebar"
-		></button>
-		<SearchIcon
-			style="width: 2rem; height: 2rem;"
-			stroke={theme().textBright}
-		/>
+		<button style:background-image={`url("${getUser()?.picture ?? ""}")`} onclick={showSidebar} aria-label="Open sidebar"></button>
+		<button style:background-image={`url("${logo}")`} onclick={showSidebar} aria-label="Open sidebar"></button>
+		<SearchIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
 	</div>
 </nav>
 
 <main>
 	<div style:background-color={theme().backgroundDark} class="views">
 		<button
-			style:color={view === "following"
-				? theme().textBright
-				: theme().textDull}
-			style:border-bottom-color={view === "following"
-				? theme().accent
-				: "transparent"}
+			style:color={view === "following" ? theme().textBright : theme().textDull}
+			style:border-bottom-color={view === "following" ? theme().accent : "transparent"}
 			onclick={() => (view = "following")}
 		>
 			Following
 		</button>
 		<button
-			style:color={view === "for you"
-				? theme().textBright
-				: theme().textDull}
-			style:border-bottom-color={view === "for you"
-				? theme().accent
-				: "transparent"}
+			style:color={view === "for you" ? theme().textBright : theme().textDull}
+			style:border-bottom-color={view === "for you" ? theme().accent : "transparent"}
 			onclick={() => (view = "for you")}
 		>
 			For You
@@ -77,12 +58,8 @@
 	{#if view === "following"}
 		{#if followedPosts.length === 0}
 			<div class="nofollowing">
-				<h1 style:color={theme().textBright}>
-					You're not following anyone.
-				</h1>
-				<p style:color={theme().textDull}>
-					When you follow people, their posts will appear here.
-				</p>
+				<h1 style:color={theme().textBright}>You're not following anyone.</h1>
+				<p style:color={theme().textDull}>When you follow people, their posts will appear here.</p>
 				<CatIcon style="width: 10rem;" stroke={theme().backgroundDim} />
 			</div>
 		{/if}
@@ -91,13 +68,8 @@
 		{/each}
 	{:else if view === "for you"}
 		<div class="nofollowing">
-			<h1 style:color={theme().textBright}>
-				We haven't figured you out yet.
-			</h1>
-			<p style:color={theme().textDull}>
-				After enough interactions, we'll start suggesting things we
-				think you'll like here.
-			</p>
+			<h1 style:color={theme().textBright}>We haven't figured you out yet.</h1>
+			<p style:color={theme().textDull}>After enough interactions, we'll start suggesting things we think you'll like here.</p>
 			<CatIcon style="width: 10rem;" stroke={theme().backgroundDim} />
 		</div>
 	{/if}
@@ -174,13 +146,5 @@
 	nav {
 		display: flex;
 		flex-direction: column;
-
-		h1 {
-			font-size: 1rem;
-		}
-
-		h2 {
-			font-size: 1rem;
-		}
 	}
 </style>

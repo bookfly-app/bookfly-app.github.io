@@ -11,7 +11,11 @@
 
 <footer style:background={theme().backgroundDark}>
 	<a aria-label="Profile" href="/profile">
-		<img src={getUser()?.picture ?? ""} class="profile-link" />
+		<img
+			alt="Your profile"
+			src={getUser()?.picture ?? ""}
+			class="profile-link"
+		/>
 	</a>
 	<a aria-label="Home" href="/">
 		<HomeIcon

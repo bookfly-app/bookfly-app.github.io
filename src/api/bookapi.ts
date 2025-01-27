@@ -1,37 +1,32 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
 import initializeFirebase from "../backend/backend";
-import { getUserFromId, } from "./userapi";
-import type { Post } from "./postapi";
+import { internalPostToPost, type InternalPost, type Post } from "./postapi";
 
 export type ISBN = string;
 
 export type Book = {
-	authors: string[],
-	isbn: ISBN,
-	title: string,
-	genres: string[],
-	pageCount: number,
-	cover: string,
-	description: string,
+	authors: string[];
+	isbn: ISBN;
+	title: string;
+	genres: string[];
+	pageCount: number;
+	cover: string;
+	description: string;
 };
 
 let { db } = initializeFirebase();
 
 export async function getBookDiscussions(isbn: ISBN): Promise<Post[]> {
-	let posts = (await getDocs(
-		query(
-			collection(db, "posts"),
-			where("books", "array-contains", isbn)
+	let posts = (
+		await getDocs(
+			query(
+				collection(db, "posts"),
+				where("books", "array-contains", isbn)
+			)
 		)
-	)).docs.map(doc => doc.data()) as Post[];
+	).docs.map((doc) => doc.data()) as InternalPost[];
 
-	posts = await Promise.all(posts.map(async post => {
-		post.poster = await getUserFromId(post.poster as unknown as string);
-		post.books = await Promise.all(post.books.map(async isbn => await getBook(isbn as unknown as string)));
-		return post;
-	}));
-
-	return posts;
+	return await Promise.all(posts.map((post) => internalPostToPost(post)));
 }
 
 export async function getBook(isbn: ISBN): Promise<Book> {
@@ -52,8 +47,10 @@ export async function getBook(isbn: ISBN): Promise<Book> {
 		isbn,
 		cover: data.cover?.large ?? "",
 		pageCount: data.number_of_pages,
-		genres: data.subjects?.map((subject: { name: string }) => subject.name) ?? [],
-		description: googleData?.volumeInfo.description ?? ""
+		genres:
+			data.subjects?.map((subject: { name: string }) => subject.name) ??
+			[],
+		description: googleData?.volumeInfo.description ?? "",
 	};
 }
 
@@ -61,6 +58,12 @@ export async function searchBooks(searchTerm: string): Promise<Book[]> {
 	let response = await fetch(
 		`https://openlibrary.org/search.json?q=${searchTerm}`
 	);
-	let books = (await response.json()).docs.filter((book: { title: string, isbn?: unknown[] }) => book.title.toLowerCase().includes(searchTerm.replace("+", " ")) && book.isbn);
-	return (await Promise.all(books.map((book: Book) => getBook(book.isbn[0])))).filter(book => book.cover);
+	let books = (await response.json()).docs.filter(
+		(book: { title: string; isbn?: unknown[] }) =>
+			book.title.toLowerCase().includes(searchTerm.replace("+", " ")) &&
+			book.isbn
+	);
+	return (
+		await Promise.all(books.map((book: Book) => getBook(book.isbn[0])))
+	).filter((book) => book.cover);
 }

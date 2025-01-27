@@ -1,11 +1,12 @@
 <script lang="ts">
+	import PlusIcon from "../assets/images/icons/PlusIcon.svelte";
 	import theme from "../themes/theme.svelte";
 </script>
 
 <div style:background={theme().backgroundDark}></div>
-<button style:background={theme().accent} style:color={theme().backgroundDark}
-	>+</button
->
+<button style:background={theme().accent} style:color={theme().backgroundDark}>
+	<PlusIcon stroke={theme().backgroundDark} style="width: 2rem;" />
+</button>
 
 <style>
 	button {

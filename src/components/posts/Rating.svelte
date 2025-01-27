@@ -65,10 +65,7 @@
 				{rating} / 10
 			</h1>
 		</div>
-		<a
-			href={`/book/${book?.isbn}`}
-			aria-label={`Go to details for book "${book?.title}"`}
-		>
+		<a href={`/book/${book?.isbn}`} aria-label={`Go to details for book "${book?.title}"`}>
 			<img alt={`Cover for book "${book?.title}"`} src={book?.cover} />
 		</a>
 	</div>
@@ -82,7 +79,7 @@
 	}
 
 	.rating-number {
-		font-size: 2rem;
+		font-size: 1.75rem;
 	}
 
 	.rating {
@@ -93,6 +90,9 @@
 
 	.content {
 		padding-right: 1rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 
 		.title {
 			font-size: 1rem;

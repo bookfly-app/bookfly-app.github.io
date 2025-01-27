@@ -1,16 +1,16 @@
 <script lang="ts">
-	import theme from "../../themes/theme.svelte";
-	import Rating from "./Rating.svelte";
-	import Discussion from "./Discussion.svelte";
-	import BookUpdate from "./BookUpdate.svelte";
-	import { getUser } from "../../backend/auth.svelte";
+	import { goto } from "$app/navigation";
+	import type { Post } from "../../api/postapi";
+	import CommentIcon from "../../assets/images/icons/CommentIcon.svelte";
 	import DotMenuIcon from "../../assets/images/icons/DotMenuIcon.svelte";
 	import EyeIcon from "../../assets/images/icons/EyeIcon.svelte";
 	import HeartIcon from "../../assets/images/icons/HeartIcon.svelte";
-	import type { Post } from "../../api/postapi";
 	import ShareIcon from "../../assets/images/icons/ShareIcon.svelte";
-	import CommentIcon from "../../assets/images/icons/CommentIcon.svelte";
-	import { goto } from "$app/navigation";
+	import { getUser } from "../../backend/auth.svelte";
+	import theme from "../../themes/theme.svelte";
+	import BookUpdate from "./BookUpdate.svelte";
+	import Discussion from "./Discussion.svelte";
+	import Rating from "./Rating.svelte";
 
 	let { post }: { post: Post } = $props();
 
@@ -65,39 +65,23 @@
 
 <section style:border-bottom={`1px solid ${theme().textDark}`}>
 	<button onclick={() => goto(`/post/${post.id}`)} class="profile">
-		<a
-			style:background-image={`url("${post.poster.picture}")`}
-			href={`/profile/${post.poster.username}`}
-		></a>
+		<a style:background-image={`url("${post.poster.picture}")`} href={`/profile/${post.poster.username}`}></a>
 	</button>
 
 	<div class="content-outer">
 		<span class="user">
 			<h2 style:color={theme().textBright}>{post.poster.displayName}</h2>
 			<h3 style:color={theme().textDim}>{`@${post.poster.username}`}</h3>
-			<h3
-				class="timestamp"
-				onclick={toggleTimeFormat}
-				style:color={theme().textDim}
-			>
+			<button class="timestamp" onclick={toggleTimeFormat} style:color={theme().textDim}>
 				{elapsedTime}
-			</h3>
+			</button>
 		</span>
 		{#if post.type === "rating"}
-			<Rating
-				isbn={post.books[0].isbn}
-				rating={post.rating}
-				review={post.body}
-				user={post.poster}
-			/>
+			<Rating isbn={post.books[0].isbn} rating={post.rating} review={post.body} user={post.poster} />
 		{:else if post.type === "general"}
 			<Discussion body={post.body} images={post.pictures} />
 		{:else if post.type === "update"}
-			<BookUpdate
-				body={post.body}
-				isbn={post.books[0].isbn}
-				user={post.poster}
-			/>
+			<BookUpdate body={post.body} isbn={post.books[0].isbn} user={post.poster} />
 		{/if}
 		<div class="stats">
 			<span style:color={theme().textDim}>
@@ -112,19 +96,11 @@
 				<CommentIcon stroke={theme().textDim} style="width: 1rem;" />
 				{post.comments.length}
 			</button>
-			<button
-				onclick={() =>
-					navigator.clipboard.writeText(
-						`bookfly.com/post/${post.id}`,
-					)}
-			>
+			<button onclick={() => navigator.clipboard.writeText(`bookfly.com/post/${post.id}`)}>
 				<ShareIcon stroke={theme().textDim} style="width: 1rem;" />
 			</button>
 			<button>
-				<DotMenuIcon
-					stroke={theme().textDull}
-					style="width: 1.25rem;"
-				/>
+				<DotMenuIcon stroke={theme().textDull} style="width: 1.25rem;" />
 			</button>
 		</div>
 	</div>
@@ -185,7 +161,8 @@
 			font-size: 1rem;
 		}
 
-		h3 {
+		h3,
+		button {
 			font-weight: normal;
 			font-size: 1rem;
 		}

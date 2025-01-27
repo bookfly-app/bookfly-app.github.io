@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+set -e
+
 bun run build
 touch build/.nojekyll
 git add .

@@ -9,6 +9,7 @@
 	import { getUser } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
 	import { logOut } from "../backend/auth.svelte";
+	import EnterIcon from "../assets/images/icons/EnterIcon.svelte";
 
 	let sidebar: HTMLElement;
 
@@ -57,31 +58,39 @@
 			{/if}
 		</div>
 		<button onclick={() => (sidebar.style.left = "-83vw")}>
-			<CloseIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem; position: absolute; top: 1.5rem; right: 1.5rem;" />
+			<CloseIcon stroke={theme().textBright} style="width: 1.5rem; height: 1.5rem; position: absolute; top: 1.5rem; right: 1.5rem;" />
 		</button>
 	</div>
 
 	<!-- Navigation buttons -->
-	<button style:color={theme().text} onclick={nav("/")}>
+	<button class="listing" style:color={theme().text} onclick={nav("/")}>
 		<HomeIcon stroke={theme().text} style="width: 2rem;" />
 		Home
 	</button>
-	<button style:color={theme().text} onclick={nav("/profile")}>
+	<button class="listing" style:color={theme().text} onclick={nav("/profile")}>
 		<PersonIcon stroke={theme().text} style="width: 2rem;" />
 		Profile
 	</button>
-	<button style:color={theme().text} onclick={nav("/community")}>
+	<button class="listing" style:color={theme().text} onclick={nav("/community")}>
 		<PeopleIcon stroke={theme().text} style="width: 2rem;" />
 		Community
 	</button>
-	<button style:color={theme().text} onclick={nav("/settings")}>
+	<button class="listing" style:color={theme().text} onclick={nav("/settings")}>
 		<GearIcon stroke={theme().text} style="width: 2rem;" />
 		Settings
 	</button>
-	<button style:color={theme().text} onclick={signOut}>
-		<ExitIcon stroke={theme().text} style="width: 2rem;" />
-		Log Out
-	</button>
+
+	{#if getUser()}
+		<button class="listing" style:color={theme().text} onclick={signOut}>
+			<ExitIcon stroke={theme().text} style="width: 2rem;" />
+			Log Out
+		</button>
+	{:else}
+		<a class="listing" style:color={theme().text} href="/login">
+			<EnterIcon stroke={theme().text} style="width: 2rem;" />
+			Log In
+		</a>
+	{/if}
 </section>
 
 <style>
@@ -98,7 +107,8 @@
 		transition: left 0.25s;
 		box-shadow: 0px 0px 10px black;
 
-		button {
+		.listing {
+			text-decoration: none;
 			font-size: 1.5rem;
 			display: flex;
 			width: fit-content;
@@ -106,11 +116,11 @@
 			padding-left: 2rem;
 			padding-top: 1rem;
 			padding-bottom: 1rem;
-		}
 
-		> *:last-child {
-			margin-top: auto;
-			margin-bottom: 0.5rem;
+			&:last-child {
+				margin-top: auto;
+				margin-bottom: 0.5rem;
+			}
 		}
 	}
 

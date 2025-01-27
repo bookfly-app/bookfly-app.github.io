@@ -1,6 +1,6 @@
 <script lang="ts">
+	import BellIcon from "../assets/images/icons/BellIcon.svelte";
 	import HomeIcon from "../assets/images/icons/HomeIcon.svelte";
-	import MessageIcon from "../assets/images/icons/MessageIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
 	import { getUser } from "../backend/auth.svelte";
@@ -14,7 +14,7 @@
 		{#if getUser()}
 			<img alt="Your profile" src={getUser()!.picture ?? ""} class="profile-link" />
 		{:else}
-			<PersonIcon stroke={selected === "profile" ? theme().textBright : theme().textDull} style="width: 2rem;" />
+			<PersonIcon stroke={selected === "profile" ? theme().textBright : theme().textDull} style="width: 1.5rem;" />
 		{/if}
 	</a>
 	<a aria-label="Home" href="/">
@@ -23,8 +23,8 @@
 	<a aria-label="Search" href="/search">
 		<SearchIcon stroke={selected === "search" ? theme().textBright : theme().textDull} style="width: 1.5rem;" />
 	</a>
-	<a aria-label="Messages" href="/search">
-		<MessageIcon stroke={selected === "messages" ? theme().textBright : theme().textDull} style="width: 1.5rem;" />
+	<a aria-label="Messages" href="/inbox">
+		<BellIcon stroke={selected === "messages" ? theme().textBright : theme().textDull} style="width: 1.5rem;" />
 	</a>
 </footer>
 

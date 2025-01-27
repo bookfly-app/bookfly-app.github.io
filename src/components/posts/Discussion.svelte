@@ -37,8 +37,8 @@
 		:global(code) {
 			font-family: monospace;
 			background-color: #11111b;
-			padding-left: 1ch;
-			padding-right: 1ch;
+			padding-left: 0.5ch;
+			padding-right: 0.5ch;
 			border-radius: 0.25rem;
 		}
 	}

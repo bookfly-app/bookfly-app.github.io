@@ -1,4 +1,4 @@
-import { addDoc, collection, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { getUser } from "../backend/auth.svelte";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
@@ -74,6 +74,11 @@ export async function post(post: Partial<InternalPost>) {
 	updateDoc(doc, { id: doc.id });
 }
 
+export async function deletePost(post: Post): Promise<void> {
+	console.log(`Deleting post ${post.id}`);
+	await deleteDoc(doc(db, "posts", post.id));
+}
+
 export async function internalPostToPost(internalPost: InternalPost): Promise<Post> {
 	return {
 		...internalPost,
@@ -111,5 +116,8 @@ export function format(text: string): string {
 		.replace(/\*\*([^\*]+)\*\*/, (_match, content) => `<b>${content}</b>`)
 		.replace(/\*([^\*]+)\*/, (_match, content) => `<i>${content}</i>`)
 		.replace(/`([^\`]+)`/, (_match, code) => `<code>${code}</code>`)
-		.replace(linkRegex, (match) => `<a href="${match}">${match}</a>`);
+		.replace(/~~([^~]+)~~/, (_match, code) => `<s>${code}</s>`)
+		.replace(linkRegex, (match) => `<a href="${match}">${match}</a>`)
+		.replace(/\\\*/, "*")
+		.replace(/\\`/, "`");
 }

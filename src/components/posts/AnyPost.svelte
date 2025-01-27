@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import type { Post } from "../../api/postapi";
+	import { deletePost, type Post } from "../../api/postapi";
 	import CommentIcon from "../../assets/images/icons/CommentIcon.svelte";
 	import DotMenuIcon from "../../assets/images/icons/DotMenuIcon.svelte";
 	import EyeIcon from "../../assets/images/icons/EyeIcon.svelte";
@@ -8,32 +8,19 @@
 	import ShareIcon from "../../assets/images/icons/ShareIcon.svelte";
 	import { getUser } from "../../backend/auth.svelte";
 	import theme from "../../themes/theme.svelte";
+	import ContextMenu from "../ContextMenu.svelte";
 	import BookUpdate from "./BookUpdate.svelte";
 	import Discussion from "./Discussion.svelte";
 	import Rating from "./Rating.svelte";
 
 	let { post }: { post: Post } = $props();
 
+	let menu: ContextMenu;
+
 	let elapsedSeconds = (Date.now() - post.timestamp) / 1000;
 
 	let elapsedTime = $state("");
-	let timeFormat: "relative" | "absolute" = "relative";
-
-	if (elapsedSeconds < 60) {
-		elapsedTime = `${Math.floor(elapsedSeconds)}s ago`;
-	} else if (elapsedSeconds < 60 * 60) {
-		elapsedTime = `${Math.floor(elapsedSeconds / 60)}m ago`;
-	} else if (elapsedSeconds < 60 * 60 * 24) {
-		elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60)}h ago`;
-	} else if (elapsedSeconds < 60 * 60 * 24 * 7) {
-		elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24)}d ago`;
-	} else if (elapsedSeconds < 60 * 60 * 24 * 30) {
-		elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24 / 7)}w ago`;
-	} else if (elapsedSeconds < 60 * 60 * 24 * 365) {
-		elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24 / 30)}m ago`;
-	} else {
-		elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24 / 365)}y ago`;
-	}
+	let timeFormat: "relative" | "absolute" = "absolute";
 
 	function toggleTimeFormat() {
 		if (timeFormat == "relative") {
@@ -60,12 +47,14 @@
 		}
 	}
 
+	toggleTimeFormat();
+
 	let isCurrentUser = $derived(getUser()?.id === post.poster.id);
 </script>
 
 <section style:border-bottom={`1px solid ${theme().textDark}`}>
-	<button onclick={() => goto(`/post/${post.id}`)} class="profile">
-		<a style:background-image={`url("${post.poster.picture}")`} href={`/profile/${post.poster.username}`}></a>
+	<button aria-label="Open post" onclick={() => goto(`/post/${post.id}`)} class="profile">
+		<a aria-label="Go to poster's profile" style:background-image={`url("${post.poster.picture}")`} href={`/profile/${post.poster.username}`}></a>
 	</button>
 
 	<div class="content-outer">
@@ -99,8 +88,18 @@
 			<button onclick={() => navigator.clipboard.writeText(`bookfly.com/post/${post.id}`)}>
 				<ShareIcon stroke={theme().textDim} style="width: 1rem;" />
 			</button>
-			<button>
+			<button onclick={event => menu.open(event)}>
 				<DotMenuIcon stroke={theme().textDull} style="width: 1.25rem;" />
+				<ContextMenu bind:this={menu}>
+					{#if isCurrentUser}
+						<button style:background={theme().backgroundDim} style:color={theme().textBright}>Hide Post</button>
+						<button onclick={() => deletePost(post)} style:background={theme().backgroundDim} style:color={theme().textBright}>
+							Delete Post
+						</button>
+					{:else}
+						<button style:background={theme().backgroundDim} style:color={theme().textBright}>Report</button>
+					{/if}
+				</ContextMenu>
 			</button>
 		</div>
 	</div>
@@ -146,7 +145,6 @@
 			border-radius: 50%;
 			margin-right: 1rem;
 			margin-left: 1rem;
-			margin-bottom: 4rem;
 			background-size: cover;
 		}
 	}

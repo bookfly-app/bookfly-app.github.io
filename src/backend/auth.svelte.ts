@@ -32,6 +32,24 @@ export function getUser(): User | null {
 	return currentUser;
 }
 
+export function passwordErrors(password: string): string[] {
+	let errors = [];
+	if (!/\d/.test(password)) errors.push("Must contain at least 1 number");
+	if (!/[a-z]/.test(password)) errors.push("Must contain at least 1 lowercase letter");
+	if (!/[A-Z]/.test(password)) errors.push("Must contain at least 1 uppercase letter");
+	if (!/[\$_=\+\*!@#%\^&\|\\\/\(\)\[\]\{\}<>\?:;'"`~\-]/.test(password)) errors.push("Must contain at least 1 symbol");
+	if (password.length < 8) errors.push("Must be at least 8 characters");
+	return errors;
+}
+
+export async function usernameIsTaken(username: string): Promise<boolean> {
+	return (await getDocs(query(collection(db, "users"), where("username", "==", username)))).docs.length > 0;
+}
+
+export async function emailIsTaken(email: string): Promise<boolean> {
+	return (await getDocs(query(collection(db, "users"), where("email", "==", email)))).docs.length > 0;
+}
+
 onAuthStateChanged(auth, async (user) => {
 	// Logged in
 	if (user) {

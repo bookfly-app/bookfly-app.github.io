@@ -19,23 +19,31 @@
 
 	let { user }: { user: User } = $props();
 
-	let view = $state("all");
+	let view: "all" | "ratings" | "discussion" | "list" = $state("all");
 
+	/** This user's highest rated book */
 	let favoriteBook = getFavoriteBook(user);
+
+	/** This user's posts */
 	let posts = getUserPosts(user);
-	let current: string | null = $state("");
-	let booksRead = posts.then((posts) => posts.length);
 
 	/** Whether the profile being viewed is of the currently logged in user. */
 	let isCurrentUser = $derived(getUser()?.id === user.id);
 
-	(async () => {
-		current = user.currentBook ? (await getBook(user.currentBook)).title : null;
-	})();
+	/** The title of the book that the user is currently reading (or null if they aren't) */
+	let currentlyReading = user.currentBook ? getBook(user.currentBook).then(book => book.title) : Promise.resolve(null);
+
+	/** The total number of books this user has read */
+	let booksRead = posts.then(posts => posts.filter(post => post.type === "rating").length);
 
 	let followingOverride: boolean | null = $state(null);
-	let following = $derived(getUser()?.following.some((following) => following === user.id) ?? false);
 
+	/** Whether the current user is following this profile's user */
+	let following = $derived(
+		followingOverride || ((getUser()?.following.some(following => following === user.id) ?? false) && followingOverride === null),
+	);
+
+	/** Follows this user. */
 	function follow() {
 		followingOverride = true;
 		updateUser({
@@ -46,13 +54,14 @@
 		});
 	}
 
+	/** Unfollows this user. */
 	function unfollow() {
 		followingOverride = false;
 		updateUser({
-			following: getUser()!.following.filter((id) => id !== user.id),
+			following: getUser()!.following.filter(id => id !== user.id),
 		});
 		updateOtherUser(user, {
-			followers: user.followers.filter((id) => id !== getUser()!.id),
+			followers: user.followers.filter(id => id !== getUser()!.id),
 		});
 	}
 </script>
@@ -84,7 +93,7 @@
 			{:else}
 				<div class="profile-actions">
 					<button style:border-color={theme().textDull} class="profile-action-follow">
-						{#if followingOverride || (following && followingOverride !== false)}
+						{#if following}
 							<CheckIcon stroke={theme().textDull} style="width: 2rem;" onclick={unfollow} />
 						{:else}
 							<AddIcon stroke={theme().textDull} style="width: 2rem;" onclick={follow} />
@@ -104,18 +113,23 @@
 			{#await favoriteBook then favorite}
 				{#if favorite}
 					<span title={`${user.displayName}'s highest rated book is ${favorite.title}`}>
-						<StarIcon stroke={theme().textDull} style="width: 1.25rem; height: 1.25rem;" />
+						<StarIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
 						<span class="truncate" style:color={theme().textDull}>{favorite.title}</span>
 					</span>
 				{/if}
 			{/await}
 
-			{#if current}
-				<span title={`${user.displayName} is currently reading ${current}`}>
-					<ClockIcon stroke={theme().textDull} style="width: 1.25rem; height: 1.25rem;" />
-					<span class="truncate" style:color={theme().textDull}>{current}</span>
-				</span>
-			{/if}
+			<!-- Current book -->
+			{#await currentlyReading then current}
+				{#if current}
+					<span title={`${user.displayName} is currently reading ${current}`}>
+						<ClockIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
+						<span class="truncate" style:color={theme().textDull}>{current}</span>
+					</span>
+				{/if}
+			{/await}
+
+			<!-- Number of books read -->
 			{#await booksRead then booksRead}
 				<span title={`${user.displayName} has read ${booksRead} book${booksRead === 1 ? "" : "s"}`}>
 					<BookIcon stroke={theme().textDull} style="width: 1.25rem; height: 1.25rem;" />
@@ -159,7 +173,7 @@
 
 	{#await posts then posts}
 		{#if view === "discussion"}
-			{#each posts.filter((post) => post.type === "general") as post}
+			{#each posts.filter(post => post.type === "general") as post}
 				<AnyPost {post} />
 			{/each}
 		{:else if view === "ratings"}
@@ -168,7 +182,7 @@
 					<SortIcon stroke={theme().text} style="width: 1.75rem; height: 1.75rem;" />
 					Best
 				</span>
-				{#each posts.filter((post) => post.type === "rating") as post}
+				{#each posts.filter(post => post.type === "rating") as post}
 					<AnyPost {post} />
 				{/each}
 			</div>
@@ -228,6 +242,7 @@
 		text-overflow: ellipsis;
 		display: inline-block;
 		overflow-x: hidden;
+		font-size: 0.85rem;
 	}
 
 	.ratings {

@@ -4,12 +4,12 @@
 </script>
 
 <div style:background={theme().backgroundDark}></div>
-<button style:background={theme().accent} style:color={theme().backgroundDark}>
+<a href="/new" style:background={theme().accent} style:color={theme().backgroundDark}>
 	<PlusIcon stroke={theme().backgroundDark} style="width: 2rem;" />
-</button>
+</a>
 
 <style>
-	button {
+	a {
 		position: absolute;
 		bottom: 5rem;
 		right: 1rem;

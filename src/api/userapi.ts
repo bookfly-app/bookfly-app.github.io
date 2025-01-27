@@ -61,6 +61,14 @@ export type User = {
 
 let { db } = initializeFirebase();
 
+export function usernameErrors(username: string): string[] {
+	let errors = [];
+	if (username.length < 1) errors.push("Username can't be empty");
+	if (username.length > 30) errors.push("Username can't be more than 30 characters");
+	if (!/^[\w\-]*$/.test(username)) errors.push("Username can only contain letters, numbers, underscores, and hyphens");
+	return errors;
+}
+
 /**
  * Returns a user's "favorite book" which is defined as the book that
  * they have rated the highest. if the user has not rated any books, this

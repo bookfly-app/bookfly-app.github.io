@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { logIn } from "../../backend/auth.svelte";
+	import { getUser, logIn } from "../../backend/auth.svelte";
+	import Background from "../../components/Background.svelte";
+	import Footer from "../../components/Footer.svelte";
+	import theme from "../../themes/theme.svelte";
 
 	let email: string;
 	let password: string;
@@ -12,49 +15,82 @@
 			goto("/profile");
 		}
 	}
+
+	$effect(() => {
+		if (getUser()!) {
+			goto("/profile");
+		}
+	});
 </script>
 
+<Background />
 <main>
-	<h1>Log In</h1>
+	<h1 style:color={theme().textBright}>Log In</h1>
 	<div>
-		<input type="text" placeholder="Email" bind:value={email} />
-		<input type="password" placeholder="Password" bind:value={password} />
+		<div class="section">
+			<p style:color={theme().textDull}>Email</p>
+			<input
+				style:color={theme().text}
+				style:background={theme().backgroundDark}
+				type="text"
+				placeholder="example@website.com"
+				bind:value={email}
+			/>
+		</div>
+		<div class="section">
+			<p style:color={theme().textDull}>Password</p>
+			<input
+				style:color={theme().text}
+				style:background={theme().backgroundDark}
+				type="password"
+				placeholder="s3cr3tp4zzc0d3"
+				bind:value={password}
+			/>
+		</div>
 	</div>
-	<button onclick={signIn}>Log In</button>
+	<button style:background={`linear-gradient(${theme().accent}, ${theme().accent2})`} onclick={signIn}>Log In</button>
 </main>
+<Footer selected="profile" />
 
 <style>
+	.section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+
+		p {
+			font-size: 0.85rem;
+		}
+	}
+
 	main {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		background-image: linear-gradient(#1e1e2e, #181825);
-		color: var(--text);
 		gap: 5rem;
 		height: 100%;
 
-		div {
+		> div {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			gap: 1rem;
 
 			input {
-				background: var(--crust);
 				padding: 1rem;
 				border-radius: 1rem;
 				width: 15rem;
+				font-size: 0.85rem;
 			}
 		}
 
 		button {
-			background-image: linear-gradient(#b4befe, #89b4fa);
-			color: var(--base);
 			padding: 1rem;
 			width: 15rem;
 			border-radius: 1rem;
 			font-weight: bold;
+			box-shadow: 0px 0px 10px black;
 		}
 	}
 </style>

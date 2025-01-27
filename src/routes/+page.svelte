@@ -2,6 +2,7 @@
 	import type { Post } from "../api/postapi";
 	import { getFollowedPosts } from "../api/postapi";
 	import CatIcon from "../assets/images/icons/CatIcon.svelte";
+	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
 	import logo from "../assets/images/logo.svg";
 	import { getUser } from "../backend/auth.svelte";
@@ -16,22 +17,20 @@
 
 	let view: "following" | "for you" = $state("following");
 
-	let followedPosts: Post[] = $state([]);
-
-	$effect(() => {
-		(async () => {
-			if (getUser()) {
-				followedPosts = await getFollowedPosts(getUser()!);
-			}
-		})();
-	});
+	let followedPosts = $derived(getUser() ? getFollowedPosts(getUser()!) : Promise.resolve([]));
 </script>
 
 <Background />
 
 <nav style:background={theme().backgroundDark}>
 	<div class="banner">
-		<button style:background-image={`url("${getUser()?.picture ?? ""}")`} onclick={showSidebar} aria-label="Open sidebar"></button>
+		<button onclick={showSidebar} aria-label="Open sidebar">
+			{#if getUser()}
+				<img alt="Your profile" src={getUser()!.picture ?? ""} class="profile-link" />
+			{:else}
+				<PersonIcon stroke={theme().textDull} style="width: 2.5rem;" />
+			{/if}
+		</button>
 		<button style:background-image={`url("${logo}")`} onclick={showSidebar} aria-label="Open sidebar"></button>
 		<SearchIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
 	</div>
@@ -56,16 +55,18 @@
 	</div>
 
 	{#if view === "following"}
-		{#if followedPosts.length === 0}
-			<div class="nofollowing">
-				<h1 style:color={theme().textBright}>You're not following anyone.</h1>
-				<p style:color={theme().textDull}>When you follow people, their posts will appear here.</p>
-				<CatIcon style="width: 10rem;" stroke={theme().backgroundDim} />
-			</div>
-		{/if}
-		{#each followedPosts as post}
-			<AnyPost {post} />
-		{/each}
+		{#await followedPosts then followedPosts}
+			{#if followedPosts.length === 0}
+				<div class="nofollowing">
+					<h1 style:color={theme().textBright}>You're not following anyone.</h1>
+					<p style:color={theme().textDull}>When you follow people, their posts will appear here.</p>
+					<CatIcon style="width: 10rem;" stroke={theme().backgroundDim} />
+				</div>
+			{/if}
+			{#each followedPosts as post}
+				<AnyPost {post} />
+			{/each}
+		{/await}
 	{:else if view === "for you"}
 		<div class="nofollowing">
 			<h1 style:color={theme().textBright}>We haven't figured you out yet.</h1>

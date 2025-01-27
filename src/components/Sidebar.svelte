@@ -35,29 +35,29 @@
 	bind:this={sidebar}
 >
 	<div class="profile" style:border-color={theme().textDark}>
-		<a
-			class="profile-picture"
-			style:background-image={`url("${getUser()?.picture ?? ""}")`}
-			href="/profile"
-			aria-label="Go to profile"
-		></a>
+		<a class="profile-picture" href="/profile" aria-label="Go to profile">
+			{#if getUser()}
+				<img alt="Your profile" src={getUser()!.picture ?? ""} class="profile-link" />
+			{:else}
+				<PersonIcon stroke={theme().textDull} style="width: 5rem;" />
+			{/if}
+		</a>
 		<div>
 			<a href="/profile"
 				><h1 style:color={theme().textBright}>
-					{getUser()?.displayName ?? ""}
+					{getUser()?.displayName ?? "Guest"}
 				</h1></a
 			>
-			<a href="/profile"
-				><h2 style:color={theme().textDim}>
-					@{getUser()?.username ?? ""}
-				</h2></a
-			>
+			{#if getUser()}
+				<a href="/profile"
+					><h2 style:color={theme().textDim}>
+						@{getUser()!.username}
+					</h2></a
+				>
+			{/if}
 		</div>
 		<button onclick={() => (sidebar.style.left = "-83vw")}>
-			<CloseIcon
-				stroke="#FFFFFF"
-				style="width: 1.5rem; height: 1.5rem; position: absolute; top: 1.5rem; right: 1.5rem;"
-			/>
+			<CloseIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem; position: absolute; top: 1.5rem; right: 1.5rem;" />
 		</button>
 	</div>
 

@@ -1,0 +1,1 @@
+import{c as s,a as i}from"./DBBcDvdm.js";import{b as f,E as p,j as c,ak as d,R as h,h as l,l as m,al as u}from"./Cd4famqs.js";function v(t,e,...a){var r=t,o=d,n;f(()=>{o!==(o=e())&&(n&&(h(n),n=null),n=c(()=>o(r,...a)))},p),l&&(r=m)}function E(t,e){var a=s(),r=u(a);v(r,()=>e.children),i(t,a)}export{E as L};

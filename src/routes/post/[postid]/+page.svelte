@@ -4,6 +4,7 @@
 	import { getUser } from "../../../backend/auth.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
+	import Page from "../../../components/Page.svelte";
 	import AnyPost from "../../../components/posts/AnyPost.svelte";
 	import theme from "../../../themes/theme.svelte";
 
@@ -45,7 +46,7 @@
 </script>
 
 <Background />
-<main>
+<Page class="post">
 	{#await thePost then post}
 		<AnyPost post={post!} postpage />
 		<div style:border-color={theme().textDark} class="reply">
@@ -79,11 +80,11 @@
 			</div>
 		{/await}
 	{/await}
-</main>
-<Footer selected="search" />
+	<Footer selected="search" />
+</Page>
 
 <style>
-	main {
+	:global(.post) {
 		display: flex;
 		flex-direction: column;
 		align-items: center;

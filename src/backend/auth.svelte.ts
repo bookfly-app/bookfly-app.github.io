@@ -7,19 +7,8 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 } from "firebase/auth";
-import {
-	collection,
-	doc,
-	getDocs,
-	query,
-	setDoc,
-	where,
-} from "firebase/firestore";
-import {
-	internalUserToUser,
-	type InternalUser,
-	type User,
-} from "../api/userapi";
+import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { internalUserToUser, type InternalUser, type User } from "../api/userapi";
 import initializeFirebase from "./backend";
 
 let { db } = initializeFirebase();
@@ -50,15 +39,11 @@ export async function emailIsTaken(email: string): Promise<boolean> {
 	return (await getDocs(query(collection(db, "users"), where("email", "==", email)))).docs.length > 0;
 }
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, async user => {
 	// Logged in
 	if (user) {
 		currentUser = await internalUserToUser(
-			(
-				await getDocs(
-					query(collection(db, "users"), where("id", "==", user.uid))
-				)
-			).docs[0].data() as InternalUser
+			(await getDocs(query(collection(db, "users"), where("id", "==", user.uid)))).docs[0].data() as InternalUser
 		);
 	}
 
@@ -87,17 +72,9 @@ export async function updateOtherUser(user: User, userInfo: Partial<User>) {
 	await setDoc(doc(db, "users", newUser.id), newUser);
 }
 
-export async function signUp(
-	email: string,
-	password: string,
-	username: string
-): Promise<unknown | null> {
+export async function signUp(email: string, password: string, username: string): Promise<unknown | null> {
 	try {
-		let userInfo = await createUserWithEmailAndPassword(
-			auth,
-			email,
-			password
-		);
+		let userInfo = await createUserWithEmailAndPassword(auth, email, password);
 		let user: User = {
 			displayName: username,
 			email,
@@ -113,7 +90,8 @@ export async function signUp(
 			readingList: [],
 			following: [],
 			followers: [],
-			views: []
+			views: [],
+			shares: [],
 		};
 		await setDoc(doc(db, "users", user.id), user);
 		return null;
@@ -123,10 +101,7 @@ export async function signUp(
 	}
 }
 
-export async function logIn(
-	email: string,
-	password: string
-): Promise<unknown | null> {
+export async function logIn(email: string, password: string): Promise<unknown | null> {
 	try {
 		await signInWithEmailAndPassword(auth, email, password);
 		return null;

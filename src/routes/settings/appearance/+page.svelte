@@ -2,11 +2,13 @@
 	import { goto } from "$app/navigation";
 	import LeftArrowIcon from "../../../assets/images/icons/LeftArrowIcon.svelte";
 	import Background from "../../../components/Background.svelte";
-	import theme, { themes, setTheme } from "../../../themes/theme.svelte";
+	import Footer from "../../../components/Footer.svelte";
+	import Page from "../../../components/Page.svelte";
+	import theme, { setTheme, themes } from "../../../themes/theme.svelte";
 </script>
 
 <Background />
-<main>
+<Page class="settings">
 	<span class="settings-header">
 		<button
 			onclick={() => goto("/settings")}
@@ -30,11 +32,7 @@
 		</button>
 	</span>
 	{#each themes as otherTheme}
-		<button
-			class="theme"
-			onclick={() => setTheme(otherTheme)}
-			style:border-bottom-color={theme().textDark}
-		>
+		<button class="theme" onclick={() => setTheme(otherTheme)} style:border-bottom-color={theme().textDark}>
 			<div
 				style:background-image={`linear-gradient(${otherTheme.background}, ${otherTheme.backgroundDim})`}
 				style:border-color={otherTheme.accent}
@@ -43,7 +41,8 @@
 			<span style:color={theme().textDull}>{otherTheme.name}</span>
 		</button>
 	{/each}
-</main>
+	<Footer selected="profile" />
+</Page>
 
 <style>
 	.settings-header {
@@ -65,12 +64,6 @@
 		border-radius: 50%;
 		border-width: 2px;
 		border-style: solid;
-	}
-
-	main {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
 	}
 
 	.theme-header {

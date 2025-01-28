@@ -30,12 +30,14 @@
 
 <style>
 	footer {
-		position: absolute;
-		width: 100vw;
+		position: fixed;
+		width: 100%;
 		bottom: 0px;
-		left: 0px;
+		left: 50%;
 		display: flex;
 		align-items: center;
+		max-width: 25rem;
+		transform: translateX(-50%);
 
 		a {
 			padding-top: 1rem;

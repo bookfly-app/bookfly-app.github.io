@@ -19,7 +19,7 @@
 	function nav(to: string) {
 		return function () {
 			goto(to);
-			sidebar.style.left = "-83vw";
+			sidebar.style.left = "-83%";
 		};
 	}
 
@@ -34,7 +34,7 @@
 	style:border-color={theme().textDark}
 	bind:this={sidebar}
 >
-	<div class="profile" style:border-color={theme().textDark}>
+	<div class="profile" style:background={theme().backgroundDark}>
 		<a class="profile-picture" href="/profile" aria-label="Go to profile">
 			{#if getUser()}
 				<img alt="Your profile" src={getUser()!.picture ?? ""} class="profile-link" />
@@ -95,8 +95,8 @@
 <style>
 	section {
 		position: absolute;
-		left: -83vw;
-		width: 80vw;
+		left: -83%;
+		width: 80%;
 		height: 100vh;
 		top: 0px;
 		display: flex;
@@ -108,8 +108,9 @@
 
 		.listing {
 			text-decoration: none;
-			font-size: 1.5rem;
+			font-size: 1.25rem;
 			display: flex;
+			align-items: center;
 			width: fit-content;
 			gap: 2rem;
 			padding-left: 2rem;

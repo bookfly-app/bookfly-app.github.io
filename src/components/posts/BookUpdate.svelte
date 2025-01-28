@@ -14,23 +14,21 @@
 <div>
 	<p class="rating-line" style:color={theme().textDull}>
 		{user.displayName} started reading
-		<i style:color={theme().text}>{book?.title}</i>:
+		<i style:color={theme().text}>{book?.title}</i>
+		:
 	</p>
 	<div class="info">
 		<div class="content">
-			<h2 class="title" style:color={theme().text}>{book?.title}</h2>
-			<h2 class="title" style:color={theme().textDim}>
+			<a href="/book/{book?.isbn}" class="title" style:color={theme().text}>{book?.title}</a>
+			<a href="/book/{book?.isbn}" class="author" style:color={theme().textDim}>
 				{book?.authors.join(", ")}
-			</h2>
+			</a>
 
 			<p style:color={theme().text}>
 				{[...(book?.genres ?? [])].splice(0, 2).join(", ")}
 			</p>
 		</div>
-		<a
-			aria-label={`Go to details for book "${book?.title}"`}
-			href={`/book/${book?.isbn}`}
-		>
+		<a aria-label={`Go to details for book "${book?.title}"`} href={`/book/${book?.isbn}`}>
 			<img alt={`Cover for book "${book?.title}"`} src={book?.cover} />
 		</a>
 	</div>
@@ -46,9 +44,11 @@
 	.content {
 		padding-right: 1rem;
 
-		.title {
+		.title,
+		.author {
 			font-size: 0.85rem;
 			font-weight: normal;
+			text-decoration: none;
 		}
 
 		p {

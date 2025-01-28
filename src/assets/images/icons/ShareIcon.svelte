@@ -1,22 +1,16 @@
 <script lang="ts">
 	let props = $props();
 
-	let stroke = props.stroke;
+	let stroke = $derived(props.stroke);
 
 	props = { ...props };
 	props.stroke = undefined;
 </script>
 
-<svg
-	{...props}
-	viewBox="0 0 24 24"
-	fill="none"
-	xmlns="http://www.w3.org/2000/svg"
-	><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g
-		id="SVGRepo_tracerCarrier"
-		stroke-linecap="round"
-		stroke-linejoin="round"
-	></g><g id="SVGRepo_iconCarrier">
+<svg {...props} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+	<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+	<g id="SVGRepo_iconCarrier">
 		<path
 			fill-rule="evenodd"
 			clip-rule="evenodd"
@@ -27,5 +21,5 @@
 			d="M7 1.00391H4C2.34315 1.00391 1 2.34705 1 4.00391V20.0039C1 21.6608 2.34315 23.0039 4 23.0039H20C21.6569 23.0039 23 21.6608 23 20.0039V17.0039C23 16.4516 22.5523 16.0039 22 16.0039C21.4477 16.0039 21 16.4516 21 17.0039V20.0039C21 20.5562 20.5523 21.0039 20 21.0039H4C3.44772 21.0039 3 20.5562 3 20.0039V4.00391C3 3.45162 3.44772 3.00391 4 3.00391H7C7.55228 3.00391 8 2.55619 8 2.00391C8 1.45162 7.55228 1.00391 7 1.00391Z"
 			fill={stroke}
 		></path>
-	</g></svg
->
+	</g>
+</svg>

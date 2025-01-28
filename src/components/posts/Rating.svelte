@@ -20,10 +20,10 @@
 	</p>
 	<div class="info">
 		<div class="content">
-			<h2 class="title" style:color={theme().text}>{book?.title}</h2>
-			<h2 class="title" style:color={theme().textDim}>
+			<a href={`/book/${book?.isbn}`} class="title" style:color={theme().text}>{book?.title}</a>
+			<a href={`/book/${book?.isbn}`} class="author" style:color={theme().textDim}>
 				{book?.authors.join(", ")}
-			</h2>
+			</a>
 			<span class="rating">
 				<StarIcon
 					stroke="#FFFFAA"
@@ -94,9 +94,11 @@
 		flex-direction: column;
 		align-items: center;
 
-		.title {
+		.title,
+		.author {
 			font-size: 1rem;
 			font-weight: normal;
+			text-decoration: none;
 		}
 	}
 

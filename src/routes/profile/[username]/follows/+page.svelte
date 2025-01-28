@@ -2,6 +2,7 @@
 	import { getUserFromId, getUserFromUsername } from "../../../../api/userapi";
 	import Background from "../../../../components/Background.svelte";
 	import Footer from "../../../../components/Footer.svelte";
+	import Page from "../../../../components/Page.svelte";
 	import UserListing from "../../../../components/UserListing.svelte";
 	import theme from "../../../../themes/theme.svelte";
 
@@ -16,7 +17,7 @@
 </script>
 
 <Background />
-<main>
+<Page>
 	{#await user then user}
 		<div class="view" style:background={theme().backgroundDark}>
 			{#await following then following}
@@ -53,8 +54,8 @@
 			{/await}
 		{/if}
 	{/await}
-</main>
-<Footer selected="profile" />
+	<Footer selected="profile" />
+</Page>
 
 <style>
 	.view {

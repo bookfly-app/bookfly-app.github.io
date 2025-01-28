@@ -1,8 +1,10 @@
 <script lang="ts">
-	import Profile from "../../../components/Profile.svelte";
-	import { getUserFromUsername } from "../../../api/userapi";
 	import type { User } from "../../../api/userapi";
+	import { getUserFromUsername } from "../../../api/userapi";
+	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
+	import Page from "../../../components/Page.svelte";
+	import Profile from "../../../components/Profile.svelte";
 
 	let { data } = $props();
 
@@ -13,11 +15,15 @@
 	})();
 </script>
 
-{#if user}
-	<Profile {user} />
-{/if}
-<div></div>
-<Footer selected="search" />
+<Background />
+
+<Page>
+	{#if user}
+		<Profile {user} />
+	{/if}
+	<div></div>
+	<Footer selected="search" />
+</Page>
 
 <style>
 	div {

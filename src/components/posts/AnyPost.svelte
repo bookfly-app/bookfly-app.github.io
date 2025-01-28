@@ -1,6 +1,20 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { deletePost, didComment, didLike, getPostFromId, getPostViews, likePost, unlikePost, type Post } from "../../api/postapi";
+	import {
+		deletePost,
+		didComment,
+		didLike,
+		didShare,
+		getLikes,
+		getPostFromId,
+		getPostViews,
+		getReplies,
+		getShares,
+		likePost,
+		sharePost,
+		unlikePost,
+		type Post,
+	} from "../../api/postapi";
 	import CommentIcon from "../../assets/images/icons/CommentIcon.svelte";
 	import DotMenuIcon from "../../assets/images/icons/DotMenuIcon.svelte";
 	import EyeIcon from "../../assets/images/icons/EyeIcon.svelte";
@@ -9,6 +23,7 @@
 	import { getUser } from "../../backend/auth.svelte";
 	import theme from "../../themes/theme.svelte";
 	import ContextMenu from "../ContextMenu.svelte";
+	import Notification from "../Notification.svelte";
 	import BookUpdate from "./BookUpdate.svelte";
 	import Discussion from "./Discussion.svelte";
 	import Rating from "./Rating.svelte";
@@ -59,6 +74,10 @@
 			return;
 		}
 
+		await goToPost();
+	}
+
+	async function goToPost() {
 		if (post.type === "reply") {
 			goto(`/post/${(await parent)!.id}`);
 		} else {
@@ -66,19 +85,22 @@
 		}
 	}
 
-	let likes = $state(post.likes.length);
+	let likes = $state(getLikes(post).then(likes => likes.length));
+	let comments = $state(getReplies(post).then(replies => replies.length));
+	let shares = $state(getShares(post).then(shares => shares.length));
 
 	let liked = $state(didLike(post));
+	let shared = $state(didShare(post));
 	let commented = $state(didComment(post));
 
 	async function toggleLike() {
 		liked = liked.then(liked => !liked);
 		if (await liked) {
 			likePost(post);
-			likes += 1;
+			likes = likes.then(likes => likes + 1);
 		} else {
 			unlikePost(post);
-			likes -= 1;
+			likes = likes.then(likes => likes - 1);
 		}
 	}
 
@@ -87,6 +109,16 @@
 	function deleteAndUpdate() {
 		isDeleted = true;
 		deletePost(post);
+	}
+
+	// svelte-ignore non_reactive_update
+	let shareNotification: Notification;
+	async function share() {
+		navigator.clipboard.writeText(`https://bookfly-app.github.io/post/${post.id}`);
+		shareNotification.show();
+		if (!(await shared)) shares = shares.then(shares => shares + 1);
+		shared = Promise.resolve(true);
+		sharePost(post);
 	}
 </script>
 
@@ -105,8 +137,8 @@
 
 	<div class="content-outer">
 		<span class="user">
-			<h2 style:color={theme().textBright}>{post.poster.displayName}</h2>
-			<h3 style:color={theme().textDim}>{`@${post.poster.username}`}</h3>
+			<a href="/profile/{post.poster.username}" class="display-name" style:color={theme().textBright}>{post.poster.displayName}</a>
+			<a href="/profile/{post.poster.username}" class="username" style:color={theme().textDim}>{`@${post.poster.username}`}</a>
 			<button class="timestamp" onclick={toggleTimeFormat} style:color={theme().textDim}>
 				{elapsedTime}
 			</button>
@@ -135,21 +167,31 @@
 					{views}
 				{/await}
 			</span>
-			{#await liked then liked}
-				<button onclick={toggleLike} style:color={liked ? "#FFAACC" : theme().textDim}>
-					<HeartIcon fill={liked ? "#FFAACC" : "none"} stroke={liked ? "#FFAACC" : theme().textDim} style="width: 1rem;" />
-					{likes}
-				</button>
+			{#await likes then likes}
+				{#await liked then liked}
+					<button onclick={toggleLike} style:color={liked ? "#FFAACC" : theme().textDim}>
+						<HeartIcon fill={liked ? "#FFAACC" : "none"} stroke={liked ? "#FFAACC" : theme().textDim} style="width: 1rem;" />
+						{likes}
+					</button>
+				{/await}
 			{/await}
 			{#await commented then commented}
-				<a href="/posts/{post.id}" style:color={commented ? "#99BBFF" : theme().textDim}>
-					<CommentIcon stroke={commented ? "#99BBFF" : theme().textDim} style="width: 1rem;" />
-					{post.comments.length}
-				</a>
+				{#await comments then comments}
+					<button onclick={goToPost} style:color={commented ? "#99BBFF" : theme().textDim}>
+						<CommentIcon stroke={commented ? "#99BBFF" : theme().textDim} style="width: 1rem;" />
+						{comments}
+					</button>
+				{/await}
 			{/await}
-			<button onclick={() => navigator.clipboard.writeText(`bookfly.com/post/${post.id}`)}>
-				<ShareIcon stroke={theme().textDim} style="width: 1rem;" />
-			</button>
+			{#await shares then shares}
+				{#await shared then shared}
+					<button style:color={shared ? "#BB99FF" : theme().textDim} onclick={share}>
+						<ShareIcon stroke={shared ? "#BB99FF" : theme().textDim} style="width: 0.85rem;" />
+						{shares}
+						<Notification message="Link copied!" bind:this={shareNotification} />
+					</button>
+				{/await}
+			{/await}
 			<button onclick={event => menu.open(event)}>
 				<DotMenuIcon stroke={theme().textDull} style="width: 1.25rem;" />
 				<ContextMenu bind:this={menu}>
@@ -231,11 +273,15 @@
 		gap: 0.5rem;
 		width: 100%;
 
-		h2 {
+		a {
+			text-decoration: none;
+		}
+
+		.display-name {
 			font-size: 1rem;
 		}
 
-		h3,
+		.username,
 		button {
 			font-weight: normal;
 			font-size: 1rem;

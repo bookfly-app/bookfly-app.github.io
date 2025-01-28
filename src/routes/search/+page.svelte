@@ -2,6 +2,7 @@
 	import { goto } from "$app/navigation";
 	import Background from "../../components/Background.svelte";
 	import Footer from "../../components/Footer.svelte";
+	import Page from "../../components/Page.svelte";
 	import theme from "../../themes/theme.svelte";
 
 	let search;
@@ -20,47 +21,28 @@
 </script>
 
 <Background />
-<main>
-	<input
-		style:background={theme().backgroundDark}
-		style:color={theme().textBright}
-		type="text"
-		bind:value={searchTerm}
-		onkeyup={handleSearch}
-		bind:this={search}
-	/>
+<Page>
+	<section>
+		<input
+			style:background={theme().backgroundDark}
+			style:color={theme().textBright}
+			type="text"
+			bind:value={searchTerm}
+			onkeyup={handleSearch}
+			bind:this={search}
+		/>
 
-	<div class="views" style:border-color={theme().textDark}>
-		<button
-			style:color={view === "posts"
-				? theme().textBright
-				: theme().textDull}
-			onclick={() => (view = "posts")}
-		>
-			Posts
-		</button>
-		<button
-			style:color={view === "books"
-				? theme().textBright
-				: theme().textDull}
-			onclick={() => (view = "books")}
-		>
-			Books
-		</button>
-		<button
-			style:color={view === "people"
-				? theme().textBright
-				: theme().textDull}
-			onclick={() => (view = "people")}
-		>
-			People
-		</button>
-	</div>
-</main>
-<Footer selected="search" />
+		<div class="views" style:border-color={theme().textDark}>
+			<button style:color={view === "posts" ? theme().textBright : theme().textDull} onclick={() => (view = "posts")}>Posts</button>
+			<button style:color={view === "books" ? theme().textBright : theme().textDull} onclick={() => (view = "books")}>Books</button>
+			<button style:color={view === "people" ? theme().textBright : theme().textDull} onclick={() => (view = "people")}>People</button>
+		</div>
+	</section>
+	<Footer selected="search" />
+</Page>
 
 <style>
-	main {
+	section {
 		padding-top: 1rem;
 	}
 

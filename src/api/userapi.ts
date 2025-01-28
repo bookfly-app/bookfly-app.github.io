@@ -21,13 +21,12 @@ export type InternalUser = {
 	tags: string[];
 	links: {}[];
 	currentBook: string | null;
+
 	views: PostId[];
+	likes: PostId[];
+	shares: PostId[];
 
 	readingList: ISBN[];
-
-	// Interactions
-
-	likes: string[];
 
 	followers: UserId[];
 	following: UserId[];
@@ -49,13 +48,12 @@ export type User = {
 	tags: string[];
 	links: {}[];
 	currentBook: string | null;
+
 	views: PostId[];
+	likes: PostId[];
+	shares: PostId[];
 
 	readingList: ISBN[];
-
-	// Interactions
-
-	likes: string[];
 
 	followers: UserId[];
 	following: UserId[];

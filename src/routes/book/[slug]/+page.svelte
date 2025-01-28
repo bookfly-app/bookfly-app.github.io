@@ -4,6 +4,7 @@
 	import { getUser } from "../../../backend/auth.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
+	import Page from "../../../components/Page.svelte";
 	import AnyPost from "../../../components/posts/AnyPost.svelte";
 	import Sidebar, { showSidebar } from "../../../components/Sidebar.svelte";
 	import theme from "../../../themes/theme.svelte.js";
@@ -38,54 +39,56 @@
 </script>
 
 <Background />
-<nav style:background={theme().backgroundDark}>
-	<div class="banner">
-		<button style:background-image={`url("${getUser()?.picture ?? ""}")`} onclick={showSidebar} aria-label="Open sidebar"></button>
-		<div class="book-name">
-			<h1 style:color={theme().textBright}>{book.title}</h1>
-			<h2 style:color={theme().textDim}>{book.authors.join(", ")}</h2>
+<Page style="overflow-y: hidden;">
+	<nav style:background={theme().backgroundDark}>
+		<div class="banner">
+			<button style:background-image={`url("${getUser()?.picture ?? ""}")`} onclick={showSidebar} aria-label="Open sidebar"></button>
+			<div class="book-name">
+				<h1 style:color={theme().textBright}>{book.title}</h1>
+				<h2 style:color={theme().textDim}>{book.authors.join(", ")}</h2>
+			</div>
+			<SearchIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
 		</div>
-		<SearchIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
-	</div>
-</nav>
-<main>
-	<div style:background-color={theme().backgroundDark} class="views">
-		<button
-			style:color={view === "info" ? theme().textBright : theme().textDull}
-			style:border-bottom-color={view === "info" ? theme().accent : "transparent"}
-			onclick={() => (view = "info")}
-		>
-			Info
-		</button>
-		<button
-			style:color={view === "discussion" ? theme().textBright : theme().textDull}
-			style:border-bottom-color={view === "discussion" ? theme().accent : "transparent"}
-			onclick={() => (view = "discussion")}
-		>
-			Discussion
-		</button>
-	</div>
+	</nav>
+	<section>
+		<div style:background-color={theme().backgroundDark} class="views">
+			<button
+				style:color={view === "info" ? theme().textBright : theme().textDull}
+				style:border-bottom-color={view === "info" ? theme().accent : "transparent"}
+				onclick={() => (view = "info")}
+			>
+				Info
+			</button>
+			<button
+				style:color={view === "discussion" ? theme().textBright : theme().textDull}
+				style:border-bottom-color={view === "discussion" ? theme().accent : "transparent"}
+				onclick={() => (view = "discussion")}
+			>
+				Discussion
+			</button>
+		</div>
 
-	{#if view === "info"}
-		<div class="book-info">
-			<img alt={`${book.title} cover`} class="cover" src={book.cover} />
-			<p class="description" style:color={theme().textDull}>
-				{makeReadable(book.description)}
-			</p>
-		</div>
-	{:else if view === "discussion"}
-		{#await discussions then discussions}
-			{#each discussions as post}
-				<AnyPost {post} />
-			{/each}
-		{/await}
-	{/if}
-</main>
-<Footer selected="search" />
-<Sidebar />
+		{#if view === "info"}
+			<div class="book-info">
+				<img alt={`${book.title} cover`} class="cover" src={book.cover} />
+				<p class="description" style:color={theme().textDull}>
+					{makeReadable(book.description)}
+				</p>
+			</div>
+		{:else if view === "discussion"}
+			{#await discussions then discussions}
+				{#each discussions as post}
+					<AnyPost {post} />
+				{/each}
+			{/await}
+		{/if}
+	</section>
+	<Footer selected="search" />
+	<Sidebar />
+</Page>
 
 <style>
-	main {
+	section {
 		display: flex;
 		flex-direction: column;
 		align-items: center;

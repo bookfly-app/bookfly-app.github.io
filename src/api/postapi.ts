@@ -2,7 +2,7 @@ import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, 
 import { getUser, updateUser } from "../backend/auth.svelte";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
-import { getUserFromId, type User, type UserId } from "./userapi";
+import { getUserFromId, type InternalUser, type User, type UserId } from "./userapi";
 
 export type PostType = "general" | "rating" | "update" | "reply";
 
@@ -55,7 +55,7 @@ export type InternalPost<T extends PostType = PostType> = {
 	 */
 	timestamp: number;
 
-	/** 
+	/**
 	 * The books referenced by the current post, stored as a list of ISBN-13's. More data
 	 * about each book can be retrieved with `getBookFromISBN()`.
 	 */
@@ -64,11 +64,6 @@ export type InternalPost<T extends PostType = PostType> = {
 	authors: string[];
 
 	pictures: string[];
-
-	// Stats
-
-	likes: UserId[];
-	shares: UserId[];
 
 	rating: T extends "rating" ? number : never;
 	updateType: T extends "update" ? "start" : never;
@@ -101,7 +96,7 @@ export type Post<T extends PostType = PostType> = {
 	 */
 	timestamp: number;
 
-	/** 
+	/**
 	 * The books referenced by the current post, stored as a list of ISBN-13's. More data
 	 * about each book can be retrieved with `getBookFromISBN()`.
 	 */
@@ -109,11 +104,6 @@ export type Post<T extends PostType = PostType> = {
 
 	authors: string[];
 	pictures: string[];
-
-	// Stats
-
-	likes: User[];
-	shares: User[];
 
 	/**
 	 * The rating of the book being reviewed, as a number in [0, 10].
@@ -139,7 +129,7 @@ let { db } = initializeFirebase();
  *
  * @returns The created post object.
  */
-export async function post(post: Partial<InternalPost> & { body: string, id: never, type: PostType }): Promise<Post> {
+export async function post(post: Partial<Omit<InternalPost, "id">> & { body: string; type: PostType }): Promise<Post> {
 	let toPost: InternalPost = {
 		timestamp: Date.now(),
 		poster: getUser()!.id,
@@ -149,6 +139,7 @@ export async function post(post: Partial<InternalPost> & { body: string, id: nev
 		likes: [],
 		shares: [],
 		pictures: [],
+		id: "",
 		...post,
 	} as InternalPost;
 
@@ -175,7 +166,7 @@ export async function deletePost(post: Post): Promise<void> {
 /**
  * Converts an `InternalPost` object to a `Post` object. `InternalPosts` are how posts are
  * stored internally in the database, and `Post` objects are a wrapper around them with an easier API
- * to use. 
+ * to use.
  *
  * @param internalPost The internal post object to convert
  *
@@ -186,8 +177,6 @@ export async function internalPostToPost(internalPost: InternalPost): Promise<Po
 		...internalPost,
 		poster: await getUserFromId(internalPost.poster),
 		books: await Promise.all(internalPost.books.map(async isbn => getBook(isbn))),
-		likes: await Promise.all(internalPost.likes.map(async userId => getUserFromId(userId))),
-		shares: await Promise.all(internalPost.shares.map(async userId => getUserFromId(userId))),
 	};
 
 	if (getUser() && !getUser()!.views.includes(post.id)) {
@@ -240,10 +229,18 @@ export async function getReplies(post: Post): Promise<Post[]> {
 	);
 }
 
+export async function getLikes(post: Post): Promise<InternalUser[]> {
+	return (await getDocs(query(collection(db, "users"), where("likes", "array-contains", post.id)))).docs.map(doc => doc.data() as InternalUser);
+}
+
+export async function getShares(post: Post): Promise<InternalUser[]> {
+	return (await getDocs(query(collection(db, "users"), where("shares", "array-contains", post.id)))).docs.map(doc => doc.data() as InternalUser);
+}
+
 /**
  * A regular expression matching (most) links. This is a modified version of the expression
  * provided [here](https://stackoverflow.com/a/3809435), with some minor tweaks to fix some
- * issues that were occurring. This is *not* perfect and isn't guaranteed to always provide 
+ * issues that were occurring. This is *not* perfect and isn't guaranteed to always provide
  * accurate results.
  *
  * This is used in `format()` to detect links.
@@ -295,8 +292,8 @@ export async function getPostViews(post: Post): Promise<number> {
 /**
  * Likes the given post with the current user.
  *
- * This will throw an error if there is no current user, i.e., if the person is not 
- * currently signed in or the user hasn't loaded yet; Take care to check the value of 
+ * This will throw an error if there is no current user, i.e., if the person is not
+ * currently signed in or the user hasn't loaded yet; Take care to check the value of
  * `getUser()` for `null` first.
  *
  * This can be safely called even if the user has already liked the given post. It will just
@@ -307,14 +304,18 @@ export async function getPostViews(post: Post): Promise<number> {
  * @returns A promise that resolves when the database is updated with the post like.
  */
 export async function likePost(post: Post): Promise<void> {
-	await updateDoc(doc(collection(db, "posts"), post.id), { likes: [...new Set([...post.likes.map(like => like.id), getUser()!.id])] });
+	await updateDoc(doc(collection(db, "users"), getUser()!.id), { likes: [...new Set([...getUser()!.likes, post.id])] });
+}
+
+export async function sharePost(post: Post): Promise<void> {
+	await updateDoc(doc(collection(db, "users"), getUser()!.id), { shares: [...new Set([...getUser()!.shares, post.id])] });
 }
 
 /**
  * Unlikes the given post with the current user.
  *
- * This will throw an error if there is no current user, i.e., if the person is not 
- * currently signed in or the user hasn't loaded yet; Take care to check the value of 
+ * This will throw an error if there is no current user, i.e., if the person is not
+ * currently signed in or the user hasn't loaded yet; Take care to check the value of
  * `getUser()` for `null` first.
  *
  * This can be safely called even if the user hasn't liked the given post. It will just
@@ -325,14 +326,14 @@ export async function likePost(post: Post): Promise<void> {
  * @returns A promise that resolves when the database is updated with the post like.
  */
 export async function unlikePost(post: Post): Promise<void> {
-	await updateDoc(doc(collection(db, "posts"), post.id), { likes: post.likes.map(like => like.id).filter(id => id !== getUser()!.id) });
+	await updateDoc(doc(collection(db, "users"), getUser()!.id), { likes: getUser()!.likes.filter(id => id !== post.id) });
 }
 
 /**
- * Returns whether the current user liked the given post. 
+ * Returns whether the current user liked the given post.
  *
- * This will throw an error if there is no current user, i.e., if the person is not 
- * currently signed in or the user hasn't loaded yet; Take care to check the value of 
+ * This will throw an error if there is no current user, i.e., if the person is not
+ * currently signed in or the user hasn't loaded yet; Take care to check the value of
  * `getUser()` for `null` first.
  *
  * @param post The post to check if the user liked
@@ -341,7 +342,11 @@ export async function unlikePost(post: Post): Promise<void> {
  * the given post.
  */
 export async function didLike(post: Post): Promise<boolean> {
-	return ((await getDoc(doc(collection(db, "posts"), post.id))).data() as InternalPost).likes.includes(getUser()!.id);
+	return getUser()!.likes.includes(post.id);
+}
+
+export async function didShare(post: Post): Promise<boolean> {
+	return getUser()!.shares.includes(post.id);
 }
 
 /**

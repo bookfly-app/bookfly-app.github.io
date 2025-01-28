@@ -13,7 +13,6 @@
 	import StarIcon from "../assets/images/icons/StarIcon.svelte";
 	import { getUser, updateOtherUser, updateUser } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
-	import Background from "./Background.svelte";
 	import AnyPost from "./posts/AnyPost.svelte";
 	import ReadingListItem from "./ReadingListItem.svelte";
 
@@ -66,8 +65,7 @@
 	}
 </script>
 
-<Background />
-<main>
+<section>
 	<div class="banner" style:background-image={`url("${user.banner}")`}></div>
 	<button class="back-arrow" onclick={() => goto("/")}>
 		<LeftArrowIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem;" />
@@ -89,7 +87,14 @@
 				{/if}
 			</span>
 			{#if isCurrentUser}
-				<button class="edit-profile" onclick={() => goto("/profile/edit")}>Edit Profile</button>
+				<button
+					style:color={theme().background}
+					style:background="linear-gradient({theme().accent}, {theme().accent2})"
+					class="edit-profile"
+					onclick={() => goto("/profile/edit")}
+				>
+					Edit Profile
+				</button>
 			{:else}
 				<div class="profile-actions">
 					<button style:border-color={theme().textDull} class="profile-action-follow">
@@ -204,10 +209,10 @@
 			{/each}
 		{/if}
 	{/await}
-</main>
+</section>
 
 <style>
-	main {
+	section {
 		min-height: 100%;
 		position: relative;
 	}
@@ -356,12 +361,10 @@
 			width: 7rem;
 			height: 2rem;
 			margin-right: 1rem;
-			background-image: linear-gradient(to bottom right, #b4befe, #89b4fa);
-			color: var(--base);
 			padding-left: 1rem;
 			padding-right: 1rem;
 			border-radius: 100vmax;
-			font-weight: bold;
+			font-weight: 600;
 		}
 	}
 

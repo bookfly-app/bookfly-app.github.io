@@ -4,13 +4,13 @@
 	import DeveloperIcon from "../../../assets/images/icons/DeveloperIcon.svelte";
 	import LeftArrowIcon from "../../../assets/images/icons/LeftArrowIcon.svelte";
 	import TrashIcon from "../../../assets/images/icons/TrashIcon.svelte";
-	import UsernameIcon from "../../../assets/images/icons/UsernameIcon.svelte";
 	import Background from "../../../components/Background.svelte";
+	import Page from "../../../components/Page.svelte";
 	import theme from "../../../themes/theme.svelte";
 </script>
 
 <Background />
-<main>
+<Page class="settings">
 	<span class="settings-header">
 		<button
 			onclick={() => goto("/settings")}
@@ -23,61 +23,37 @@
 	</span>
 
 	<!-- Request author verification -->
-	<a
-		href="/settings/account/changeusername"
-		style:border-bottom-color={theme().textDark}
-	>
+	<a href="/settings/account/changeusername" style:border-bottom-color={theme().textDark}>
 		<div>
-			<AuthorIcon
-				style="width: 2rem; height: 2rem;"
-				stroke={theme().textBright}
-			/>
-			<span style:color={theme().textBright}
-				>Request author verification</span
-			>
+			<AuthorIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
+			<span style:color={theme().textBright}>Request author verification</span>
 		</div>
-		<p style:color={theme().textDull}>
-			Only published authors can recieve author verifications. Independent
-			publishing is allowed.
-		</p>
+		<p style:color={theme().textDull}>Only published authors can recieve author verifications. Independent publishing is allowed.</p>
 	</a>
 
 	<!-- Become a developer -->
-	<a
-		href="/settings/account/changeusername"
-		style:border-bottom-color={theme().textDark}
-	>
+	<a href="/settings/account/changeusername" style:border-bottom-color={theme().textDark}>
 		<div>
-			<DeveloperIcon
-				style="width: 2rem; height: 2rem;"
-				stroke={theme().textBright}
-			/>
+			<DeveloperIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
 			<span style:color={theme().textBright}>Become a developer</span>
 		</div>
 		<p style:color={theme().textDull}>
-			Bookfly is a non-profit organization powered by volunteers. Paying
-			positions are currently not available.
+			Bookfly is a non-profit organization powered by volunteers. Paying positions are currently not available.
 		</p>
 	</a>
 
 	<!-- Delete account -->
-	<a
-		href="/settings/account/delete"
-		style:border-bottom-color={theme().textDark}
-	>
+	<a href="/settings/account/delete" style:border-bottom-color={theme().textDark}>
 		<div>
-			<TrashIcon
-				style="width: 2rem; height: 2rem;"
-				stroke={theme().textBright}
-			/>
+			<TrashIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
 			<span style:color={theme().textBright}>Delete your account</span>
 		</div>
 		<p style:color={theme().textDull}>
-			<b>This cannot be undone.</b> You will be taken to a confirmation page
-			first.
+			<b>This cannot be undone.</b>
+			You will be taken to a confirmation page first.
 		</p>
 	</a>
-</main>
+</Page>
 
 <style>
 	.settings-header {
@@ -91,12 +67,6 @@
 		width: 2rem;
 		height: 2rem;
 		border-radius: 50%;
-	}
-
-	main {
-		display: flex;
-		flex-direction: column;
-		min-height: 100vh;
 	}
 
 	a {

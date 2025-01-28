@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { deletePost, didLike, getPostFromId, getPostViews, likePost, unlikePost, type Post } from "../../api/postapi";
+	import { deletePost, didComment, didLike, getPostFromId, getPostViews, likePost, unlikePost, type Post } from "../../api/postapi";
 	import CommentIcon from "../../assets/images/icons/CommentIcon.svelte";
 	import DotMenuIcon from "../../assets/images/icons/DotMenuIcon.svelte";
 	import EyeIcon from "../../assets/images/icons/EyeIcon.svelte";
@@ -69,6 +69,8 @@
 	let likes = $state(post.likes.length);
 
 	let liked = $state(didLike(post));
+	let commented = $state(didComment(post));
+
 	async function toggleLike() {
 		liked = liked.then(liked => !liked);
 		if (await liked) {
@@ -139,10 +141,12 @@
 					{likes}
 				</button>
 			{/await}
-			<a href="/posts/{post.id}" style:color={theme().textDim}>
-				<CommentIcon stroke={theme().textDim} style="width: 1rem;" />
-				{post.comments.length}
-			</a>
+			{#await commented then commented}
+				<a href="/posts/{post.id}" style:color={commented ? "#99BBFF" : theme().textDim}>
+					<CommentIcon stroke={commented ? "#99BBFF" : theme().textDim} style="width: 1rem;" />
+					{post.comments.length}
+				</a>
+			{/await}
 			<button onclick={() => navigator.clipboard.writeText(`bookfly.com/post/${post.id}`)}>
 				<ShareIcon stroke={theme().textDim} style="width: 1rem;" />
 			</button>

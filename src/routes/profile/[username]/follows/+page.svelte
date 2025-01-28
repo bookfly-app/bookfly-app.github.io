@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getUserFromUsername, type User } from "../../../../api/userapi";
+	import { getUserFromId, getUserFromUsername } from "../../../../api/userapi";
 	import Background from "../../../../components/Background.svelte";
 	import Footer from "../../../../components/Footer.svelte";
 	import UserListing from "../../../../components/UserListing.svelte";
@@ -10,44 +10,47 @@
 	let { data }: { data: { username: string } } = $props();
 	let { username } = data;
 
-	let user: User | null = $state(null);
-	(async () => {
-		user = await getUserFromUsername(username);
-	})();
+	let user = $state(getUserFromUsername(username));
+	let following = user.then(user => Promise.all(user.following.map(following => getUserFromId(following))));
+	let followers = user.then(user => Promise.all(user.followers.map(follower => getUserFromId(follower))));
 </script>
 
 <Background />
 <main>
-	<div class="view" style:background={theme().backgroundDark}>
-		<button
-			style:color={view === "following"
-				? theme().textBright
-				: theme().textDull}
-			style:border-color={view === "following"
-				? theme().accent
-				: "transparent"}
-			onclick={() => (view = "following")}
-		>
-			Following ({user?.following.length})
-		</button>
-		<button
-			style:color={view === "followers"
-				? theme().textBright
-				: theme().textDull}
-			style:border-color={view === "followers"
-				? theme().accent
-				: "transparent"}
-			onclick={() => (view = "followers")}
-		>
-			Followers ({user?.followers.length})
-		</button>
-	</div>
+	{#await user then user}
+		<div class="view" style:background={theme().backgroundDark}>
+			{#await following then following}
+				<button
+					style:color={view === "following" ? theme().textBright : theme().textDull}
+					style:border-color={view === "following" ? theme().accent : "transparent"}
+					onclick={() => (view = "following")}
+				>
+					Following ({following.length})
+				</button>
+			{/await}
+			<button
+				style:color={view === "followers" ? theme().textBright : theme().textDull}
+				style:border-color={view === "followers" ? theme().accent : "transparent"}
+				onclick={() => (view = "followers")}
+			>
+				Followers ({user?.followers.length})
+			</button>
+		</div>
 
-	{#if user}
-		{#each user[view] as child}
-			<UserListing user={child} />
-		{/each}
-	{/if}
+		{#if view === "following"}
+			{#await following then following}
+				{#each following as child}
+					<UserListing user={child} />
+				{/each}
+			{/await}
+		{:else if view === "followers"}
+			{#await followers then followers}
+				{#each followers as child}
+					<UserListing user={child} />
+				{/each}
+			{/await}
+		{/if}
+	{/await}
 </main>
 <Footer selected="profile" />
 

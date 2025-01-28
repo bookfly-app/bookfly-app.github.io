@@ -168,3 +168,7 @@ export async function unlikePost(post: Post): Promise<void> {
 export async function didLike(post: Post): Promise<boolean> {
 	return ((await getDoc(doc(collection(db, "posts"), post.id))).data() as InternalPost).likes.includes(getUser()!.id);
 }
+
+export async function didComment(post: Post): Promise<boolean> {
+	return (await getDocs(query(collection(db, "posts"), where("parent", "==", post.id), where("poster", "==", getUser()!.id)))).docs.length > 0;
+}

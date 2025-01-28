@@ -23,7 +23,6 @@ export type InternalPost<T extends PostType = PostType> = {
 	views: UserId[];
 	likes: UserId[];
 	shares: UserId[];
-	comments: PostId[];
 
 	rating: T extends "rating" ? number : never;
 	updateType: T extends "update" ? "start" : never;
@@ -46,7 +45,7 @@ export type Post<T extends PostType = PostType> = {
 	views: User[];
 	likes: User[];
 	shares: User[];
-	comments: PostId[];
+	comments: Post[];
 
 	rating: T extends "rating" ? number : never;
 	updateType: T extends "update" ? "start" : never;
@@ -66,7 +65,6 @@ export async function post(post: Partial<InternalPost>): Promise<Post> {
 		views: [],
 		likes: [],
 		shares: [],
-		comments: [],
 		pictures: [],
 		id: "",
 		...post,
@@ -83,14 +81,18 @@ export async function deletePost(post: Post): Promise<void> {
 }
 
 export async function internalPostToPost(internalPost: InternalPost): Promise<Post> {
-	return {
+	let post: Post = {
 		...internalPost,
 		poster: await getUserFromId(internalPost.poster),
 		books: await Promise.all(internalPost.books.map(async isbn => getBook(isbn))),
 		views: await Promise.all(internalPost.views.map(async userId => getUserFromId(userId))),
 		likes: await Promise.all(internalPost.likes.map(async userId => getUserFromId(userId))),
 		shares: await Promise.all(internalPost.shares.map(async userId => getUserFromId(userId))),
+		comments: [],
 	};
+
+	post.comments = await getReplies(post);
+	return post;
 }
 
 export async function getPostFromId(postid: PostId): Promise<Post | null> {

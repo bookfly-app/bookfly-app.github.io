@@ -28,13 +28,15 @@
 					Following ({following.length})
 				</button>
 			{/await}
-			<button
-				style:color={view === "followers" ? theme().textBright : theme().textDull}
-				style:border-color={view === "followers" ? theme().accent : "transparent"}
-				onclick={() => (view = "followers")}
-			>
-				Followers ({user?.followers.length})
-			</button>
+			{#await followers then followers}
+				<button
+					style:color={view === "followers" ? theme().textBright : theme().textDull}
+					style:border-color={view === "followers" ? theme().accent : "transparent"}
+					onclick={() => (view = "followers")}
+				>
+					Followers ({followers.length})
+				</button>
+			{/await}
 		</div>
 
 		{#if view === "following"}

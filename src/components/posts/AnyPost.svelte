@@ -39,11 +39,11 @@
 			} else if (elapsedSeconds < 60 * 60 * 24 * 7) {
 				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24)}d ago`;
 			} else if (elapsedSeconds < 60 * 60 * 24 * 30) {
-				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 7)}w ago`;
+				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24 / 7)}w ago`;
 			} else if (elapsedSeconds < 60 * 60 * 24 * 365) {
-				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 30)}m ago`;
+				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24 / 30)}m ago`;
 			} else {
-				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 365)}y ago`;
+				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24 / 365)}y ago`;
 			}
 			timeFormat = "relative";
 		}

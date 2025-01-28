@@ -102,8 +102,7 @@ export async function signUp(
 			displayName: username,
 			email,
 			username,
-			picture:
-				"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToiRnzzyrDtkmRzlAvPPbh77E-Mvsk3brlxQ&s",
+			picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToiRnzzyrDtkmRzlAvPPbh77E-Mvsk3brlxQ&s",
 			bio: "",
 			likes: [],
 			id: userInfo.user.uid,
@@ -114,6 +113,7 @@ export async function signUp(
 			readingList: [],
 			following: [],
 			followers: [],
+			views: []
 		};
 		await setDoc(doc(db, "users", user.id), user);
 		return null;

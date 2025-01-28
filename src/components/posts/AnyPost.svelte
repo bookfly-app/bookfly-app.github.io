@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { deletePost, getPostFromId, type Post } from "../../api/postapi";
+	import { deletePost, didLike, getPostFromId, getPostViews, likePost, unlikePost, type Post } from "../../api/postapi";
 	import CommentIcon from "../../assets/images/icons/CommentIcon.svelte";
 	import DotMenuIcon from "../../assets/images/icons/DotMenuIcon.svelte";
 	import EyeIcon from "../../assets/images/icons/EyeIcon.svelte";
@@ -19,6 +19,7 @@
 	let menu: ContextMenu;
 
 	let elapsedSeconds = (Date.now() - post.timestamp) / 1000;
+	let views = getPostViews(post);
 
 	let elapsedTime = $state("");
 	let timeFormat: "relative" | "absolute" = "absolute";
@@ -51,7 +52,6 @@
 	toggleTimeFormat();
 
 	let isCurrentUser = $derived(getUser()?.id === post.poster.id);
-
 	let parent = post.type === "reply" ? getPostFromId(post.parent) : Promise.resolve(null);
 
 	async function clickPost(event: MouseEvent) {
@@ -65,11 +65,33 @@
 			goto(`/post/${post.id}`);
 		}
 	}
+
+	let likes = $state(post.likes.length);
+
+	let liked = $state(didLike(post));
+	async function toggleLike() {
+		liked = liked.then(liked => !liked);
+		if (await liked) {
+			likePost(post);
+			likes += 1;
+		} else {
+			unlikePost(post);
+			likes -= 1;
+		}
+	}
+
+	let isDeleted = $state(false);
+
+	function deleteAndUpdate() {
+		isDeleted = true;
+		deletePost(post);
+	}
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <section
 	style:background={postpage ? theme().backgroundDark : "transparent"}
+	style:display={isDeleted ? "none" : "flex"}
 	tabindex="0"
 	role="link"
 	onclick={clickPost}
@@ -105,18 +127,22 @@
 			<BookUpdate body={post.body} isbn={post.books[0].isbn} user={post.poster} />
 		{/if}
 		<div class="stats">
-			<span style:color={theme().textDim}>
-				<EyeIcon stroke={theme().textDim} style="width: 1rem;" />
-				{post.views.length}
+			<span style:color="#88FFDD">
+				<EyeIcon stroke="#88FFDD" style="width: 1rem;" />
+				{#await views then views}
+					{views}
+				{/await}
 			</span>
-			<button style:color={theme().textDim}>
-				<HeartIcon stroke={theme().textDim} style="width: 1rem;" />
-				{post.likes.length}
-			</button>
-			<button style:color={theme().textDim}>
+			{#await liked then liked}
+				<button onclick={toggleLike} style:color={liked ? "#FFAACC" : theme().textDim}>
+					<HeartIcon fill={liked ? "#FFAACC" : "none"} stroke={liked ? "#FFAACC" : theme().textDim} style="width: 1rem;" />
+					{likes}
+				</button>
+			{/await}
+			<a href="/posts/{post.id}" style:color={theme().textDim}>
 				<CommentIcon stroke={theme().textDim} style="width: 1rem;" />
 				{post.comments.length}
-			</button>
+			</a>
 			<button onclick={() => navigator.clipboard.writeText(`bookfly.com/post/${post.id}`)}>
 				<ShareIcon stroke={theme().textDim} style="width: 1rem;" />
 			</button>
@@ -124,8 +150,9 @@
 				<DotMenuIcon stroke={theme().textDull} style="width: 1.25rem;" />
 				<ContextMenu bind:this={menu}>
 					{#if isCurrentUser}
+						<button style:background={theme().backgroundDim} style:color={theme().textBright}>View Activity</button>
 						<button style:background={theme().backgroundDim} style:color={theme().textBright}>Hide Post</button>
-						<button onclick={() => deletePost(post)} style:background={theme().backgroundDim} style:color={theme().textBright}>
+						<button onclick={deleteAndUpdate} style:background={theme().backgroundDim} style:color={theme().textBright}>
 							Delete Post
 						</button>
 					{:else}
@@ -150,6 +177,7 @@
 			align-items: center;
 			gap: 0.5rem;
 			font-size: 0.85rem;
+			text-decoration: none;
 		}
 	}
 

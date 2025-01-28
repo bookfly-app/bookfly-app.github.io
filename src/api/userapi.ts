@@ -1,7 +1,7 @@
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
-import { internalPostToPost, type InternalPost, type Post } from "./postapi";
+import { internalPostToPost, type InternalPost, type Post, type PostId } from "./postapi";
 
 export type UserId = string;
 
@@ -21,6 +21,7 @@ export type InternalUser = {
 	tags: string[];
 	links: {}[];
 	currentBook: string | null;
+	views: PostId[];
 
 	readingList: ISBN[];
 
@@ -48,6 +49,7 @@ export type User = {
 	tags: string[];
 	links: {}[];
 	currentBook: string | null;
+	views: PostId[];
 
 	readingList: ISBN[];
 
@@ -85,10 +87,10 @@ export function usernameErrors(username: string): string[] {
  * rated any books.
  */
 export async function getFavoriteBook(user: User): Promise<Book | null> {
-	let posts = (await getDocs(query(collection(db, "posts"), where("poster", "==", user.id), where("type", "==", "rating")))).docs.map((doc) =>
+	let posts = (await getDocs(query(collection(db, "posts"), where("poster", "==", user.id), where("type", "==", "rating")))).docs.map(doc =>
 		doc.data()
 	) as Post[];
-	let books = posts.toSorted((a, b) => b.rating! - a.rating!).map((post) => post.books[0]);
+	let books = posts.toSorted((a, b) => b.rating! - a.rating!).map(post => post.books[0]);
 	return books.length > 0 ? await getBook(books[0] as unknown as string) : null;
 }
 
@@ -120,17 +122,17 @@ export async function getNumberOfBooksRead(user: User): Promise<number> {
 }
 
 export async function getUserPosts(user: User): Promise<Post[]> {
-	let internalPosts = (await getDocs(query(collection(db, "posts"), where("poster", "==", user.id), orderBy("timestamp", "desc")))).docs.map(
-		(doc) => doc.data()
+	let internalPosts = (await getDocs(query(collection(db, "posts"), where("poster", "==", user.id), orderBy("timestamp", "desc")))).docs.map(doc =>
+		doc.data()
 	) as InternalPost[];
 
-	let posts = await Promise.all(internalPosts.map(async (post) => internalPostToPost(post)));
+	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
 	return posts;
 }
 
 export async function searchUsers(searchTerm: string): Promise<User[]> {
 	let users = (await getDocs(query(collection(db, "users")))).docs
-		.map((doc) => doc.data())
-		.filter((user) => user.username.toLowerCase().includes(searchTerm.toLowerCase()) || user.displayName.includes(searchTerm.toLowerCase()));
+		.map(doc => doc.data())
+		.filter(user => user.username.toLowerCase().includes(searchTerm.toLowerCase()) || user.displayName.includes(searchTerm.toLowerCase()));
 	return users as User[];
 }

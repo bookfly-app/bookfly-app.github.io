@@ -11,8 +11,7 @@
 	}
 
 	export function close() {
-		console.log("closing");
-		menu.style.visibility = "hidden";
+		//menu.style.visibility = "hidden";
 	}
 </script>
 

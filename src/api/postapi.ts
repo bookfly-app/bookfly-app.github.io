@@ -1,5 +1,5 @@
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { getUser } from "../backend/auth.svelte";
+import { getUser, updateUser } from "../backend/auth.svelte";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
 import { getUserFromId, type User, type UserId } from "./userapi";
@@ -76,7 +76,6 @@ export async function post(post: Partial<InternalPost>): Promise<Post> {
 }
 
 export async function deletePost(post: Post): Promise<void> {
-	console.log(`Deleting post ${post.id}`);
 	await deleteDoc(doc(db, "posts", post.id));
 }
 
@@ -92,6 +91,12 @@ export async function internalPostToPost(internalPost: InternalPost): Promise<Po
 	};
 
 	post.comments = await getReplies(post);
+	if (getUser()) {
+		if (!getUser()!.views.includes(post.id)) {
+			updateUser({ views: [...getUser()!.views, post.id] });
+		}
+	}
+
 	return post;
 }
 
@@ -141,4 +146,25 @@ export function format(text: string): string {
 		.replace(linkRegex, match => `<a target="_blank" rel="noopener noreferrer" href="${match}">${match}</a>`)
 		.replace(/\\\*/, "*")
 		.replace(/\\`/, "`");
+}
+
+export async function getPostViews(post: Post): Promise<number> {
+	let storedViews = (await getDocs(query(collection(db, "users"), where("views", "array-contains", post.id)))).docs;
+	let stored = storedViews.length;
+	if (!getUser() || !storedViews.map(user => user.id).includes(getUser()!.id)) {
+		stored += 1;
+	}
+	return stored;
+}
+
+export async function likePost(post: Post): Promise<void> {
+	await updateDoc(doc(collection(db, "posts"), post.id), { likes: [...new Set([...post.likes.map(like => like.id), getUser()!.id])] });
+}
+
+export async function unlikePost(post: Post): Promise<void> {
+	await updateDoc(doc(collection(db, "posts"), post.id), { likes: post.likes.map(like => like.id).filter(id => id !== getUser()!.id) });
+}
+
+export async function didLike(post: Post): Promise<boolean> {
+	return ((await getDoc(doc(collection(db, "posts"), post.id))).data() as InternalPost).likes.includes(getUser()!.id);
 }

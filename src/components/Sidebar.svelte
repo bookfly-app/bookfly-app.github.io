@@ -1,15 +1,14 @@
 <script lang="ts" module>
 	import { goto } from "$app/navigation";
 	import CloseIcon from "../assets/images/icons/CloseIcon.svelte";
+	import EnterIcon from "../assets/images/icons/EnterIcon.svelte";
 	import ExitIcon from "../assets/images/icons/ExitIcon.svelte";
 	import GearIcon from "../assets/images/icons/GearIcon.svelte";
 	import HomeIcon from "../assets/images/icons/HomeIcon.svelte";
 	import PeopleIcon from "../assets/images/icons/PeopleIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
-	import { getUser } from "../backend/auth.svelte";
+	import { getUser, logOut } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
-	import { logOut } from "../backend/auth.svelte";
-	import EnterIcon from "../assets/images/icons/EnterIcon.svelte";
 
 	let sidebar: HTMLElement;
 
@@ -44,17 +43,17 @@
 			{/if}
 		</a>
 		<div>
-			<a href="/profile"
-				><h1 style:color={theme().textBright}>
+			<a href="/profile">
+				<h1 style:color={theme().textBright}>
 					{getUser()?.displayName ?? "Guest"}
-				</h1></a
-			>
+				</h1>
+			</a>
 			{#if getUser()}
-				<a href="/profile"
-					><h2 style:color={theme().textDim}>
+				<a href="/profile">
+					<h2 style:color={theme().textDim}>
 						@{getUser()!.username}
-					</h2></a
-				>
+					</h2>
+				</a>
 			{/if}
 		</div>
 		<button onclick={() => (sidebar.style.left = "-83vw")}>
@@ -132,6 +131,12 @@
 		margin-left: 2rem;
 		background-size: cover;
 		background-position: center;
+		overflow: hidden;
+
+		img {
+			width: 5rem;
+			height: 5rem;
+		}
 	}
 
 	.profile {

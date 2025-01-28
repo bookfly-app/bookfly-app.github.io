@@ -31,7 +31,7 @@
 	let isCurrentUser = $derived(getUser()?.id === user.id);
 
 	/** The title of the book that the user is currently reading (or null if they aren't) */
-	let currentlyReading = user.currentBook ? getBook(user.currentBook).then(book => book.title) : Promise.resolve(null);
+	let currentlyReading = user.currentBook ? getBook(user.currentBook) : Promise.resolve(null);
 
 	/** The total number of books this user has read */
 	let booksRead = posts.then(posts => posts.filter(post => post.type === "rating").length);
@@ -112,26 +112,26 @@
 			<!-- Favorite Book -->
 			{#await favoriteBook then favorite}
 				{#if favorite}
-					<span title={`${user.displayName}'s highest rated book is ${favorite.title}`}>
+					<a href={`/book/${favorite.isbn}`} title={`${user.displayName}'s highest rated book is ${favorite.title}`}>
 						<StarIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
 						<span class="truncate" style:color={theme().textDull}>{favorite.title}</span>
-					</span>
+					</a>
 				{/if}
 			{/await}
 
 			<!-- Current book -->
 			{#await currentlyReading then current}
 				{#if current}
-					<span title={`${user.displayName} is currently reading ${current}`}>
+					<a href="/book/{current.isbn}" title={`${user.displayName} is currently reading ${current}`}>
 						<ClockIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
-						<span class="truncate" style:color={theme().textDull}>{current}</span>
-					</span>
+						<span class="truncate" style:color={theme().textDull}>{current.title}</span>
+					</a>
 				{/if}
 			{/await}
 
 			<!-- Number of books read -->
 			{#await booksRead then booksRead}
-				<span title={`${user.displayName} has read ${booksRead} book${booksRead === 1 ? "" : "s"}`}>
+				<span title="{user.displayName} has read ${booksRead} book{booksRead === 1 ? '' : 's'}">
 					<BookIcon stroke={theme().textDull} style="width: 1.25rem; height: 1.25rem;" />
 					<span style:color={theme().textDull}>{booksRead}</span>
 				</span>
@@ -151,23 +151,31 @@
 			<button
 				style:color={view === "all" ? theme().text : theme().textDim}
 				style:border-bottom={view === "all" ? `3px solid ${theme().accent}` : "3px solid transparent"}
-				onclick={() => (view = "all")}>All</button
+				onclick={() => (view = "all")}
 			>
+				All
+			</button>
 			<button
 				style:color={view === "discussion" ? theme().text : theme().textDim}
 				style:border-bottom={view === "discussion" ? `3px solid ${theme().accent}` : "3px solid transparent"}
-				onclick={() => (view = "discussion")}>Discussion</button
+				onclick={() => (view = "discussion")}
 			>
+				Discussion
+			</button>
 			<button
 				style:color={view === "ratings" ? theme().text : theme().textDim}
 				style:border-bottom={view === "ratings" ? `3px solid ${theme().accent}` : "3px solid transparent"}
-				onclick={() => (view = "ratings")}>Reviews</button
+				onclick={() => (view = "ratings")}
 			>
+				Reviews
+			</button>
 			<button
 				style:color={view === "list" ? theme().text : theme().textDim}
 				style:border-bottom={view === "list" ? `3px solid ${theme().accent}` : "3px solid transparent"}
-				onclick={() => (view = "list")}>Reading List</button
+				onclick={() => (view = "list")}
 			>
+				Reading List
+			</button>
 		</div>
 	</div>
 

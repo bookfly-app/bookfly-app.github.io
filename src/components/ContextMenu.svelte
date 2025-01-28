@@ -1,35 +1,23 @@
 <script lang="ts">
-	import { onMount } from "svelte";
 	import theme from "../themes/theme.svelte";
 
 	let menu: HTMLElement;
-
-	let clickEvent: MouseEvent | null = null;
-
-	onMount(() => {
-		document.addEventListener("click", event => {
-			if (clickEvent === event) {
-				clickEvent = null;
-				return;
-			}
-
-			if (!event.composedPath().includes(menu)) {
-				menu.style.visibility = "hidden";
-			}
-		});
-
-		Array.from(menu.children).forEach(child => child.addEventListener("click", () => (menu.style.visibility = "hidden")));
-	});
 
 	export function open(event: MouseEvent) {
 		menu.style.left = `${event.clientX - menu.clientWidth}px`;
 		menu.style.top = `${event.clientY}px`;
 		menu.style.visibility = "visible";
-		clickEvent = event;
+		menu.focus();
+	}
+
+	export function close() {
+		console.log("closing");
+		menu.style.visibility = "hidden";
 	}
 </script>
 
-<section style:border-color={theme().textDark} bind:this={menu} class="contextmenu">
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<section tabindex="0" onblur={close} style:border-color={theme().textDark} bind:this={menu} class="contextmenu">
 	<slot />
 </section>
 

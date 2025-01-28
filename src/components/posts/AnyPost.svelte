@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { deletePost, type Post } from "../../api/postapi";
+	import { deletePost, getPostFromId, type Post } from "../../api/postapi";
 	import CommentIcon from "../../assets/images/icons/CommentIcon.svelte";
 	import DotMenuIcon from "../../assets/images/icons/DotMenuIcon.svelte";
 	import EyeIcon from "../../assets/images/icons/EyeIcon.svelte";
@@ -12,8 +12,9 @@
 	import BookUpdate from "./BookUpdate.svelte";
 	import Discussion from "./Discussion.svelte";
 	import Rating from "./Rating.svelte";
+	import Reply from "./Reply.svelte";
 
-	let { post }: { post: Post } = $props();
+	let { post, postpage }: { post: Post; postpage?: boolean } = $props();
 
 	let menu: ContextMenu;
 
@@ -50,12 +51,33 @@
 	toggleTimeFormat();
 
 	let isCurrentUser = $derived(getUser()?.id === post.poster.id);
+
+	let parent = post.type === "reply" ? getPostFromId(post.parent) : Promise.resolve(null);
+
+	async function clickPost(event: MouseEvent) {
+		if ((event.target as HTMLElement).closest("button") || (event.target as HTMLElement).closest("a")) {
+			return;
+		}
+
+		if (post.type === "reply") {
+			goto(`/post/${(await parent)!.id}`);
+		} else {
+			goto(`/post/${post.id}`);
+		}
+	}
 </script>
 
-<section style:border-bottom={`1px solid ${theme().textDark}`}>
-	<button aria-label="Open post" onclick={() => goto(`/post/${post.id}`)} class="profile">
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<section
+	style:background={postpage ? theme().backgroundDark : "transparent"}
+	tabindex="0"
+	role="link"
+	onclick={clickPost}
+	style:border-bottom={`1px solid ${theme().textDark}`}
+>
+	<div class="profile">
 		<a aria-label="Go to poster's profile" style:background-image={`url("${post.poster.picture}")`} href={`/profile/${post.poster.username}`}></a>
-	</button>
+	</div>
 
 	<div class="content-outer">
 		<span class="user">
@@ -65,10 +87,20 @@
 				{elapsedTime}
 			</button>
 		</span>
+		{#if post.type === "reply"}
+			{#await parent then parent}
+				<span style:color={theme().textDim} class="replying-to">
+					Replying to <a href="/profile/{parent!.poster.username}">@{parent!.poster.username}</a>
+				</span>
+			{/await}
+		{/if}
+
 		{#if post.type === "rating"}
 			<Rating isbn={post.books[0].isbn} rating={post.rating} review={post.body} user={post.poster} />
 		{:else if post.type === "general"}
 			<Discussion body={post.body} images={post.pictures} />
+		{:else if post.type === "reply"}
+			<Reply body={post.body} images={post.pictures} parent={post.parent} />
 		{:else if post.type === "update"}
 			<BookUpdate body={post.body} isbn={post.books[0].isbn} user={post.poster} />
 		{/if}
@@ -121,11 +153,23 @@
 		}
 	}
 
+	.replying-to {
+		font-size: 0.85rem;
+
+		a {
+			text-decoration: none;
+			color: cornflowerblue;
+		}
+	}
+
 	section {
 		padding-top: 1rem;
 		padding-right: 1rem;
 		padding-bottom: 0.5rem;
 		display: flex;
+		cursor: pointer;
+		width: 100%;
+		top: 0px;
 	}
 
 	.content-outer {

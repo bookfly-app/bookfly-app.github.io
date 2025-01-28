@@ -1,10 +1,9 @@
 <script lang="ts">
-	import type { Post } from "../api/postapi";
 	import { getFollowedPosts } from "../api/postapi";
 	import CatIcon from "../assets/images/icons/CatIcon.svelte";
+	import LogoIcon from "../assets/images/icons/LogoIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
-	import logo from "../assets/images/logo.svg";
 	import { getUser } from "../backend/auth.svelte";
 	import initializeFirebase from "../backend/backend";
 	import Background from "../components/Background.svelte";
@@ -31,7 +30,9 @@
 				<PersonIcon stroke={theme().textDull} style="width: 2.5rem;" />
 			{/if}
 		</button>
-		<button style:background-image={`url("${logo}")`} onclick={showSidebar} aria-label="Open sidebar"></button>
+		<button onclick={showSidebar} aria-label="Open sidebar">
+			<LogoIcon style="width: 3rem; height: 3rem;" stroke={theme().textDull} />
+		</button>
 		<SearchIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
 	</div>
 </nav>
@@ -136,11 +137,15 @@
 		padding: 1rem;
 
 		button {
-			height: 3rem;
-			width: 3rem;
-			border-radius: 50%;
 			background-size: cover;
 			background-position: center;
+			overflow: hidden;
+
+			img {
+				border-radius: 50%;
+				width: 3rem;
+				height: 3rem;
+			}
 		}
 	}
 

@@ -5,9 +5,13 @@
 	import Background from "../../components/Background.svelte";
 	import theme from "../../themes/theme.svelte";
 
+	// svelte-ignore non_reactive_update - We don't need this to be reactive, we only really need the one way binding
 	let email: string;
+	// svelte-ignore non_reactive_update - We don't need this to be reactive, we only really need the one way binding
 	let password: string;
+	// svelte-ignore non_reactive_update - We don't need this to be reactive, we only really need the one way binding
 	let password2: string;
+	// svelte-ignore non_reactive_update - We don't need this to be reactive, we only really need the one way binding
 	let username: string;
 
 	let usernameInput: HTMLInputElement;

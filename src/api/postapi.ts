@@ -249,7 +249,7 @@ let linkRegex = /(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}
 
 /**
  * Formats the given text into an HTML string that's styled for things like **bold**, *italic*,
- * links, and other common markdown formatting. The text is automatically sanitized, meaning it's
+ * [links](https://www.google.com), and other common markdown formatting. The text is automatically sanitized, meaning it's
  * safe to be injected as raw HTML text content, probably using Svelte's `{@html ... }` tag.
  *
  * @param text the text to format
@@ -349,6 +349,18 @@ export async function didLike(post: Post): Promise<boolean> {
 	return user()!.likes.includes(post.id);
 }
 
+/**
+ * Returns whether the current user share4d the given post.
+ *
+ * This will throw an error if there is no current user, i.e., if the person is not
+ * currently signed in or the user hasn't loaded yet; Take care to check the value of
+ * `user()` for `null` first.
+ *
+ * @param post The post to check if the user shared
+ *
+ * @returns A promise that, when resolved, returns whether or not the current user shared
+ * the given post.
+ */
 export async function didShare(post: Post): Promise<boolean> {
 	return user()!.shares.includes(post.id);
 }

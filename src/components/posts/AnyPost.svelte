@@ -20,7 +20,7 @@
 	import EyeIcon from "../../assets/images/icons/EyeIcon.svelte";
 	import HeartIcon from "../../assets/images/icons/HeartIcon.svelte";
 	import ShareIcon from "../../assets/images/icons/ShareIcon.svelte";
-	import { getUser } from "../../backend/auth.svelte";
+	import { user } from "../../backend/auth.svelte";
 	import theme from "../../themes/theme.svelte";
 	import ContextMenu from "../ContextMenu.svelte";
 	import Notification from "../Notification.svelte";
@@ -66,7 +66,7 @@
 
 	toggleTimeFormat();
 
-	let isCurrentUser = $derived(getUser()?.id === post.poster.id);
+	let isCurrentUser = $derived(user()?.id === post.poster.id);
 	let parent = post.type === "reply" ? getPostFromId(post.parent) : Promise.resolve(null);
 
 	async function clickPost(event: MouseEvent) {

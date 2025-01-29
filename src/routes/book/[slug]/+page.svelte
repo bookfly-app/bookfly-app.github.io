@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getBookDiscussions } from "../../../api/bookapi";
 	import SearchIcon from "../../../assets/images/icons/SearchIcon.svelte";
-	import { getUser } from "../../../backend/auth.svelte";
+	import { user } from "../../../backend/auth.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
 	import Page from "../../../components/Page.svelte";
@@ -42,7 +42,7 @@
 <Page style="overflow-y: hidden;">
 	<nav style:background={theme().backgroundDark}>
 		<div class="banner">
-			<button style:background-image={`url("${getUser()?.picture ?? ""}")`} onclick={showSidebar} aria-label="Open sidebar"></button>
+			<button style:background-image={`url("${user()?.picture ?? ""}")`} onclick={showSidebar} aria-label="Open sidebar"></button>
 			<div class="book-name">
 				<h1 style:color={theme().textBright}>{book.title}</h1>
 				<h2 style:color={theme().textDim}>{book.authors.join(", ")}</h2>

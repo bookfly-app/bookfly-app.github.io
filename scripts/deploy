@@ -1,10 +1,20 @@
 #!/usr/bin/bash
 
+# Exit if any errors occur
 set -e
 
+# Build for production
 bun run build
+
+# .nojekyll - without this, Github pages will automatically ignore any folders
+# starting with an underscore, which Svelte will automatically generate, thus
+# fudging everything up
 touch build/.nojekyll
+
+# Push to the main branch
 git add .
 git commit -m "New build deployment"
 git push
+
+# Push the build to the `gh-pages` branch
 git subtree push --prefix build origin gh-pages

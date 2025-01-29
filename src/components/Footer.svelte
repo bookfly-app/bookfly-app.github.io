@@ -3,7 +3,7 @@
 	import HomeIcon from "../assets/images/icons/HomeIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
-	import { getUser } from "../backend/auth.svelte";
+	import { user } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
 
 	let { selected }: { selected: "home" | "profile" | "search" | "messages" } = $props();
@@ -11,8 +11,8 @@
 
 <footer style:background={theme().backgroundDark}>
 	<a aria-label="Profile" href="/profile">
-		{#if getUser()}
-			<img alt="Your profile" src={getUser()!.picture ?? ""} class="profile-link" />
+		{#if user()}
+			<img alt="Your profile" src={user()!.picture ?? ""} class="profile-link" />
 		{:else}
 			<PersonIcon stroke={selected === "profile" ? theme().textBright : theme().textDull} style="width: 1.5rem;" />
 		{/if}
@@ -36,7 +36,7 @@
 		left: 50%;
 		display: flex;
 		align-items: center;
-		max-width: 25rem;
+		max-width: var(--max-width);
 		transform: translateX(-50%);
 
 		a {

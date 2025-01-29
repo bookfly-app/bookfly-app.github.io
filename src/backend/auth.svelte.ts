@@ -17,7 +17,7 @@ setPersistence(auth, browserLocalPersistence);
 
 let currentUser: User | null = $state(null);
 
-export function getUser(): User | null {
+export function user(): User | null {
 	return currentUser;
 }
 

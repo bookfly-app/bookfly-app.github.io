@@ -13,18 +13,20 @@
 	export function close() {
 		//menu.style.visibility = "hidden";
 	}
+
+	let { children } = $props();
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <section tabindex="0" onblur={close} style:border-color={theme().textDark} bind:this={menu} class="contextmenu">
-	<slot />
+	{@render children()}
 </section>
 
 <style>
 	.contextmenu {
 		display: flex;
 		flex-direction: column;
-		position: absolute;
+		position: fixed;
 		visibility: hidden;
 		overflow: hidden;
 		border-radius: 0.5rem;

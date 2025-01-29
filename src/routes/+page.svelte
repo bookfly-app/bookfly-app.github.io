@@ -4,7 +4,7 @@
 	import LogoIcon from "../assets/images/icons/LogoIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
-	import { getUser } from "../backend/auth.svelte";
+	import { user } from "../backend/auth.svelte";
 	import initializeFirebase from "../backend/backend";
 	import Background from "../components/Background.svelte";
 	import Footer from "../components/Footer.svelte";
@@ -17,7 +17,7 @@
 
 	let view: "following" | "for you" = $state("following");
 
-	let followedPosts = $derived(getUser() ? getFollowedPosts(getUser()!) : Promise.resolve([]));
+	let followedPosts = $derived(user() ? getFollowedPosts(user()!) : Promise.resolve([]));
 </script>
 
 <Background />
@@ -26,8 +26,8 @@
 	<nav style:background={theme().backgroundDark}>
 		<div class="banner">
 			<button onclick={showSidebar} aria-label="Open sidebar">
-				{#if getUser()}
-					<img alt="Your profile" src={getUser()!.picture ?? ""} class="profile-link" />
+				{#if user()}
+					<img alt="Your profile" src={user()!.picture ?? ""} class="profile-link" />
 				{:else}
 					<PersonIcon stroke={theme().textDull} style="width: 2.5rem;" />
 				{/if}
@@ -155,6 +155,6 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-		max-width: 25rem;
+		max-width: var(--max-width);
 	}
 </style>

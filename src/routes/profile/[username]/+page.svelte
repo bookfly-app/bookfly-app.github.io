@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { User } from "../../../api/userapi";
 	import { getUserFromUsername } from "../../../api/userapi";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
@@ -8,19 +7,17 @@
 
 	let { data } = $props();
 
-	let user: User | null = $state(null);
-
-	(async function () {
-		user = await getUserFromUsername(data.username);
-	})();
+	let user = getUserFromUsername(data.username);
 </script>
 
 <Background />
 
 <Page>
-	{#if user}
-		<Profile {user} />
-	{/if}
+	{#await user then user}
+		{#if user}
+			<Profile {user} />
+		{/if}
+	{/await}
 	<div></div>
 	<Footer selected="search" />
 </Page>

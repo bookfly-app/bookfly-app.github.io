@@ -1,13 +1,13 @@
 <script lang="ts" module>
 	import { goto } from "$app/navigation";
+	import BookmarkIcon from "../assets/images/icons/BookmarkIcon.svelte";
 	import CloseIcon from "../assets/images/icons/CloseIcon.svelte";
 	import EnterIcon from "../assets/images/icons/EnterIcon.svelte";
 	import ExitIcon from "../assets/images/icons/ExitIcon.svelte";
 	import GearIcon from "../assets/images/icons/GearIcon.svelte";
 	import HomeIcon from "../assets/images/icons/HomeIcon.svelte";
-	import PeopleIcon from "../assets/images/icons/PeopleIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
-	import { getUser, logOut } from "../backend/auth.svelte";
+	import { logOut, user } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
 
 	let sidebar: HTMLElement;
@@ -36,8 +36,8 @@
 >
 	<div class="profile" style:background={theme().backgroundDark}>
 		<a class="profile-picture" href="/profile" aria-label="Go to profile">
-			{#if getUser()}
-				<img alt="Your profile" src={getUser()!.picture ?? ""} class="profile-link" />
+			{#if user()}
+				<img alt="Your profile" src={user()!.picture ?? ""} class="profile-link" />
 			{:else}
 				<PersonIcon stroke={theme().textDull} style="width: 5rem;" />
 			{/if}
@@ -45,13 +45,13 @@
 		<div>
 			<a href="/profile">
 				<h1 style:color={theme().textBright}>
-					{getUser()?.displayName ?? "Guest"}
+					{user()?.displayName ?? "Guest"}
 				</h1>
 			</a>
-			{#if getUser()}
+			{#if user()}
 				<a href="/profile">
 					<h2 style:color={theme().textDim}>
-						@{getUser()!.username}
+						@{user()!.username}
 					</h2>
 				</a>
 			{/if}
@@ -70,16 +70,16 @@
 		<PersonIcon stroke={theme().text} style="width: 2rem;" />
 		Profile
 	</button>
-	<button class="listing" style:color={theme().text} onclick={nav("/community")}>
-		<PeopleIcon stroke={theme().text} style="width: 2rem;" />
-		Community
+	<button class="listing" style:color={theme().text} onclick={nav("/settings")}>
+		<BookmarkIcon stroke={theme().text} style="width: 2rem;" />
+		Saved
 	</button>
 	<button class="listing" style:color={theme().text} onclick={nav("/settings")}>
 		<GearIcon stroke={theme().text} style="width: 2rem;" />
 		Settings
 	</button>
 
-	{#if getUser()}
+	{#if user()}
 		<button class="listing" style:color={theme().text} onclick={signOut}>
 			<ExitIcon stroke={theme().text} style="width: 2rem;" />
 			Log Out

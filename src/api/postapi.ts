@@ -1,5 +1,5 @@
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { getUser, updateUser } from "../backend/auth.svelte";
+import { updateUser, user } from "../backend/auth.svelte";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
 import { getUserFromId, type InternalUser, type User, type UserId } from "./userapi";
@@ -132,7 +132,7 @@ let { db } = initializeFirebase();
 export async function post(post: Partial<Omit<InternalPost, "id">> & { body: string; type: PostType }): Promise<Post> {
 	let toPost: InternalPost = {
 		timestamp: Date.now(),
-		poster: getUser()!.id,
+		poster: user()!.id,
 		authors: [],
 		books: [],
 		views: [],
@@ -179,8 +179,8 @@ export async function internalPostToPost(internalPost: InternalPost): Promise<Po
 		books: await Promise.all(internalPost.books.map(async isbn => getBook(isbn))),
 	};
 
-	if (getUser() && !getUser()!.views.includes(post.id)) {
-		updateUser({ views: [...getUser()!.views, post.id] });
+	if (user() && !user()!.views.includes(post.id)) {
+		updateUser({ views: [...user()!.views, post.id] });
 	}
 
 	return post;
@@ -245,14 +245,12 @@ export async function getShares(post: Post): Promise<InternalUser[]> {
  *
  * This is used in `format()` to detect links.
  */
-let linkRegex = /(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+let linkRegex = /(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
 
 /**
  * Formats the given text into an HTML string that's styled for things like **bold**, *italic*,
- * links, and other common markdown formatting.
- *
- * TODO: This currently is unsafe, and may expose XSS attacks. We need to perform sanitization on the rendered
- * text.
+ * links, and other common markdown formatting. The text is automatically sanitized, meaning it's
+ * safe to be injected as raw HTML text content, probably using Svelte's `{@html ... }` tag.
  *
  * @param text the text to format
  *
@@ -261,14 +259,20 @@ let linkRegex = /(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}
  */
 export function format(text: string): string {
 	return text
-		.replace(/@(\w+)/, (match, username) => `<a style="text-decoration: none;" href="/profile/${username}">${match}</a>`)
-		.replace(/\*\*([^\*]+)\*\*/, (_match, content) => `<b>${content}</b>`)
-		.replace(/\*([^\*]+)\*/, (_match, content) => `<i>${content}</i>`)
-		.replace(/`([^\`]+)`/, (_match, code) => `<code>${code}</code>`)
-		.replace(/~~([^~]+)~~/, (_match, code) => `<s>${code}</s>`)
-		.replace(linkRegex, match => `<a target="_blank" rel="noopener noreferrer" href="${match}">${match}</a>`)
-		.replace(/\\\*/, "*")
-		.replace(/\\`/, "`");
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("'", "&#x27;")
+		.replaceAll(/@(\w+)/g, (match, username) => `<a style="text-decoration: none;" href="/profile/${username}">${match}</a>`)
+		.replaceAll(/\*\*([^\*]+)\*\*/g, (_match, content) => `<b>${content}</b>`)
+		.replaceAll(/\*([^\*]+)\*/g, (_match, content) => `<i>${content}</i>`)
+		.replaceAll(/`([^\`]+)`/g, (_match, code) => `<code>${code}</code>`)
+		.replaceAll(/~~([^~]+)~~/g, (_match, code) => `<s>${code}</s>`)
+		.replaceAll(linkRegex, match => `<a target="_blank" rel="noopener noreferrer" href="${match}">${match}</a>`)
+		.replaceAll(/\\\*/g, "*")
+		.replaceAll(/\\`/g, "`")
+		.replaceAll("`", "&#x60;");
 }
 
 /**
@@ -283,7 +287,7 @@ export function format(text: string): string {
 export async function getPostViews(post: Post): Promise<number> {
 	let storedViews = (await getDocs(query(collection(db, "users"), where("views", "array-contains", post.id)))).docs;
 	let stored = storedViews.length;
-	if (!getUser() || !storedViews.map(user => user.id).includes(getUser()!.id)) {
+	if (!user() || !storedViews.map(user => user.id).includes(user()!.id)) {
 		stored += 1;
 	}
 	return stored;
@@ -294,7 +298,7 @@ export async function getPostViews(post: Post): Promise<number> {
  *
  * This will throw an error if there is no current user, i.e., if the person is not
  * currently signed in or the user hasn't loaded yet; Take care to check the value of
- * `getUser()` for `null` first.
+ * `user()` for `null` first.
  *
  * This can be safely called even if the user has already liked the given post. It will just
  * do nothing.
@@ -304,11 +308,11 @@ export async function getPostViews(post: Post): Promise<number> {
  * @returns A promise that resolves when the database is updated with the post like.
  */
 export async function likePost(post: Post): Promise<void> {
-	await updateDoc(doc(collection(db, "users"), getUser()!.id), { likes: [...new Set([...getUser()!.likes, post.id])] });
+	await updateDoc(doc(collection(db, "users"), user()!.id), { likes: [...new Set([...user()!.likes, post.id])] });
 }
 
 export async function sharePost(post: Post): Promise<void> {
-	await updateDoc(doc(collection(db, "users"), getUser()!.id), { shares: [...new Set([...getUser()!.shares, post.id])] });
+	await updateDoc(doc(collection(db, "users"), user()!.id), { shares: [...new Set([...user()!.shares, post.id])] });
 }
 
 /**
@@ -316,7 +320,7 @@ export async function sharePost(post: Post): Promise<void> {
  *
  * This will throw an error if there is no current user, i.e., if the person is not
  * currently signed in or the user hasn't loaded yet; Take care to check the value of
- * `getUser()` for `null` first.
+ * `user()` for `null` first.
  *
  * This can be safely called even if the user hasn't liked the given post. It will just
  * do nothing.
@@ -326,7 +330,7 @@ export async function sharePost(post: Post): Promise<void> {
  * @returns A promise that resolves when the database is updated with the post like.
  */
 export async function unlikePost(post: Post): Promise<void> {
-	await updateDoc(doc(collection(db, "users"), getUser()!.id), { likes: getUser()!.likes.filter(id => id !== post.id) });
+	await updateDoc(doc(collection(db, "users"), user()!.id), { likes: user()!.likes.filter(id => id !== post.id) });
 }
 
 /**
@@ -334,7 +338,7 @@ export async function unlikePost(post: Post): Promise<void> {
  *
  * This will throw an error if there is no current user, i.e., if the person is not
  * currently signed in or the user hasn't loaded yet; Take care to check the value of
- * `getUser()` for `null` first.
+ * `user()` for `null` first.
  *
  * @param post The post to check if the user liked
  *
@@ -342,17 +346,17 @@ export async function unlikePost(post: Post): Promise<void> {
  * the given post.
  */
 export async function didLike(post: Post): Promise<boolean> {
-	return getUser()!.likes.includes(post.id);
+	return user()!.likes.includes(post.id);
 }
 
 export async function didShare(post: Post): Promise<boolean> {
-	return getUser()!.shares.includes(post.id);
+	return user()!.shares.includes(post.id);
 }
 
 /**
  * Returns whether the current user replied to the given post. This will throw an error
  * if there is no current user, i.e., if the person is not currently signed in or the user
- * hasn't loaded yet; Take care to check the value of `getUser()` for `null` first.
+ * hasn't loaded yet; Take care to check the value of `user()` for `null` first.
  *
  * @param post The post to check if the user replied to
  *
@@ -360,5 +364,5 @@ export async function didShare(post: Post): Promise<boolean> {
  * to the given post.
  */
 export async function didComment(post: Post): Promise<boolean> {
-	return (await getDocs(query(collection(db, "posts"), where("parent", "==", post.id), where("poster", "==", getUser()!.id)))).docs.length > 0;
+	return (await getDocs(query(collection(db, "posts"), where("parent", "==", post.id), where("poster", "==", user()!.id)))).docs.length > 0;
 }

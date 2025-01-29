@@ -15,7 +15,7 @@
 <style>
 	main {
 		width: 100%;
-		max-width: 25rem;
+		max-width: var(--max-width);
 		height: 100%;
 		overflow-y: auto;
 		overflow-x: hidden;

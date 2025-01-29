@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { signUp, passwordErrors, usernameIsTaken, emailIsTaken, getUser } from "../../backend/auth.svelte";
 	import { usernameErrors } from "../../api/userapi";
+	import { emailIsTaken, passwordErrors, signUp, user, usernameIsTaken } from "../../backend/auth.svelte";
 	import Background from "../../components/Background.svelte";
 	import theme from "../../themes/theme.svelte";
 
@@ -90,7 +90,7 @@
 	}
 
 	$effect(() => {
-		if (getUser()!) {
+		if (user()) {
 			goto("/profile");
 		}
 	});

@@ -3,20 +3,20 @@
 
 	let { message } = $props();
 
-	let notification: HTMLElement;
-
 	export function show() {
-		notification.style.bottom = "5rem";
+		isHidden = false;
 		setTimeout(() => {
-			notification.style.bottom = "0rem";
+			isHidden = true;
 		}, 3000);
 	}
+
+	let isHidden = $state(true);
 </script>
 
 <section
-	bind:this={notification}
 	style:color={theme().background}
-	style:background={`linear-gradient(${theme().accent}, ${theme().accent2})`}
+	style:background="linear-gradient({theme().accent}, {theme().accent2})"
+	style:bottom={isHidden ? "-5rem" : "5rem"}
 	class="notification"
 >
 	{message}
@@ -37,8 +37,8 @@
 		box-shadow: 0px 0px 10px black;
 		font-weight: 600;
 		left: 50%;
-		bottom: 0rem;
 		transform: translateX(-50%);
 		transition: bottom 0.2s;
+		z-index: 9999;
 	}
 </style>

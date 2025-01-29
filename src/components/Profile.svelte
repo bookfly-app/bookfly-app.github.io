@@ -11,26 +11,27 @@
 	import MessageIcon from "../assets/images/icons/MessageIcon.svelte";
 	import SortIcon from "../assets/images/icons/SortIcon.svelte";
 	import StarIcon from "../assets/images/icons/StarIcon.svelte";
-	import { getUser, updateOtherUser, updateUser } from "../backend/auth.svelte";
+	import { updateOtherUser, updateUser, user } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
 	import AnyPost from "./posts/AnyPost.svelte";
 	import ReadingListItem from "./ReadingListItem.svelte";
 
-	let { user }: { user: User } = $props();
+	let props = $props();
+	let profileUser: User = props.user;
 
 	let view: "all" | "ratings" | "discussion" | "list" = $state("all");
 
 	/** This user's highest rated book */
-	let favoriteBook = getFavoriteBook(user);
+	let favoriteBook = getFavoriteBook(profileUser);
 
 	/** This user's posts */
-	let posts = getUserPosts(user);
+	let posts = getUserPosts(profileUser);
 
 	/** Whether the profile being viewed is of the currently logged in user. */
-	let isCurrentUser = $derived(getUser()?.id === user.id);
+	let isCurrentUser = $derived(user()?.id === profileUser.id);
 
 	/** The title of the book that the user is currently reading (or null if they aren't) */
-	let currentlyReading = user.currentBook ? getBook(user.currentBook) : Promise.resolve(null);
+	let currentlyReading = profileUser.currentBook ? getBook(profileUser.currentBook) : Promise.resolve(null);
 
 	/** The total number of books this user has read */
 	let booksRead = posts.then(posts => posts.filter(post => post.type === "rating").length);
@@ -39,17 +40,17 @@
 
 	/** Whether the current user is following this profile's user */
 	let following = $derived(
-		followingOverride || ((getUser()?.following.some(following => following === user.id) ?? false) && followingOverride === null),
+		followingOverride || ((user()?.following.some(following => following === profileUser.id) ?? false) && followingOverride === null),
 	);
 
 	/** Follows this user. */
 	function follow() {
 		followingOverride = true;
 		updateUser({
-			following: [...new Set([...getUser()!.following, user.id])],
+			following: [...new Set([...user()!.following, profileUser.id])],
 		});
-		updateOtherUser(user, {
-			followers: [...new Set([...user.followers, getUser()!.id])],
+		updateOtherUser(profileUser, {
+			followers: [...new Set([...profileUser.followers, user()!.id])],
 		});
 	}
 
@@ -57,32 +58,37 @@
 	function unfollow() {
 		followingOverride = false;
 		updateUser({
-			following: getUser()!.following.filter(id => id !== user.id),
+			following: user()!.following.filter(id => id !== profileUser.id),
 		});
-		updateOtherUser(user, {
-			followers: user.followers.filter(id => id !== getUser()!.id),
+		updateOtherUser(profileUser, {
+			followers: profileUser.followers.filter(id => id !== user()!.id),
 		});
 	}
 </script>
 
 <section>
-	<div class="banner" style:background-image={`url("${user.banner}")`}></div>
+	<div class="banner" style:background-image={`url("${profileUser.banner}")`}></div>
 	<button class="back-arrow" onclick={() => goto("/")}>
 		<LeftArrowIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem;" />
 	</button>
 	<div class="profile" style:background={theme().backgroundDark}>
-		<img class="profile-picture" src={user.picture} alt={`${user.displayName} profile picture`} style:border-color={theme().backgroundDark} />
+		<img
+			class="profile-picture"
+			src={profileUser.picture}
+			alt={`${profileUser.displayName} profile picture`}
+			style:border-color={theme().backgroundDark}
+		/>
 		<div class="profile-line-1">
 			<span class="name">
-				<h1 style:color={theme().textBright}>{user.displayName}</h1>
-				<h2 style:color={theme().textDim}>@{user.username}</h2>
-				{#if user.tags.includes("dev")}
+				<h1 style:color={theme().textBright}>{profileUser.displayName}</h1>
+				<h2 style:color={theme().textDim}>@{profileUser.username}</h2>
+				{#if profileUser.tags.includes("dev")}
 					<span class="dev">Dev</span>
 				{/if}
-				{#if user.tags.includes("author")}
+				{#if profileUser.tags.includes("author")}
 					<span class="author">Author</span>
 				{/if}
-				{#if user.tags.includes("mod")}
+				{#if profileUser.tags.includes("mod")}
 					<span class="mod">Moderator</span>
 				{/if}
 			</span>
@@ -110,14 +116,14 @@
 				</div>
 			{/if}
 		</div>
-		<p style:color={theme().text} class="bio">{@html format(user.bio)}</p>
+		<p style:color={theme().text} class="bio">{@html format(profileUser.bio)}</p>
 
 		<!-- Line 2: Profile stats -->
 		<div class="profile-line-2">
 			<!-- Favorite Book -->
 			{#await favoriteBook then favorite}
 				{#if favorite}
-					<a href={`/book/${favorite.isbn}`} title={`${user.displayName}'s highest rated book is ${favorite.title}`}>
+					<a href={`/book/${favorite.isbn}`} title={`${profileUser.displayName}'s highest rated book is ${favorite.title}`}>
 						<StarIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
 						<span class="truncate" style:color={theme().textDull}>{favorite.title}</span>
 					</a>
@@ -127,7 +133,7 @@
 			<!-- Current book -->
 			{#await currentlyReading then current}
 				{#if current}
-					<a href="/book/{current.isbn}" title={`${user.displayName} is currently reading ${current}`}>
+					<a href="/book/{current.isbn}" title={`${profileUser.displayName} is currently reading ${current}`}>
 						<ClockIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
 						<span class="truncate" style:color={theme().textDull}>{current.title}</span>
 					</a>
@@ -136,18 +142,18 @@
 
 			<!-- Number of books read -->
 			{#await booksRead then booksRead}
-				<span title="{user.displayName} has read ${booksRead} book{booksRead === 1 ? '' : 's'}">
+				<span title="{profileUser.displayName} has read ${booksRead} book{booksRead === 1 ? '' : 's'}">
 					<BookIcon stroke={theme().textDull} style="width: 1.25rem; height: 1.25rem;" />
 					<span style:color={theme().textDull}>{booksRead}</span>
 				</span>
 			{/await}
 		</div>
-		<a style:border-color={theme().textDull} style:color={theme().textDull} class="follows" href={`/profile/${user.username}/follows`}>
+		<a style:border-color={theme().textDull} style:color={theme().textDull} class="follows" href={`/profile/${profileUser.username}/follows`}>
 			<span>
-				{user.followers.length} Followers
+				{profileUser.followers.length} Followers
 			</span>
 			<span>
-				{user.following.length} Following
+				{profileUser.following.length} Following
 			</span>
 		</a>
 
@@ -200,7 +206,7 @@
 				{/each}
 			</div>
 		{:else if view === "list"}
-			{#each user.readingList as isbn}
+			{#each profileUser.readingList as isbn}
 				<ReadingListItem {isbn} {user} />
 			{/each}
 		{:else if view === "all"}

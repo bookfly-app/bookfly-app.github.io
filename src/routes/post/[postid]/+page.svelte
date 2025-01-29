@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getPostFromId, getReplies, post, type Post, type PostId } from "../../../api/postapi";
 	import SendIcon from "../../../assets/images/icons/SendIcon.svelte";
-	import { getUser } from "../../../backend/auth.svelte";
+	import { user } from "../../../backend/auth.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
 	import Page from "../../../components/Page.svelte";
@@ -51,9 +51,9 @@
 		<AnyPost post={post!} postpage />
 		<div style:border-color={theme().textDark} class="reply">
 			<a aria-label="Go to profile" href="/profile">
-				<img alt="Your profile" src={getUser()?.picture} />
+				<img alt="Your profile" src={user()?.picture} />
 			</a>
-			{#if getUser()}
+			{#if user()}
 				<textarea
 					bind:this={reply}
 					bind:value={replyBody}

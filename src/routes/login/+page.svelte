@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { getUser, logIn } from "../../backend/auth.svelte";
+	import { logIn, user } from "../../backend/auth.svelte";
 	import Background from "../../components/Background.svelte";
 	import Footer from "../../components/Footer.svelte";
 	import theme from "../../themes/theme.svelte";
@@ -17,7 +17,7 @@
 	}
 
 	$effect(() => {
-		if (getUser()!) {
+		if (user()!) {
 			goto("/profile");
 		}
 	});

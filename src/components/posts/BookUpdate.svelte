@@ -43,6 +43,8 @@
 
 	.content {
 		padding-right: 1rem;
+		display: flex;
+		flex-direction: column;
 
 		.title,
 		.author {

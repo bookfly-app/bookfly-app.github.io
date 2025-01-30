@@ -39,12 +39,21 @@
 	let elapsedTime = $state("");
 	let timeFormat: "relative" | "absolute" = "absolute";
 
+	/**
+	 * Switches the timestamp on the post between relative time (like "3h ago") and
+	 * absolute time (like "1/29/2025 @ 5:00PM"). The result is stored in `elapsedTime`
+	 * and the UI is automatically refreshed to show the new time display.
+	 */
 	function toggleTimeFormat() {
+		// Switch from relative to absolute
 		if (timeFormat == "relative") {
 			let date = new Date(post.timestamp);
 			elapsedTime = `${date.toLocaleDateString()} @ ${date.toLocaleTimeString().replace(/(.*)\D\d+/, "$1")}`;
 			timeFormat = "absolute";
-		} else {
+		}
+
+		// Switch from absolute to relative
+		else {
 			if (elapsedSeconds < 60) {
 				elapsedTime = `${Math.floor(elapsedSeconds)}s ago`;
 			} else if (elapsedSeconds < 60 * 60) {
@@ -64,6 +73,7 @@
 		}
 	}
 
+	// Set the initial time to relative
 	toggleTimeFormat();
 
 	let isCurrentUser = $derived(user()?.id === post.poster.id);
@@ -85,8 +95,11 @@
 		}
 	}
 
+	/** The number of likes on the post */
 	let likes = $state(getLikes(post).then(likes => likes.length));
+	/** The number of replies on the post */
 	let comments = $state(getReplies(post).then(replies => replies.length));
+	/** The number of shares on the post */
 	let shares = $state(getShares(post).then(shares => shares.length));
 
 	let liked = $state(didLike(post));
@@ -106,19 +119,32 @@
 
 	let isDeleted = $state(false);
 
-	function deleteAndUpdate() {
+	/**
+	 * Deletes this post. This deletes it internally in the database and
+	 * updates the UI to hide the post.
+	 */
+	async function deleteAndUpdate() {
 		isDeleted = true;
-		deletePost(post);
+		await deletePost(post);
 	}
 
-	// svelte-ignore non_reactive_update
 	let shareNotification: Notification;
+
+	/**
+	 * Called when the share button on a post is clicked.
+	 *
+	 * This does four things:
+	 * - Copies the post link to the user's clipboard
+	 * - Shows the share notification
+	 * - Stores in the database that this user shared this post
+	 * - Updates the UI to reflect the shared post
+	 */
 	async function share() {
 		navigator.clipboard.writeText(`https://bookfly-app.github.io/post/${post.id}`);
 		shareNotification.show();
 		if (!(await shared)) shares = shares.then(shares => shares + 1);
 		shared = Promise.resolve(true);
-		sharePost(post);
+		await sharePost(post);
 	}
 </script>
 
@@ -196,8 +222,6 @@
 				<DotMenuIcon stroke={theme().textDull} style="width: 1.25rem;" />
 				<ContextMenu bind:this={menu}>
 					{#if isCurrentUser}
-						<button style:background={theme().backgroundDim} style:color={theme().textBright}>View Activity</button>
-						<button style:background={theme().backgroundDim} style:color={theme().textBright}>Hide Post</button>
 						<button onclick={deleteAndUpdate} style:background={theme().backgroundDim} style:color={theme().textBright}>
 							Delete Post
 						</button>

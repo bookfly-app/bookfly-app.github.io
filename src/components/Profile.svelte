@@ -14,12 +14,11 @@
 	import { updateOtherUser, updateUser, user } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
 	import AnyPost from "./posts/AnyPost.svelte";
-	import ReadingListItem from "./ReadingListItem.svelte";
 
 	let props = $props();
 	let profileUser: User = props.user;
 
-	let view: "all" | "ratings" | "discussion" | "list" = $state("all");
+	let view: "all" | "ratings" | "discussion" | "activity" = $state("all");
 
 	/** This user's highest rated book */
 	let favoriteBook = getFavoriteBook(profileUser);
@@ -133,7 +132,7 @@
 			<!-- Current book -->
 			{#await currentlyReading then current}
 				{#if current}
-					<a href="/book/{current.isbn}" title={`${profileUser.displayName} is currently reading ${current}`}>
+					<a href="/book/{current.isbn}" title={`${profileUser.displayName} is currently reading ${current.title}`}>
 						<ClockIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
 						<span class="truncate" style:color={theme().textDull}>{current.title}</span>
 					</a>
@@ -142,7 +141,7 @@
 
 			<!-- Number of books read -->
 			{#await booksRead then booksRead}
-				<span title="{profileUser.displayName} has read ${booksRead} book{booksRead === 1 ? '' : 's'}">
+				<span title="{profileUser.displayName} has read {booksRead} book{booksRead === 1 ? '' : 's'}">
 					<BookIcon stroke={theme().textDull} style="width: 1.25rem; height: 1.25rem;" />
 					<span style:color={theme().textDull}>{booksRead}</span>
 				</span>
@@ -181,11 +180,11 @@
 				Reviews
 			</button>
 			<button
-				style:color={view === "list" ? theme().text : theme().textDim}
-				style:border-bottom={view === "list" ? `3px solid ${theme().accent}` : "3px solid transparent"}
-				onclick={() => (view = "list")}
+				style:color={view === "activity" ? theme().text : theme().textDim}
+				style:border-bottom={view === "activity" ? `3px solid ${theme().accent}` : "3px solid transparent"}
+				onclick={() => (view = "activity")}
 			>
-				Reading List
+				Activity
 			</button>
 		</div>
 	</div>
@@ -205,9 +204,9 @@
 					<AnyPost {post} />
 				{/each}
 			</div>
-		{:else if view === "list"}
-			{#each profileUser.readingList as isbn}
-				<ReadingListItem {isbn} {user} />
+		{:else if view === "activity"}
+			{#each posts.filter(post => post.type === "update") as post}
+				<AnyPost {post} />
 			{/each}
 		{:else if view === "all"}
 			{#each posts as post}

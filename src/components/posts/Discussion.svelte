@@ -1,6 +1,6 @@
 <script lang="ts">
-	import theme from "../../themes/theme.svelte";
 	import { format } from "../../api/postapi";
+	import theme from "../../themes/theme.svelte";
 
 	let { body, images } = $props();
 </script>
@@ -8,7 +8,7 @@
 <section>
 	<p class="body" style:color={theme().text}>{@html format(body)}</p>
 	{#if images.length > 0}
-		<div class="image" style:background-image={`url("${images[0]}")`}>
+		<div class="image" style:background-image="url('{images[0]}')">
 			{#each images}
 				<div class="dot"></div>
 			{/each}

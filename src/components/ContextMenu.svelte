@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import theme from "../themes/theme.svelte";
 
 	let menu: HTMLElement;
@@ -11,14 +12,22 @@
 	}
 
 	export function close() {
-		//menu.style.visibility = "hidden";
+		menu.style.visibility = "hidden";
 	}
 
 	let { children } = $props();
+
+	onMount(() => {
+		menu.addEventListener("focusout", event => {
+			if (!menu.contains(event.relatedTarget as Node)) {
+				close();
+			}
+		});
+	});
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-<section tabindex="0" onblur={close} style:border-color={theme().textDark} bind:this={menu} class="contextmenu">
+<section tabindex="0" style:border-color={theme().textDark} bind:this={menu} class="contextmenu">
 	{@render children()}
 </section>
 

@@ -2,6 +2,7 @@
 	import { getBook } from "../../api/bookapi";
 	import StarIcon from "../../assets/images/icons/StarIcon.svelte";
 	import theme from "../../themes/theme.svelte";
+	import StarRating from "../StarRating.svelte";
 
 	let { isbn, rating, review, user } = $props();
 
@@ -21,43 +22,9 @@
 				<a href={`/book/${book?.isbn}`} class="author" style:color={theme().textDim}>
 					{book?.authors.join(", ")}
 				</a>
-				<span class="rating">
-					<StarIcon
-						stroke="#FFFFAA"
-						fill="#FFFFAA"
-						fillEnd={theme().background}
-						fillPercent={rating < 2 ? rating / 2 : undefined}
-						style="width: 1.5rem; height: 1.5rem;"
-					/>
-					<StarIcon
-						stroke="#FFFFAA"
-						fill="#FFFFAA"
-						fillEnd={theme().background}
-						fillPercent={rating < 4 ? (rating - 2) / 2 : undefined}
-						style="width: 1.5rem; height: 1.5rem;"
-					/>
-					<StarIcon
-						stroke="#FFFFAA"
-						fill="#FFFFAA"
-						fillEnd={theme().background}
-						fillPercent={rating < 6 ? (rating - 4) / 2 : undefined}
-						style="width: 1.5rem; height: 1.5rem;"
-					/>
-					<StarIcon
-						stroke="#FFFFAA"
-						fill="#FFFFAA"
-						fillEnd={theme().background}
-						fillPercent={rating < 8 ? (rating - 6) / 2 : undefined}
-						style="width: 1.5rem; height: 1.5rem;"
-					/>
-					<StarIcon
-						stroke="#FFFFAA"
-						fill="#FFFFAA"
-						fillEnd={theme().background}
-						fillPercent={rating < 10 ? (rating - 8) / 2 : undefined}
-						style="width: 1.5rem; height: 1.5rem;"
-					/>
-				</span>
+				<div class="stars">
+					<StarRating {rating} size={1.5} />
+				</div>
 				<h1 class="rating-number" style:color={theme().textBright}>
 					{rating} / 10
 				</h1>
@@ -81,8 +48,7 @@
 		font-size: 2rem;
 	}
 
-	.rating {
-		display: flex;
+	.stars {
 		padding-top: 1rem;
 		padding-bottom: 1rem;
 	}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import { getBook } from "../api/bookapi";
-	import { format } from "../api/postapi";
+	import { format, type Post } from "../api/postapi";
 	import { getFavoriteBook, getUserPosts, type User } from "../api/userapi";
 	import AddIcon from "../assets/images/icons/AddIcon.svelte";
 	import BookIcon from "../assets/images/icons/BookIcon.svelte";
@@ -9,11 +9,15 @@
 	import ClockIcon from "../assets/images/icons/ClockIcon.svelte";
 	import LeftArrowIcon from "../assets/images/icons/LeftArrowIcon.svelte";
 	import MessageIcon from "../assets/images/icons/MessageIcon.svelte";
+	import SortIcon from "../assets/images/icons/SortIcon.svelte";
 	import StarIcon from "../assets/images/icons/StarIcon.svelte";
 	import { updateOtherUser, updateUser, user } from "../backend/auth.svelte";
-	import theme from "../themes/theme.svelte";
+	import theme, { accentGradient } from "../themes/theme.svelte";
 	import Badges from "./Badges.svelte";
+	import BookListing from "./BookListing.svelte";
+	import ContextMenu from "./ContextMenu.svelte";
 	import AnyPost from "./posts/AnyPost.svelte";
+	import RadioInput from "./RadioInput.svelte";
 
 	let props = $props();
 	let profileUser: User = props.user;
@@ -34,6 +38,31 @@
 
 	/** The total number of books this user has read */
 	let booksRead = posts.then(posts => posts.filter(post => post.type === "rating").length);
+
+	let showFullReviews = $state(false);
+	let ratingSortMenu: ContextMenu;
+
+	let ratingSort: "best" | "recent" = $state("best");
+	let ratingSortName = $derived({ best: "Highest Rated", recent: "Recently Finished" }[ratingSort]);
+	let ratings = $derived(
+		posts.then(posts =>
+			posts
+				.filter(post => post.type === "rating")
+				.toSorted(
+					{
+						best: (a: Post, b: Post) => a.rating - b.rating,
+						recent: (a: Post, b: Post) => a.timestamp - b.timestamp,
+					}[ratingSort],
+				),
+		),
+	);
+
+	function sortRatingsBy(sorter: "best" | "recent") {
+		return () => {
+			ratingSort = sorter;
+			ratingSortMenu.close();
+		};
+	}
 
 	let followingOverride: boolean | null = $state(null);
 
@@ -94,7 +123,7 @@
 			{#if isCurrentUser}
 				<button
 					style:color={theme().background}
-					style:background="linear-gradient({theme().accent}, {theme().accent2})"
+					style:background={accentGradient()}
 					class="edit-profile"
 					onclick={() => goto("/profile/edit")}
 				>
@@ -178,7 +207,7 @@
 				style:border-bottom={view === "ratings" ? `3px solid ${theme().accent}` : "3px solid transparent"}
 				onclick={() => (view = "ratings")}
 			>
-				Ratings
+				Books
 			</button>
 			<button
 				style:color={view === "activity" ? theme().text : theme().textDim}
@@ -202,9 +231,35 @@
 			{/each}
 		{:else if view === "ratings"}
 			<div class="ratings">
-				{#each posts.filter(post => post.type === "rating") as post}
-					<AnyPost {post} />
-				{/each}
+				{#await ratings then ratings}
+					{#each ratings as post}
+						<div class="rating-options" style:border-color={theme().textDark}>
+							<span style:color={theme().textDull}>
+								<label for="show-full-reviews">Show full reviews</label>
+								<RadioInput id="show-full-reviews" size={0.5} bind:on={showFullReviews} />
+							</span>
+							<span style:color={theme().textDull}>
+								<label for="change-rating-sort">{ratingSortName}</label>
+								<button onclick={event => ratingSortMenu.open(event)} id="change-rating-sort">
+									<SortIcon stroke={theme().textDull} style="width: 1.5rem;" />
+								</button>
+							</span>
+							<ContextMenu bind:this={ratingSortMenu}>
+								<button onclick={sortRatingsBy("best")} style:color={theme().text} style:background={theme().backgroundDim}>
+									Highest Rated
+								</button>
+								<button onclick={sortRatingsBy("recent")} style:color={theme().text} style:background={theme().backgroundDim}>
+									Recently Finished
+								</button>
+							</ContextMenu>
+						</div>
+						{#if showFullReviews}
+							<AnyPost {post} />
+						{:else}
+							<BookListing book={post.books[0]} rating={post.rating} user={profileUser} />
+						{/if}
+					{/each}
+				{/await}
 			</div>
 		{:else if view === "activity"}
 			{#each posts.filter(post => post.type === "update") as post}
@@ -222,6 +277,20 @@
 	.pronouns {
 		display: flex;
 		align-items: center;
+	}
+
+	.rating-options {
+		display: flex;
+		justify-content: space-between;
+		padding: 1rem;
+		border-bottom-style: solid;
+		border-bottom-width: 1px;
+
+		> * {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
 	}
 
 	.dot {

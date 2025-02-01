@@ -45,6 +45,7 @@ export async function getBook(isbn: ISBN): Promise<Book> {
 
 export async function searchBooks(searchTerm: string): Promise<Book[]> {
 	let response = await fetch(`https://openlibrary.org/search.json?q=${searchTerm}`);
+	console.log(await response.json());
 	let books = (await response.json()).docs.filter(
 		(book: { title: string; isbn?: unknown[] }) => book.title.toLowerCase().includes(searchTerm.replace("+", " ")) && book.isbn
 	);

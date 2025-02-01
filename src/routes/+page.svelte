@@ -62,7 +62,9 @@
 				{#if followedPosts.length === 0}
 					<div class="nofollowing">
 						<h1 style:color={theme().textBright}>You're not following anyone.</h1>
-						<p style:color={theme().textDull}>When you follow people, their posts will appear here.</p>
+						<p style:color={theme().textDull}>
+							When you follow people, their posts will appear here.
+						</p>
 						<CatIcon style="width: 10rem;" stroke={theme().backgroundDim} />
 					</div>
 				{/if}
@@ -73,7 +75,10 @@
 		{:else if view === "for you"}
 			<div class="nofollowing">
 				<h1 style:color={theme().textBright}>We haven't figured you out yet.</h1>
-				<p style:color={theme().textDull}>After enough interactions, we'll start suggesting things we think you'll like here.</p>
+				<p style:color={theme().textDull}>
+					After enough interactions, we'll start suggesting things we think you'll like
+					here.
+				</p>
 				<CatIcon style="width: 10rem;" stroke={theme().backgroundDim} />
 			</div>
 		{/if}

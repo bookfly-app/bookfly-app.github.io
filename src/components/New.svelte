@@ -1,18 +1,18 @@
 <script lang="ts">
 	import PlusIcon from "../assets/images/icons/PlusIcon.svelte";
-	import theme from "../themes/theme.svelte";
+	import theme, { accentGradient } from "../themes/theme.svelte";
 </script>
 
 <div style:background={theme().backgroundDark}></div>
-<a href="/new" style:background={theme().accent} style:color={theme().backgroundDark}>
+<a href="/new" style:background={accentGradient()} style:color={theme().backgroundDark}>
 	<PlusIcon stroke={theme().backgroundDark} style="width: 2rem;" />
 </a>
 
 <style>
 	a {
-		position: absolute;
+		position: fixed;
 		bottom: 5rem;
-		right: 1rem;
+		left: calc(50% + 0.5 * var(--max-width) - 6rem);
 		font-size: 3rem;
 		width: 4rem;
 		height: 4rem;
@@ -23,9 +23,9 @@
 	}
 
 	div {
-		position: absolute;
+		position: fixed;
 		bottom: 5rem;
-		right: 1rem;
+		left: calc(50% + 0.5 * var(--max-width) - 6rem);
 		font-size: 3rem;
 		width: 4rem;
 		height: 4rem;

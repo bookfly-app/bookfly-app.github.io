@@ -30,3 +30,8 @@ export function setTheme(theme: Theme) {
 	currentTheme = theme;
 	localStorage.setItem("theme", theme.id);
 }
+
+let accentGradient_ = $derived(`linear-gradient(to bottom right, ${theme().accent}, ${theme().accent2})`);
+export function accentGradient() {
+	return accentGradient_;
+}

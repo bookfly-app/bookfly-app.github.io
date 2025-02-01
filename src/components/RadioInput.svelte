@@ -1,5 +1,5 @@
 <script lang="ts">
-	import theme from "../themes/theme.svelte";
+	import theme, { accentGradient } from "../themes/theme.svelte";
 
 	let { on = $bindable(), size = 1, ...props } = $props();
 
@@ -15,7 +15,7 @@
 	{...props}
 	aria-label="radio"
 	onclick={toggle}
-	style:background={state ? `linear-gradient(${theme().accent}, ${theme().accent2})` : theme().textDull}
+	style:background={state ? accentGradient() : theme().textDull}
 	style="width: {4 * size}rem; height: {2 * size}rem; padding: {0.2 * size}rem;"
 >
 	<div style:margin-left={state ? `${size * 2}rem` : "0px"} style:background={theme().backgroundDim}></div>

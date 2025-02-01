@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { getPostFromId, getReplies, post, type Post, type PostId } from "../../../api/postapi";
+	import { serializeImage } from "../../../api/serializer";
+	import AddImageIcon from "../../../assets/images/icons/AddImageIcon.svelte";
 	import SendIcon from "../../../assets/images/icons/SendIcon.svelte";
 	import { user } from "../../../backend/auth.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
+	import ImageCarousel from "../../../components/ImageCarousel.svelte";
 	import Page from "../../../components/Page.svelte";
 	import AnyPost from "../../../components/posts/AnyPost.svelte";
 	import theme from "../../../themes/theme.svelte";
@@ -37,11 +40,22 @@
 
 	let replyBody = $state("");
 
+	let imageAttachment: FileList | null = $state(null);
+	let images = $derived(
+		imageAttachment ? Promise.all(Array.from(imageAttachment).map(image => serializeImage(image as Blob))) : Promise.resolve([]),
+	);
+
 	async function sendReply() {
 		let body = replyBody;
 		replyBody = "";
-		let replyPost = await post({ body, type: "reply", parent: (await thePost)!.id });
+		let replyPost = await post({
+			body,
+			type: "reply",
+			parent: (await thePost)!.id,
+			...(imageAttachment && { pictures: await images }),
+		});
 		newReplies = [replyPost, ...newReplies];
+		imageAttachment = null;
 	}
 </script>
 
@@ -49,23 +63,37 @@
 <Page class="post">
 	{#await thePost then post}
 		<AnyPost post={post!} postpage />
-		<div style:border-color={theme().textDark} class="reply">
+		<div style:padding-bottom={imageAttachment === null ? "0rem" : "2.5rem"} style:border-color={theme().textDark} class="reply">
 			<a aria-label="Go to profile" href="/profile">
 				<img alt="Your profile" src={user()?.picture} />
 			</a>
+
 			{#if user()}
-				<textarea
-					bind:this={reply}
-					bind:value={replyBody}
-					onfocus={expand}
-					onblur={contract}
-					style:color={theme().text}
-					style:background={theme().backgroundDim}
-					placeholder="Leave a reply"
-				></textarea>
-				<button title="Post" class="send" onmousedown={sendReply}>
-					<SendIcon stroke={theme().textDull} style="width: 1.5rem;" />
-				</button>
+				<div class="reply-body">
+					<textarea
+						bind:this={reply}
+						bind:value={replyBody}
+						onfocus={expand}
+						onblur={contract}
+						style:color={theme().text}
+						style:background={theme().backgroundDim}
+						placeholder="Leave a reply"
+					></textarea>
+
+					{#await images then images}
+						<ImageCarousel {images} />
+					{/await}
+
+					<div style:bottom={imageAttachment === null ? "1.4rem" : "-2rem"} title="Post" class="send">
+						<label for="attach-image-reply">
+							<AddImageIcon stroke={theme().textDull} style="width: 1.5rem;" />
+						</label>
+						<input multiple bind:files={imageAttachment} id="attach-image-reply" type="file" class="attach-image" />
+						<button onmousedown={sendReply}>
+							<SendIcon stroke={theme().textDull} style="width: 1.5rem;" />
+						</button>
+					</div>
+				</div>
 			{/if}
 		</div>
 
@@ -84,6 +112,10 @@
 </Page>
 
 <style>
+	label {
+		cursor: pointer;
+	}
+
 	:global(.post) {
 		display: flex;
 		flex-direction: column;
@@ -98,17 +130,25 @@
 		width: 100%;
 		transition: height 0.2s;
 		height: 2.3rem;
-		width: 80%;
+		width: calc(100% - 2rem);
 		border-radius: 100vmax;
 		display: flex;
 		align-items: center;
 		margin-top: 0.4rem;
+		filter: brightness(90%);
 	}
 
 	.replies {
 		width: 100%;
 		height: 100%;
 		overflow-y: auto;
+	}
+
+	.reply-body {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		position: relative;
 	}
 
 	.reply {
@@ -135,10 +175,20 @@
 	}
 
 	.send {
-		margin-top: auto;
+		display: flex;
+		gap: 0.5rem;
 		height: fit-content;
-		position: relative;
-		top: -0.5rem;
-		left: -3rem;
+		position: absolute;
+		right: 2.1rem;
+
+		> * {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.attach-image {
+			display: none;
+		}
 	}
 </style>

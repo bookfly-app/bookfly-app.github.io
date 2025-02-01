@@ -20,12 +20,5 @@
 		<Profile user={user()!} />
 	{/if}
 	<New />
-	<div></div>
 	<Footer selected="profile" />
 </Page>
-
-<style>
-	div {
-		height: 4rem;
-	}
-</style>

@@ -17,7 +17,7 @@
 
 	let view: "following" | "for you" = $state("following");
 
-	let followedPosts = $derived(user() ? getFollowedPosts(user()!) : Promise.resolve([]));
+	let followedPosts = $derived(user() ? getFollowedPosts(user()!, true) : Promise.resolve([]));
 </script>
 
 <Background />

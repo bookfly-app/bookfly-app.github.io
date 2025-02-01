@@ -22,6 +22,7 @@
 	import ShareIcon from "../../assets/images/icons/ShareIcon.svelte";
 	import { user } from "../../backend/auth.svelte";
 	import theme from "../../themes/theme.svelte";
+	import Badges from "../Badges.svelte";
 	import ContextMenu from "../ContextMenu.svelte";
 	import Notification from "../Notification.svelte";
 	import BookUpdate from "./BookUpdate.svelte";
@@ -31,12 +32,37 @@
 
 	let { post, postpage }: { post: Post; postpage?: boolean } = $props();
 
-	let menu: ContextMenu;
+	/**
+	 * The context menu that appears when clicking the post actions button, which
+	 * allows things like deleting the post (if you're the poster), reporting the
+	 * post, etc.
+	 */
+	let actionsMenu: ContextMenu;
 
+	/**
+	 * The amount of seconds that have elapsed since the post was posted.
+	 */
 	let elapsedSeconds = (Date.now() - post.timestamp) / 1000;
-	let views = getPostViews(post);
 
+	/**
+	 * The timestamp on the post as a string. This will either be a relative
+	 * timestamp (such as `3h ago`) or an absolute timestamp (such as
+	 * `1/30/2025 @ 10:25AM`); The specific format is determined by `timeFormat`
+	 * and toggled with `toggleTimeFormat()` below.
+	 */
 	let elapsedTime = $state("");
+
+	/**
+	 * The format of the posting time shown on the post, either:
+	 *
+	 * - `"relative"`: Such as "3h ago"
+	 * - `"absolute"`: Such as `1/30/2025 @ 10:22AM`
+	 *
+	 * The time format is switched in `toggleTimeFormat()` when the post's timestamp is
+	 * clicked. The default is `"relative"`, but the timestamp UI element starts empty, (see
+	 * `elapsedTime` above), so we set this to `"absolute"` and call `toggleTimeFormat()` once
+	 * to get the initial relative text.
+	 */
 	let timeFormat: "relative" | "absolute" = "absolute";
 
 	/**
@@ -76,9 +102,25 @@
 	// Set the initial time to relative
 	toggleTimeFormat();
 
+	/** Whether this post was posted by the current user. */
 	let isCurrentUser = $derived(user()?.id === post.poster.id);
+
+	/**
+	 * The "parent" of this post. If this post is a reply, this is the post being replied to.
+	 * If this post isn't a reply, it's `null`.
+	 */
 	let parent = post.type === "reply" ? getPostFromId(post.parent) : Promise.resolve(null);
 
+	/**
+	 * Called when the post is clicked. If an interactible part of the post is clicked,
+	 * such as a link or button, this will do nothing and let the link/button handle the
+	 * interaction. If a non-interactible part of the post was clicked, such as plain text
+	 * or empty space, this will open the post's page.
+	 *
+	 * @param event The click event fired from clicking the post.
+	 *
+	 * @returns A promise that resolves when the post page opens, if going to the post page.
+	 */
 	async function clickPost(event: MouseEvent) {
 		if ((event.target as HTMLElement).closest("button") || (event.target as HTMLElement).closest("a")) {
 			return;
@@ -87,14 +129,20 @@
 		await goToPost();
 	}
 
+	/**
+	 * Called when the post is clicked on. This will open the post, or if it's a reply,
+	 * open the parent post.
+	 */
 	async function goToPost() {
 		if (post.type === "reply") {
-			goto(`/post/${(await parent)!.id}`);
+			await goto(`/post/${(await parent)!.id}`);
 		} else {
-			goto(`/post/${post.id}`);
+			await goto(`/post/${post.id}`);
 		}
 	}
 
+	/** The number of views on the post */
+	let views = getPostViews(post);
 	/** The number of likes on the post */
 	let likes = $state(getLikes(post).then(likes => likes.length));
 	/** The number of replies on the post */
@@ -102,21 +150,41 @@
 	/** The number of shares on the post */
 	let shares = $state(getShares(post).then(shares => shares.length));
 
+	/** Whether the current user liked the post. */
 	let liked = $state(didLike(post));
+	/** Whether the current user shared the post. */
 	let shared = $state(didShare(post));
+	/** Whether the current user replied to the post. */
 	let commented = $state(didComment(post));
 
+	/**
+	 * Toggles whether the user has liked this post. This is called when the user
+	 * presses the like button on a post. The UI will be updated to reflect whether
+	 * they have liked the post, and the database will be updated to reflect that.
+	 *
+	 * @returns A promise that resolves when the database is finished updating.
+	 */
 	async function toggleLike() {
 		liked = liked.then(liked => !liked);
+
+		// Liking the post
 		if (await liked) {
-			likePost(post);
 			likes = likes.then(likes => likes + 1);
-		} else {
-			unlikePost(post);
+			await likePost(post);
+		}
+
+		// Unliking the post
+		else {
 			likes = likes.then(likes => likes - 1);
+			await unlikePost(post);
 		}
 	}
 
+	/**
+	 * Whether or not this post has been deleted. This is used to hide the post
+	 * in the UI when it's deleted, since deleting it in the database won't immediately
+	 * update the UI.
+	 */
 	let isDeleted = $state(false);
 
 	/**
@@ -128,6 +196,7 @@
 		await deletePost(post);
 	}
 
+	// svelte-ignore non_reactive_update
 	let shareNotification: Notification;
 
 	/**
@@ -138,6 +207,9 @@
 	 * - Shows the share notification
 	 * - Stores in the database that this user shared this post
 	 * - Updates the UI to reflect the shared post
+	 *
+	 * @returns A promise that resolves when the database has been updated to
+	 * reflect the shared post. The This needn't be awaited to update the UI.
 	 */
 	async function share() {
 		navigator.clipboard.writeText(`https://bookfly-app.github.io/post/${post.id}`);
@@ -157,18 +229,25 @@
 	onclick={clickPost}
 	style:border-bottom={`1px solid ${theme().textDark}`}
 >
+	<!-- Poster's profile picture -->
 	<div class="profile">
 		<a aria-label="Go to poster's profile" style:background-image={`url("${post.poster.picture}")`} href={`/profile/${post.poster.username}`}></a>
 	</div>
 
 	<div class="content-outer">
+		<!-- User info: Display Name & Username -->
 		<span class="user">
 			<a href="/profile/{post.poster.username}" class="display-name" style:color={theme().textBright}>{post.poster.displayName}</a>
 			<a href="/profile/{post.poster.username}" class="username" style:color={theme().textDim}>{`@${post.poster.username}`}</a>
+
+			<Badges forUser={post.poster} size={0.7} />
+
 			<button class="timestamp" onclick={toggleTimeFormat} style:color={theme().textDim}>
 				{elapsedTime}
 			</button>
 		</span>
+
+		<!-- Reply: Show "replying to @user" text -->
 		{#if post.type === "reply"}
 			{#await parent then parent}
 				<span style:color={theme().textDim} class="replying-to">
@@ -177,6 +256,7 @@
 			{/await}
 		{/if}
 
+		<!-- The post content itself -->
 		{#if post.type === "rating"}
 			<Rating isbn={post.books[0].isbn} rating={post.rating} review={post.body} user={post.poster} />
 		{:else if post.type === "general"}
@@ -184,15 +264,20 @@
 		{:else if post.type === "reply"}
 			<Reply body={post.body} images={post.pictures} parent={post.parent} />
 		{:else if post.type === "update"}
-			<BookUpdate body={post.body} isbn={post.books[0].isbn} user={post.poster} />
+			<BookUpdate updateType={post.updateType} body={post.body} isbn={post.books[0].isbn} user={post.poster} />
 		{/if}
+
+		<!-- Post stats (views, likes, replies, etc.) -->
 		<div class="stats">
+			<!-- Views Button -->
 			<span style:color="#88FFDD">
 				<EyeIcon stroke="#88FFDD" style="width: 1rem;" />
 				{#await views then views}
 					{views}
 				{/await}
 			</span>
+
+			<!-- Like Button -->
 			{#await likes then likes}
 				{#await liked then liked}
 					<button onclick={toggleLike} style:color={liked ? "#FFAACC" : theme().textDim}>
@@ -201,6 +286,8 @@
 					</button>
 				{/await}
 			{/await}
+
+			<!-- Reply Button -->
 			{#await commented then commented}
 				{#await comments then comments}
 					<button onclick={goToPost} style:color={commented ? "#99BBFF" : theme().textDim}>
@@ -209,6 +296,8 @@
 					</button>
 				{/await}
 			{/await}
+
+			<!-- Share Button -->
 			{#await shares then shares}
 				{#await shared then shared}
 					<button style:color={shared ? "#BB99FF" : theme().textDim} onclick={share}>
@@ -218,9 +307,11 @@
 					</button>
 				{/await}
 			{/await}
-			<button onclick={event => menu.open(event)}>
+
+			<!-- Post Actions Button -->
+			<button onclick={event => actionsMenu.open(event)}>
 				<DotMenuIcon stroke={theme().textDull} style="width: 1.25rem;" />
-				<ContextMenu bind:this={menu}>
+				<ContextMenu bind:this={actionsMenu}>
 					{#if isCurrentUser}
 						<button onclick={deleteAndUpdate} style:background={theme().backgroundDim} style:color={theme().textBright}>
 							Delete Post

@@ -1,18 +1,20 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { usernameErrors } from "../../../api/userapi";
+	import { awaitUser, usernameErrors } from "../../../api/userapi";
 	import EditIcon from "../../../assets/images/icons/EditIcon.svelte";
-	import { updateUser, user, usernameIsTaken } from "../../../backend/auth.svelte";
+	import { updateUser, usernameIsTaken } from "../../../backend/auth.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
 	import Page from "../../../components/Page.svelte";
+	import RadioInput from "../../../components/RadioInput.svelte";
 	import theme from "../../../themes/theme.svelte";
 
-	let displayName = $state(user()?.displayName ?? "");
-	let username = $state(user()?.username ?? "");
-	let bio = $state(user()?.bio ?? "");
+	let displayName = $state(awaitUser.then(user => user.displayName));
+	let username = $state(awaitUser.then(user => user.username));
+	let bio = $state(awaitUser.then(user => user.bio));
+	let pronouns = $state(awaitUser.then(user => user.pronouns));
 
-	let usernameErrorList = $derived(usernameErrors(username));
+	let usernameErrorList = $derived(username.then(username => usernameErrors(username)));
 
 	// svelte-ignore non_reactive_update
 	let usernameInput: HTMLInputElement;
@@ -23,16 +25,16 @@
 	}
 
 	async function update() {
-		if (usernameErrorList.length > 0) {
+		if ((await usernameErrorList).length > 0) {
 			return;
 		}
 
-		if (username !== user()?.username && (await usernameIsTaken(username))) {
+		if ((await username) !== (await awaitUser).username && (await usernameIsTaken(await username))) {
 			usernameTaken = true;
 			return;
 		}
 
-		await updateUser({ displayName, bio, username });
+		await updateUser({ displayName: await displayName, bio: await bio, username: await username, pronouns: await pronouns });
 		await goto("/profile");
 		location.reload();
 	}
@@ -40,9 +42,9 @@
 
 <Background />
 <Page>
-	{#if user()}
+	{#await awaitUser then currentUser}
 		<!-- Banner -->
-		<button class="banner" style:background-image="url('{user()!.banner}')">
+		<button class="banner" style:background-image="url('{currentUser.banner}')">
 			<div class="overlay"></div>
 			<EditIcon
 				stroke="#CCCCFF"
@@ -53,7 +55,7 @@
 		<div class="profile">
 			<div class="profile-top" style:background={theme().backgroundDark}>
 				<!-- Profile Picture -->
-				<button class="profile-picture" style:border-color={theme().backgroundDark} style:background-image="url('{user()!.picture}')">
+				<button class="profile-picture" style:border-color={theme().backgroundDark} style:background-image="url('{currentUser!.picture}')">
 					<div class="overlay"></div>
 					<EditIcon
 						stroke="#CCCCFF"
@@ -68,33 +70,80 @@
 			<input style:background={theme().backgroundDark} style:color={theme().text} type="text" id="display-name" bind:value={displayName} />
 
 			<label style:color={theme().textDull} for="username">Username</label>
-			<input
-				style:outline={usernameTaken || usernameErrorList.length > 0 ? "2px solid indianred" : "none"}
-				style:background={theme().backgroundDark}
-				style:color={theme().text}
-				type="text"
-				id="username"
-				oninput={onInput}
-				bind:value={username}
-				bind:this={usernameInput}
-			/>
-			{#each usernameErrorList as usernameError}
-				<span class="error">{usernameError}</span>
-			{/each}
+			<span style:color={theme().text} class="at">@</span>
+			{#await usernameErrorList then usernameErrorList}
+				<input
+					style:outline={usernameTaken || usernameErrorList.length > 0 ? "2px solid indianred" : "none"}
+					style:background={theme().backgroundDark}
+					style:color={theme().text}
+					type="text"
+					id="username"
+					oninput={onInput}
+					bind:value={username}
+					bind:this={usernameInput}
+				/>
+				{#each usernameErrorList as usernameError}
+					<span class="error">{usernameError}</span>
+				{/each}
+			{/await}
 			{#if usernameTaken}
 				<span class="error">Username already taken</span>
 			{/if}
 
+			<!-- Pronouns -->
+
+			<hr style:background={theme().textDark} />
+
+			<label style:color={theme().textDull} for="pronouns">Pronouns</label>
+			<input style:background={theme().backgroundDark} style:color={theme().text} type="text" id="pronouns" bind:value={pronouns} />
+
+			<span class="radio-input">
+				<label for="display-pronouns" style:color={theme().textDull}>Display pronouns on your profile</label>
+				<RadioInput id="display-pronouns" size={0.7} />
+			</span>
+
+			<span class="radio-input">
+				<label for="display-post-pronouns" style:color={theme().textDull}>Display pronouns on your posts</label>
+				<RadioInput id="display-post-pronouns" size={0.7} />
+			</span>
+
+			<!-- Bio -->
+
+			<hr style:background={theme().textDark} />
+
 			<label style:color={theme().textDull} for="bio">Bio</label>
 			<textarea style:color={theme().text} style:background={theme().backgroundDark} class="bio" id="bio" bind:value={bio}>
-				{user()!.bio}
+				{currentUser.bio}
 			</textarea>
 		</div>
-	{/if}
+	{/await}
 	<Footer selected="profile" />
 </Page>
 
 <style>
+	#username {
+		padding-left: 1.4rem;
+	}
+
+	.at {
+		position: absolute;
+		top: 21.1rem;
+		left: 2.4rem;
+		font-size: 0.85rem;
+	}
+
+	hr {
+		height: 1px;
+		margin-top: 0.5rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.radio-input {
+		display: flex;
+		justify-content: space-between;
+		padding-right: 2rem;
+	}
+
 	.banner {
 		width: 100%;
 		height: 7.5rem;
@@ -130,6 +179,7 @@
 	label,
 	.profile-picture {
 		margin-left: 2rem;
+		font-size: 0.85rem;
 	}
 
 	input {
@@ -151,6 +201,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+		position: relative;
 	}
 
 	.overlay {

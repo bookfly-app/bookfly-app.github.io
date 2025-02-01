@@ -1,7 +1,8 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, or, query, updateDoc, where } from "firebase/firestore";
 import { updateUser, user } from "../backend/auth.svelte";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
+import type { Image } from "./serializer";
 import { getUserFromId, type InternalUser, type User, type UserId } from "./userapi";
 
 export type PostType = "general" | "rating" | "update" | "reply";
@@ -63,7 +64,7 @@ export type InternalPost<T extends PostType = PostType> = {
 
 	authors: string[];
 
-	pictures: string[];
+	pictures: Image[];
 
 	rating: T extends "rating" ? number : never;
 	updateType: T extends "update" ? "start" : never;
@@ -103,7 +104,7 @@ export type Post<T extends PostType = PostType> = {
 	books: Book[];
 
 	authors: string[];
-	pictures: string[];
+	pictures: Image[];
 
 	/**
 	 * The rating of the book being reviewed, as a number in [0, 10].
@@ -142,9 +143,11 @@ export async function post(post: Partial<Omit<InternalPost, "id">> & { body: str
 		id: "",
 		...post,
 	} as InternalPost;
+	let { pictures, ...postData } = toPost;
 
 	let doc = await addDoc(collection(db, "posts"), toPost);
 	updateDoc(doc, { id: doc.id });
+
 	return internalPostToPost({ ...toPost, id: doc.id });
 }
 
@@ -210,14 +213,15 @@ export async function searchPosts(searchTerm: string): Promise<Post[]> {
 	return posts.filter(post => post.body.toLowerCase().includes(searchTerm.toLowerCase()));
 }
 
-export async function getFollowedPosts(user: User): Promise<Post[]> {
+export async function getFollowedPosts(user: User, includeSelf: boolean): Promise<Post[]> {
 	if (user.following.length === 0) return [];
 
-	let internalPosts = (await getDocs(query(collection(db, "posts"), where("poster", "in", user.following)))).docs.map(doc =>
-		doc.data()
-	) as InternalPost[];
+	let postQuery: any = where("poster", "in", user.following);
+	if (includeSelf) postQuery = or(postQuery, where("poster", "==", user.id));
 
+	let internalPosts = (await getDocs(query(collection(db, "posts"), postQuery))).docs.map(doc => doc.data()) as InternalPost[];
 	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
+
 	return posts;
 }
 

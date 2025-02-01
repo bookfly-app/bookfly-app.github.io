@@ -21,6 +21,7 @@ export type InternalUser = {
 	tags: string[];
 	links: {}[];
 	currentBook: string | null;
+	pronouns: string;
 
 	views: PostId[];
 	likes: PostId[];
@@ -48,6 +49,7 @@ export type User = {
 	tags: string[];
 	links: {}[];
 	currentBook: string | null;
+	pronouns: string;
 
 	views: PostId[];
 	likes: PostId[];
@@ -59,6 +61,13 @@ export type User = {
 	following: UserId[];
 };
 
+type Settings = {
+	appearance: {
+		showMyPostsInFollowingFeed: boolean;
+		theme: string;
+	};
+};
+
 let { db } = initializeFirebase();
 
 export function usernameErrors(username: string): string[] {
@@ -68,6 +77,16 @@ export function usernameErrors(username: string): string[] {
 	if (!/^[\w\-]*$/.test(username)) errors.push("Username can only contain letters, numbers, underscores, and hyphens");
 	return errors;
 }
+
+export let resolveUser: (user: User) => void;
+
+/**
+ * A promise that resolves when the user has loaded. After this promise is resolved, `user()` can
+ * be used safely and will return a non-null value. For convenience, the promise returns the user.
+ */
+export let awaitUser: Promise<User> = new Promise(resolve => {
+	resolveUser = resolve;
+});
 
 /**
  * Returns a user's "favorite book" which is defined as the book that

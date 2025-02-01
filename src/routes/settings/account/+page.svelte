@@ -4,6 +4,7 @@
 	import DeveloperIcon from "../../../assets/images/icons/DeveloperIcon.svelte";
 	import LeftArrowIcon from "../../../assets/images/icons/LeftArrowIcon.svelte";
 	import TrashIcon from "../../../assets/images/icons/TrashIcon.svelte";
+	import WrenchIcon from "../../../assets/images/icons/WrenchIcon.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Page from "../../../components/Page.svelte";
 	import theme from "../../../themes/theme.svelte";
@@ -31,6 +32,15 @@
 		<p style:color={theme().textDull}>Only published authors can recieve author verifications. Independent publishing is allowed.</p>
 	</a>
 
+	<!-- Become a moderator -->
+	<a href="/settings/account/changeusername" style:border-bottom-color={theme().textDark}>
+		<div>
+			<WrenchIcon style="width: 1.8rem; height: 1.8rem;" stroke={theme().textBright} />
+			<span style:color={theme().textBright}>Become a moderator</span>
+		</div>
+		<p style:color={theme().textDull}>Bookfly is powered by volunteering moderators who keep Bookfly content safe, relevant, and accessible.</p>
+	</a>
+
 	<!-- Become a developer -->
 	<a href="/settings/account/changeusername" style:border-bottom-color={theme().textDark}>
 		<div>
@@ -45,8 +55,8 @@
 	<!-- Delete account -->
 	<a href="/settings/account/delete" style:border-bottom-color={theme().textDark}>
 		<div>
-			<TrashIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
-			<span style:color={theme().textBright}>Delete your account</span>
+			<TrashIcon style="width: 2rem; height: 2rem;" stroke="#f38ba8" />
+			<span style:color="#f38ba8">Delete your account</span>
 		</div>
 		<p style:color={theme().textDull}>
 			<b>This cannot be undone.</b>

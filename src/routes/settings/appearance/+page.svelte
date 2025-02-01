@@ -4,7 +4,10 @@
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
 	import Page from "../../../components/Page.svelte";
+	import RadioInput from "../../../components/RadioInput.svelte";
 	import theme, { setTheme, themes } from "../../../themes/theme.svelte";
+
+	let showMyPostsInFollowing = true;
 </script>
 
 <Background />
@@ -18,6 +21,12 @@
 			<LeftArrowIcon stroke={theme().background} />
 		</button>
 		<h1 style:color={theme().textBright}>Appearance</h1>
+	</span>
+
+	<!-- Interface -->
+	<span class="option" style:color={theme().text}>
+		Show my posts in my following feed
+		<RadioInput bind:on={showMyPostsInFollowing} style="margin-left: auto;" />
 	</span>
 
 	<!-- Themes -->
@@ -45,6 +54,14 @@
 </Page>
 
 <style>
+	.option {
+		display: flex;
+		font-size: 1rem;
+		width: 100%;
+		padding: 1rem;
+		align-items: center;
+	}
+
 	.settings-header {
 		display: flex;
 		align-items: center;

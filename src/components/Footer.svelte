@@ -9,6 +9,7 @@
 	let { selected }: { selected: "home" | "profile" | "search" | "messages" } = $props();
 </script>
 
+<div class="padding">&nbsp;</div>
 <footer style:background={theme().backgroundDark}>
 	<a aria-label="Profile" href="/profile">
 		{#if user()}
@@ -29,6 +30,11 @@
 </footer>
 
 <style>
+	.padding {
+		height: 4rem;
+		width: 100%;
+	}
+
 	footer {
 		position: fixed;
 		width: 100%;

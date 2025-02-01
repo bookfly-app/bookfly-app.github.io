@@ -9,10 +9,10 @@
 	import ClockIcon from "../assets/images/icons/ClockIcon.svelte";
 	import LeftArrowIcon from "../assets/images/icons/LeftArrowIcon.svelte";
 	import MessageIcon from "../assets/images/icons/MessageIcon.svelte";
-	import SortIcon from "../assets/images/icons/SortIcon.svelte";
 	import StarIcon from "../assets/images/icons/StarIcon.svelte";
 	import { updateOtherUser, updateUser, user } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
+	import Badges from "./Badges.svelte";
 	import AnyPost from "./posts/AnyPost.svelte";
 
 	let props = $props();
@@ -79,18 +79,18 @@
 		/>
 		<div class="profile-line-1">
 			<span class="name">
+				<!-- Username -->
 				<h1 style:color={theme().textBright}>{profileUser.displayName}</h1>
 				<h2 style:color={theme().textDim}>@{profileUser.username}</h2>
-				{#if profileUser.tags.includes("dev")}
-					<span class="dev">Dev</span>
-				{/if}
-				{#if profileUser.tags.includes("author")}
-					<span class="author">Author</span>
-				{/if}
-				{#if profileUser.tags.includes("mod")}
-					<span class="mod">Moderator</span>
-				{/if}
+
+				<!-- Badges -->
+				<Badges forUser={profileUser} size={1} />
+
+				<div class="dot" style:background={theme().textDim}></div>
+				<h2 class="pronouns" style:color={theme().textDim}>{profileUser.pronouns}</h2>
 			</span>
+
+			<!-- Edit profile button -->
 			{#if isCurrentUser}
 				<button
 					style:color={theme().background}
@@ -101,6 +101,7 @@
 					Edit Profile
 				</button>
 			{:else}
+				<!-- Profile actions -->
 				<div class="profile-actions">
 					<button style:border-color={theme().textDull} class="profile-action-follow">
 						{#if following}
@@ -177,7 +178,7 @@
 				style:border-bottom={view === "ratings" ? `3px solid ${theme().accent}` : "3px solid transparent"}
 				onclick={() => (view = "ratings")}
 			>
-				Reviews
+				Ratings
 			</button>
 			<button
 				style:color={view === "activity" ? theme().text : theme().textDim}
@@ -189,17 +190,18 @@
 		</div>
 	</div>
 
-	{#await posts then posts}
+	{#await posts}
+		<div class="loading">
+			<h1 style:color={theme().text}>Loading posts...</h1>
+			<p style:color={theme().textDull}>We promise Bookfly will be faster soon.</p>
+		</div>
+	{:then posts}
 		{#if view === "discussion"}
 			{#each posts.filter(post => post.type === "general") as post}
 				<AnyPost {post} />
 			{/each}
 		{:else if view === "ratings"}
 			<div class="ratings">
-				<span style:color={theme().text} class="rating-sort">
-					<SortIcon stroke={theme().text} style="width: 1.75rem; height: 1.75rem;" />
-					Best
-				</span>
 				{#each posts.filter(post => post.type === "rating") as post}
 					<AnyPost {post} />
 				{/each}
@@ -217,6 +219,34 @@
 </section>
 
 <style>
+	.pronouns {
+		display: flex;
+		align-items: center;
+	}
+
+	.dot {
+		content: "";
+		width: 0.25rem;
+		height: 0.25rem;
+		border-radius: 50%;
+	}
+
+	.loading {
+		padding-top: 2rem;
+		gap: 0.5rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		h1 {
+			font-size: 1.5rem;
+		}
+
+		p {
+			font-size: 0.85rem;
+		}
+	}
+
 	section {
 		min-height: 100%;
 		position: relative;
@@ -265,15 +295,6 @@
 
 	.ratings {
 		position: relative;
-	}
-
-	.rating-sort {
-		position: absolute;
-		top: 1rem;
-		right: 1rem;
-		display: flex;
-		align-items: center;
-		gap: 0.3rem;
 	}
 
 	.back-arrow {
@@ -391,30 +412,5 @@
 		align-items: center;
 		gap: 0.5rem;
 		margin-top: -0.5rem;
-
-		.dev {
-			background-image: linear-gradient(to bottom right, #94e2d5, #89b4fa, #b4befe);
-			color: var(--base);
-			padding: 0.3rem;
-			border-radius: 0.5rem;
-			font-weight: 500;
-			font-size: 0.85rem;
-		}
-
-		.author {
-			background-image: linear-gradient(to bottom right, #fab387, #f38ba8);
-			color: var(--base);
-			padding: 0.3rem;
-			border-radius: 0.5rem;
-			font-weight: 500;
-		}
-
-		.mod {
-			background-image: linear-gradient(to bottom right, #f5c2e7, #cba6f7);
-			color: var(--base);
-			padding: 0.3rem;
-			border-radius: 0.5rem;
-			font-weight: 500;
-		}
 	}
 </style>

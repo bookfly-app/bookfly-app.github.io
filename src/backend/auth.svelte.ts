@@ -8,7 +8,7 @@ import {
 	signOut,
 } from "firebase/auth";
 import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
-import { internalUserToUser, type InternalUser, type User } from "../api/userapi";
+import { internalUserToUser, resolveUser, type InternalUser, type User } from "../api/userapi";
 import initializeFirebase from "./backend";
 
 let { db } = initializeFirebase();
@@ -52,6 +52,7 @@ onAuthStateChanged(auth, async user => {
 		currentUser = await internalUserToUser(
 			(await getDocs(query(collection(db, "users"), where("id", "==", user.uid)))).docs[0].data() as InternalUser
 		);
+		resolveUser(currentUser);
 	}
 
 	// logged out
@@ -88,6 +89,7 @@ export async function signUp(email: string, password: string, username: string):
 			username,
 			picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToiRnzzyrDtkmRzlAvPPbh77E-Mvsk3brlxQ&s",
 			bio: "",
+			pronouns: "",
 			likes: [],
 			id: userInfo.user.uid,
 			banner: "https://i0.wp.com/www.lifecaretechnology.com/wp-content/uploads/2018/12/default-banner.jpg?ssl=1",

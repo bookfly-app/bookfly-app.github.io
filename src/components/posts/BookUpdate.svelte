@@ -1,41 +1,60 @@
 <script lang="ts">
-	import { getBook, type Book } from "../../api/bookapi";
+	import { getBook } from "../../api/bookapi";
 	import theme from "../../themes/theme.svelte";
 
-	let { isbn, body, user } = $props();
+	let { isbn, body, user, updateType } = $props();
 
-	let book: Book | null = $state(null);
-
-	(async function () {
-		book = await getBook(isbn);
-	})();
+	let book = getBook(isbn);
 </script>
 
-<div>
-	<p class="rating-line" style:color={theme().textDull}>
-		{user.displayName} started reading
-		<i style:color={theme().text}>{book?.title}</i>
-		:
-	</p>
-	<div class="info">
-		<div class="content">
-			<a href="/book/{book?.isbn}" class="title" style:color={theme().text}>{book?.title}</a>
-			<a href="/book/{book?.isbn}" class="author" style:color={theme().textDim}>
-				{book?.authors.join(", ")}
-			</a>
+<section>
+	{#await book then book}
+		<!-- Update information -->
+		<p class="rating-line" style:color={theme().textDull}>
+			{user.displayName}
+			{#if updateType === "start"}
+				started reading
+			{:else if updateType === "finish"}
+				finished reading
+			{:else if updateType === "abandon"}
+				abandoned
+			{/if}
+			<i style:color={theme().text}>{book?.title}</i>
+			:
+		</p>
 
-			<p style:color={theme().text}>
-				{[...(book?.genres ?? [])].splice(0, 2).join(", ")}
-			</p>
+		<!-- Book info -->
+		<div class="info">
+			<div class="content">
+				<!-- Book title & authors -->
+				<a href="/book/{book?.isbn}" class="title" style:color={theme().text}>{book?.title}</a>
+				<a href="/book/{book?.isbn}" class="author" style:color={theme().textDim}>
+					{book?.authors.join(", ")}
+				</a>
+
+				<!-- Book genres -->
+				<p style:color={theme().text}>
+					{[...(book?.genres ?? [])].splice(0, 2).join(", ")}
+				</p>
+			</div>
+
+			<!-- Book cover image -->
+			<a aria-label={`Go to details for book "${book?.title}"`} href={`/book/${book?.isbn}`}>
+				<img alt={`Cover for book "${book?.title}"`} src={book?.cover} />
+			</a>
 		</div>
-		<a aria-label={`Go to details for book "${book?.title}"`} href={`/book/${book?.isbn}`}>
-			<img alt={`Cover for book "${book?.title}"`} src={book?.cover} />
-		</a>
-	</div>
+	{/await}
+
+	<!-- Post body -->
 	<p class="review" style:color={theme().text}>{body}</p>
-</div>
+</section>
 
 <style>
+	section {
+		display: flex;
+		flex-direction: column;
+	}
+
 	.info {
 		display: flex;
 		align-items: center;

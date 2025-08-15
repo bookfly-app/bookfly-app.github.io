@@ -10,6 +10,8 @@
 	$effect(() => {
 		if (!user()) {
 			goto("/login");
+		} else {
+			goto(`/profile/${user()!.username}`);
 		}
 	});
 </script>

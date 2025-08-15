@@ -22,7 +22,7 @@
 	let props = $props();
 	let profileUser: User = props.user;
 
-	let view: "all" | "ratings" | "discussion" | "activity" = $state("all");
+	let view: "all" | "books" | "discussion" | "activity" = $state(new URLSearchParams(window.location.search).get("view") as any ?? "all");
 
 	/** This user's highest rated book */
 	let favoriteBook = getFavoriteBook(profileUser);
@@ -91,6 +91,13 @@
 		updateOtherUser(profileUser, {
 			followers: profileUser.followers.filter(id => id !== user()!.id),
 		});
+	}
+
+	function gotoView(viewName: string) {
+		return function() {
+			goto(`${window.location.origin}${window.location.pathname}?${new URLSearchParams({ view: viewName })}`);
+			view = viewName as any;
+		}
 	}
 </script>
 
@@ -194,28 +201,28 @@
 			<button
 				style:color={view === "all" ? theme().text : theme().textDim}
 				style:border-bottom={view === "all" ? `3px solid ${theme().accent}` : "3px solid transparent"}
-				onclick={() => (view = "all")}
+				onclick={gotoView("all")}
 			>
 				All
 			</button>
 			<button
 				style:color={view === "discussion" ? theme().text : theme().textDim}
 				style:border-bottom={view === "discussion" ? `3px solid ${theme().accent}` : "3px solid transparent"}
-				onclick={() => (view = "discussion")}
+				onclick={gotoView("discussion")}
 			>
 				Discussion
 			</button>
 			<button
-				style:color={view === "ratings" ? theme().text : theme().textDim}
-				style:border-bottom={view === "ratings" ? `3px solid ${theme().accent}` : "3px solid transparent"}
-				onclick={() => (view = "ratings")}
+				style:color={view === "books" ? theme().text : theme().textDim}
+				style:border-bottom={view === "books" ? `3px solid ${theme().accent}` : "3px solid transparent"}
+				onclick={gotoView("books")}
 			>
 				Books
 			</button>
 			<button
 				style:color={view === "activity" ? theme().text : theme().textDim}
 				style:border-bottom={view === "activity" ? `3px solid ${theme().accent}` : "3px solid transparent"}
-				onclick={() => (view = "activity")}
+				onclick={gotoView("activity")}
 			>
 				Activity
 			</button>
@@ -232,7 +239,7 @@
 			{#each posts.filter(post => post.type === "general") as post}
 				<AnyPost {post} />
 			{/each}
-		{:else if view === "ratings"}
+		{:else if view === "books"}
 			<div class="ratings">
 						<div class="rating-options" style:border-color={theme().textDark}>
 							<span style:color={theme().textDull}>

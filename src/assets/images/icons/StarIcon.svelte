@@ -57,7 +57,7 @@
 			stroke-width="2"
 			stroke-linecap="round"
 			stroke-linejoin="round"
-			fill={fillPercent ? `url(#star-gradient-${id})` : fill}
+			fill={fillPercent !== undefined ? `url(#star-gradient-${id})` : fill}
 		>
 		</path>
 	</g>

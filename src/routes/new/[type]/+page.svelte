@@ -8,6 +8,7 @@
 	import { searchBooks, type Book } from "../../../api/bookapi";
 	import BookListing from "../../../components/BookListing.svelte";
 	import { user } from "../../../backend/auth.svelte";
+	import Select from "../../../components/Select.svelte";
 
 	let { data }: { data: { type: PostType } } = $props();
 	let { type } = data;
@@ -21,7 +22,8 @@
 
 	let body: string;
 	let chosenBook: Book | null = $state(null);
-	let rating: string;
+	let rating: string | null = $state(null);
+	let updateType = $state("start");
 
 	let searchResults: Book[] = $state([]);
 	let searchText: string = $state("");
@@ -37,13 +39,18 @@
 	}
 
 	function upload() {
-		validateRating();
-		validateBook();
+		if (type === "rating") {
+			validateRating();
+			validateBook();
+		}
 
 		if (ratingError || bookError) return;
 
 		let object = { type, body };
-		if (chosenBook) object = Object.assign(object, { books: [chosenBook.isbn], rating: Number(rating) });
+		if (chosenBook) object = Object.assign(object, { books: [chosenBook.isbn] });
+		if (rating !== null) object = Object.assign(object, { rating: Number(rating) });
+		if (type === "update") object = Object.assign(object, { updateType });
+
 		post(object);
 
 		goto("/profile");
@@ -60,15 +67,22 @@
 	let bookError = $state("");
 
 	function validateRating() {
-		if (!/^\d(\.\d)?$/.test(rating)) {
-			ratingError = "Value must be between 0 and 10, to at most one decimal place.";
-		} else {
-			ratingError = "";
+		if (type === "rating") {
+			if (rating === null)  {
+				ratingError = "Add a rating value.";
+				return;
+			}
+			if (!/^\d(\.\d)?$/.test(rating!)) {
+				ratingError = "Value must be between 0 and 10, to at most one decimal place.";
+				return;
+			}
 		}
+
+		ratingError = "";
 	}
 
 	function validateBook() {
-		if (!chosenBook) {
+		if (type === "rating" && !chosenBook) {
 			bookError = "Choose a book to rate.";
 		} else {
 			bookError = "";
@@ -79,34 +93,34 @@
 
 <Background />
 <Page class="new-post-page">
+	<h1 style:color={theme().text}>Choose a book</h1>
+
+	<div class="book-search">
+		<input
+			id="search"
+			type="text"
+			bind:value={searchText}
+			style:background={theme().backgroundDark}
+			onkeyup={checkSearch}
+			style:color={theme().text}
+			style:outline={bookError ? `2px solid #f38ba8` : "none"}
+		/>
+		{#if bookError}
+			<span class="error">{bookError}</span>
+		{/if}
+	</div>
+
+	<div class="search-results">
+		{#if chosenBook}
+			<BookListing book={chosenBook} user={user()!} />
+		{:else}
+			{#each searchResults as book}
+				<BookListing {book} user={user()!} onclick={chooseBook(book)} />
+			{/each}
+		{/if}
+	</div>
+
 	{#if type === "rating"}
-		<h1 style:color={theme().text}>Choose a book to rate</h1>
-
-		<div class="book-search">
-			<input
-				id="search"
-				type="text"
-				bind:value={searchText}
-				style:background={theme().backgroundDark}
-				onkeyup={checkSearch}
-				style:color={theme().text}
-				style:outline={bookError ? `2px solid #f38ba8` : "none"}
-			/>
-			{#if bookError}
-				<span class="error">{bookError}</span>
-			{/if}
-		</div>
-
-		<div class="search-results">
-			{#if chosenBook}
-				<BookListing book={chosenBook} user={user()!} />
-			{:else}
-				{#each searchResults as book}
-					<BookListing {book} user={user()!} onclick={chooseBook(book)} />
-				{/each}
-			{/if}
-		</div>
-
 		<h2 class="body-name" style:color={theme().textDull}>Rating</h2>
 		<div class="stars">
 			<input 
@@ -121,6 +135,11 @@
 				<span class="error">{ratingError}</span>
 			{/if}
 		</div>
+	{/if}
+
+	{#if type === "update"}
+		<h2 class="body-name" style:color={theme().textDull}>Update Type</h2>
+		<Select options={["start", "finish", "abandon"]} bind:value={updateType} />
 	{/if}
 
 	<h2 class="body-name" style:color={theme().textDull}>{bodyName}</h2>

@@ -64,6 +64,7 @@
 		padding-right: 1rem;
 		display: flex;
 		flex-direction: column;
+		width: 70%;
 
 		.title,
 		.author {
@@ -84,8 +85,8 @@
 	}
 
 	img {
-		width: 8.5rem;
-		height: 13rem;
+		width: 6rem;
+		height: 9rem;
 	}
 
 	.review {

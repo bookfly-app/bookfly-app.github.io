@@ -1,7 +1,6 @@
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import initializeFirebase from "../backend/backend";
 import { internalPostToPost, type InternalPost, type Post } from "./postapi";
-import { updateUser } from "../backend/auth.svelte";
 
 export type ISBN = string;
 
@@ -35,36 +34,27 @@ export async function getBook(isbn: ISBN): Promise<Book> {
 	const item = localStorage.getItem(`book-${isbn}`);
 	const toReturn = item ? JSON.parse(item) : null;
 
-	const update = (async () => {
-		let [response, googleResponse] = await Promise.all([
+	const upate = (async () => {
+		let [response, second] = await Promise.all([
 			fetch(`https://openlibrary.org/isbn/${isbn}.json`),
-			fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`),
+			fetch(`https://openlibrary.org/search.json?isbn=${isbn}`),
 		]);
-		let [data, googleData] = await Promise.all([response.json(), googleResponse.json()]);
-
-		googleData = googleData.items?.[0].volumeInfo;
+		let [data, secondData] = await Promise.all([response.json(), await second.json()]);
 
 		const book: Book = {
 			title: data.title,
-			authors: Array.from(new Set(googleData?.authors ?? [])),
+			authors: Array.from(new Set(secondData.docs[0].author_name)),
 			isbn,
-			cover:
-				googleData?.imageLinks?.thumbnail ??
-				`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`,
+			cover: `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`,
 			pageCount: data.number_of_pages,
 			genres: data.subjects?.map((subject: { name: string }) => subject.name) ?? [],
-			description: data.description ?? googleData?.description ?? "",
+			description: data.description ?? "",
 		};
 
 		localStorage.setItem(`book-${isbn}`, JSON.stringify(book));
-		console.log(`Updated book "${book.title}" in localStorage`);
-
-		return book;
 	})();
 
-	if (toReturn) return toReturn;
-
-	return await update;
+	return book;
 }
 
 export async function searchBooks(searchTerm: string, max = 10): Promise<Book[]> {

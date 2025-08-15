@@ -2,7 +2,7 @@
 	import { goto } from "$app/navigation";
 	import { getBook } from "../api/bookapi";
 	import { format, type Post } from "../api/postapi";
-	import { getFavoriteBook, getUserPosts, type User } from "../api/userapi";
+	import { getFavoriteBook, getFollowers, getUserPosts, type User } from "../api/userapi";
 	import AddIcon from "../assets/images/icons/AddIcon.svelte";
 	import BookIcon from "../assets/images/icons/BookIcon.svelte";
 	import CheckIcon from "../assets/images/icons/CheckIcon.svelte";
@@ -22,10 +22,14 @@
 	let props = $props();
 	let profileUser: User = props.user;
 
-	let view: "all" | "books" | "discussion" | "activity" = $state(new URLSearchParams(window.location.search).get("view") as any ?? "all");
+	let view: "all" | "books" | "discussion" | "activity" | "list" = $state(new URLSearchParams(window.location.search).get("view") as any ?? "all");
 
 	/** This user's highest rated book */
 	let favoriteBook = getFavoriteBook(profileUser);
+
+	let readingList = Promise.all(profileUser.readingList.map(isbn => getBook(isbn)));
+
+	let followers = getFollowers(profileUser);
 
 	/** This user's posts */
 	let posts = getUserPosts(profileUser);
@@ -188,9 +192,11 @@
 			{/await}
 		</div>
 		<a style:border-color={theme().textDull} style:color={theme().textDull} class="follows" href={`/profile/${profileUser.username}/follows`}>
-			<span>
-				{profileUser.followers.length} Followers
-			</span>
+			{#await followers then followers}
+				<span>
+					{followers.length} Followers
+				</span>
+			{/await}
 			<span>
 				{profileUser.following.length} Following
 			</span>
@@ -225,6 +231,13 @@
 				onclick={gotoView("activity")}
 			>
 				Activity
+			</button>
+			<button
+				style:color={view === "list" ? theme().text : theme().textDim}
+				style:border-bottom={view === "list" ? `3px solid ${theme().accent}` : "3px solid transparent"}
+				onclick={gotoView("list")}
+			>
+				List
 			</button>
 		</div>
 	</div>
@@ -275,6 +288,14 @@
 			{#each posts.filter(post => post.type === "update") as post}
 				<AnyPost {post} />
 			{/each}
+		{:else if view === "list"}
+			<div class="ratings">
+				{#await readingList then readingList}
+					{#each readingList as book}
+						<BookListing {book} user={profileUser} />
+					{/each}
+				{/await}
+			</div>
 		{:else if view === "all"}
 			{#each posts as post}
 				<AnyPost {post} />

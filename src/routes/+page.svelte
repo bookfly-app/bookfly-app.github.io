@@ -8,6 +8,7 @@
 	import initializeFirebase from "../backend/backend";
 	import Background from "../components/Background.svelte";
 	import Footer from "../components/Footer.svelte";
+	import New from "../components/New.svelte";
 	import Page from "../components/Page.svelte";
 	import AnyPost from "../components/posts/AnyPost.svelte";
 	import Sidebar from "../components/Sidebar.svelte";
@@ -87,6 +88,7 @@
 		<div class="footer-padding"></div>
 	</section>
 
+	<New />
 	<Footer selected="home" />
 	<Sidebar bind:this={sidebar}/>
 </Page>

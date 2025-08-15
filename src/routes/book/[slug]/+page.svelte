@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { getBookDiscussions } from "../../../api/bookapi";
 	import SearchIcon from "../../../assets/images/icons/SearchIcon.svelte";
-	import { user } from "../../../backend/auth.svelte";
+	import { updateUser, user } from "../../../backend/auth.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
 	import Page from "../../../components/Page.svelte";
 	import AnyPost from "../../../components/posts/AnyPost.svelte";
 	import Sidebar from "../../../components/Sidebar.svelte";
-	import theme from "../../../themes/theme.svelte.js";
+	import theme, { accentGradient } from "../../../themes/theme.svelte.js";
 
 	let { data } = $props();
 	let book = data.book;
@@ -16,6 +16,12 @@
 
 	let discussions = getBookDiscussions(book.isbn);
 	let sidebar: Sidebar;
+
+	async function addToReadingList() {
+		const readingList = user()!.readingList;
+		updateUser({ readingList: [...readingList, book.isbn]  })
+		user()?.readingList.push(book.isbn);
+	}
 
 	function makeReadable(description: string, interval = 3) {
 		description = description.replaceAll("--", "—");
@@ -83,7 +89,11 @@
 				{/each}
 			{/await}
 		{/if}
+
+		<button id="add-to-reading-list" style:background={accentGradient()} onclick={addToReadingList}>Add to Reading List</button>
 	</section>
+
+
 	<Footer selected="search" />
 	<Sidebar bind:this={sidebar} />
 </Page>
@@ -95,6 +105,18 @@
 		align-items: center;
 		height: 100%;
 		overflow-y: scroll;
+	}
+
+	#add-to-reading-list {
+		padding: 0.5rem 1rem 0.5rem 1rem;
+		border-radius: 100vmax;
+		box-shadow: 0px 0px 0.5rem black;
+		transition: scale 0.1s;
+		margin-top: 1rem;
+
+		&:hover {
+			scale: 105%;
+		}
 	}
 
 	.book-info {

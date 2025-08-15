@@ -3,6 +3,10 @@
 	import theme from "../themes/theme.svelte";
 
 	let { rating = $bindable(), size = 0.6, interactive = false }: { rating: number; size?: number, interactive?: boolean } = $props();
+
+	function clampPercent(value: number) {
+		return Math.max(Math.min(value, 1), 0);
+	}
 </script>
 
 <span class="rating">
@@ -11,7 +15,7 @@
 		stroke="#FFFFAA"
 		fill="#FFFFAA"
 		fillEnd={theme().background}
-		fillPercent={rating < 2 ? rating / 2 : undefined}
+		fillPercent={clampPercent(rating / 2)}
 		style="cursor: {interactive ? 'pointer' : 'default'}; width: {size * 1.5}rem; height: {size * 1.5}rem;"
 	/>
 	<StarIcon
@@ -19,7 +23,7 @@
 		stroke="#FFFFAA"
 		fill="#FFFFAA"
 		fillEnd={theme().background}
-		fillPercent={rating < 4 ? (rating - 2) / 2 : undefined}
+		fillPercent={clampPercent((rating - 2) / 2)}
 		style="cursor: {interactive ? 'pointer' : 'default'}; width: {size * 1.5}rem; height: {size * 1.5}rem;"
 	/>
 	<StarIcon
@@ -27,7 +31,7 @@
 		stroke="#FFFFAA"
 		fill="#FFFFAA"
 		fillEnd={theme().background}
-		fillPercent={rating < 6 ? (rating - 4) / 2 : undefined}
+		fillPercent={clampPercent((rating - 4) / 2)}
 		style="cursor: {interactive ? 'pointer' : 'default'}; width: {size * 1.5}rem; height: {size * 1.5}rem;"
 	/>
 	<StarIcon
@@ -35,7 +39,7 @@
 		stroke="#FFFFAA"
 		fill="#FFFFAA"
 		fillEnd={theme().background}
-		fillPercent={rating < 8 ? (rating - 6) / 2 : undefined}
+		fillPercent={clampPercent((rating - 6) / 2)}
 		style="cursor: {interactive ? 'pointer' : 'default'}; width: {size * 1.5}rem; height: {size * 1.5}rem;"
 	/>
 	<StarIcon
@@ -43,7 +47,7 @@
 		stroke="#FFFFAA"
 		fill="#FFFFAA"
 		fillEnd={theme().background}
-		fillPercent={rating < 10 ? (rating - 8) / 2 : undefined}
+		fillPercent={clampPercent((rating - 8) / 2)}
 		style="cursor: {interactive ? 'pointer' : 'default'}; width: {size * 1.5}rem; height: {size * 1.5}rem;"
 	/>
 </span>

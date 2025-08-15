@@ -1,7 +1,9 @@
 <script lang="ts">
-	import { getUserFromId, getUserFromUsername } from "../../../../api/userapi";
+	import { getUserFromId, getUserFromUsername, getFollowers } from "../../../../api/userapi";
+	import { user } from "../../../../backend/auth.svelte";
 	import Background from "../../../../components/Background.svelte";
 	import Footer from "../../../../components/Footer.svelte";
+	import New from "../../../../components/New.svelte";
 	import Page from "../../../../components/Page.svelte";
 	import UserListing from "../../../../components/UserListing.svelte";
 	import theme from "../../../../themes/theme.svelte";
@@ -11,14 +13,14 @@
 	let { data }: { data: { username: string } } = $props();
 	let { username } = data;
 
-	let user = $state(getUserFromUsername(username));
-	let following = user.then(user => Promise.all(user.following.map(following => getUserFromId(following))));
-	let followers = user.then(user => Promise.all(user.followers.map(follower => getUserFromId(follower))));
+	let profileUser = $state(getUserFromUsername(username));
+	let following = profileUser.then(user => Promise.all(user.following.map(following => getUserFromId(following))));
+	let followers = profileUser.then(user => getFollowers(user));
 </script>
 
 <Background />
 <Page>
-	{#await user then user}
+	{#await profileUser then}
 		<div class="view" style:background={theme().backgroundDark}>
 			{#await following then following}
 				<button
@@ -54,6 +56,8 @@
 			{/await}
 		{/if}
 	{/await}
+
+
 	<Footer selected="profile" />
 </Page>
 

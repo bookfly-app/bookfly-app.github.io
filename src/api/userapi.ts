@@ -74,7 +74,8 @@ export function usernameErrors(username: string): string[] {
 	let errors = [];
 	if (username.length < 1) errors.push("Username can't be empty");
 	if (username.length > 30) errors.push("Username can't be more than 30 characters");
-	if (!/^[\w\-]*$/.test(username)) errors.push("Username can only contain letters, numbers, underscores, and hyphens");
+	if (!/^[\w\-]*$/.test(username))
+		errors.push("Username can only contain letters, numbers, underscores, and hyphens");
 	return errors;
 }
 
@@ -104,11 +105,26 @@ export let awaitUser: Promise<User> = new Promise(resolve => {
  * rated any books.
  */
 export async function getFavoriteBook(user: User): Promise<Book | null> {
-	let posts = (await getDocs(query(collection(db, "posts"), where("poster", "==", user.id), where("type", "==", "rating")))).docs.map(doc =>
-		doc.data()
-	) as Post[];
+	let posts = (
+		await getDocs(
+			query(
+				collection(db, "posts"),
+				where("poster", "==", user.id),
+				where("type", "==", "rating"),
+			),
+		)
+	).docs.map(doc => doc.data()) as Post[];
 	let books = posts.toSorted((a, b) => b.rating! - a.rating!).map(post => post.books[0]);
 	return books.length > 0 ? await getBook(books[0] as unknown as string) : null;
+}
+
+export async function getFollowers(user: User): Promise<User[]> {
+	const followers: User[] = [];
+	(
+		await getDocs(query(collection(db, "users"), where("following", "array-contains", user.id)))
+	).forEach(doc => followers.push(doc.data() as User));
+
+	return followers;
 }
 
 /**
@@ -121,7 +137,9 @@ export async function getFavoriteBook(user: User): Promise<Book | null> {
  * @returns The user with the given id
  */
 export async function getUserFromId(id: UserId): Promise<User> {
-	let internalUser = (await getDocs(query(collection(db, "users"), where("id", "==", id)))).docs[0].data() as InternalUser;
+	let internalUser = (
+		await getDocs(query(collection(db, "users"), where("id", "==", id)))
+	).docs[0].data() as InternalUser;
 	return internalUser;
 }
 
@@ -130,18 +148,34 @@ export async function internalUserToUser(user: InternalUser): Promise<User> {
 }
 
 export async function getUserFromUsername(username: string): Promise<User> {
-	let user = (await getDocs(query(collection(db, "users"), where("username", "==", username)))).docs[0].data() as InternalUser;
+	let user = (
+		await getDocs(query(collection(db, "users"), where("username", "==", username)))
+	).docs[0].data() as InternalUser;
 	return user;
 }
 
 export async function getNumberOfBooksRead(user: User): Promise<number> {
-	return (await getDocs(query(collection(db, "posts"), where("poster", "==", user.id), where("type", "==", "rating")))).docs.length;
+	return (
+		await getDocs(
+			query(
+				collection(db, "posts"),
+				where("poster", "==", user.id),
+				where("type", "==", "rating"),
+			),
+		)
+	).docs.length;
 }
 
 export async function getUserPosts(user: User): Promise<Post[]> {
-	let internalPosts = (await getDocs(query(collection(db, "posts"), where("poster", "==", user.id), orderBy("timestamp", "desc")))).docs.map(doc =>
-		doc.data()
-	) as InternalPost[];
+	let internalPosts = (
+		await getDocs(
+			query(
+				collection(db, "posts"),
+				where("poster", "==", user.id),
+				orderBy("timestamp", "desc"),
+			),
+		)
+	).docs.map(doc => doc.data()) as InternalPost[];
 
 	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
 	return posts;
@@ -150,6 +184,10 @@ export async function getUserPosts(user: User): Promise<Post[]> {
 export async function searchUsers(searchTerm: string): Promise<User[]> {
 	let users = (await getDocs(query(collection(db, "users")))).docs
 		.map(doc => doc.data())
-		.filter(user => user.username.toLowerCase().includes(searchTerm.toLowerCase()) || user.displayName.includes(searchTerm.toLowerCase()));
+		.filter(
+			user =>
+				user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+				user.displayName.includes(searchTerm.toLowerCase()),
+		);
 	return users as User[];
 }

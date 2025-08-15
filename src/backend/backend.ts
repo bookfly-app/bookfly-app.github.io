@@ -13,7 +13,7 @@ let db: Firestore;
  *
  * @returns A reference to the app and database.
  */
-export default function initializeFirebase(): { app: FirebaseApp, db: Firestore } {
+export default function initializeFirebase(): { app: FirebaseApp; db: Firestore } {
 	if (!app) {
 		app = initializeApp(env.firebase);
 		db = getFirestore(app);

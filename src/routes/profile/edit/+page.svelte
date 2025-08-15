@@ -9,12 +9,19 @@
 	import RadioInput from "../../../components/RadioInput.svelte";
 	import theme from "../../../themes/theme.svelte";
 
-	let displayName = $state(awaitUser.then(user => user.displayName));
-	let username = $state(awaitUser.then(user => user.username));
-	let bio = $state(awaitUser.then(user => user.bio));
-	let pronouns = $state(awaitUser.then(user => user.pronouns));
+	awaitUser.then(user => {
+		displayName = user.displayName;
+		username = user.username;
+		bio = user.bio;
+		pronouns = user.pronouns;
+	});
 
-	let usernameErrorList = $derived(username.then(username => usernameErrors(username)));
+	let displayName = $state("");
+	let username = $state("");
+	let bio = $state("");
+	let pronouns = $state("");
+
+	let usernameErrorList = $derived(usernameErrors(username));
 
 	// svelte-ignore non_reactive_update
 	let usernameInput: HTMLInputElement;
@@ -25,16 +32,16 @@
 	}
 
 	async function update() {
-		if ((await usernameErrorList).length > 0) {
+		if (usernameErrorList.length > 0) {
 			return;
 		}
 
-		if ((await username) !== (await awaitUser).username && (await usernameIsTaken(await username))) {
+		if (username !== (await awaitUser).username && (await usernameIsTaken(username))) {
 			usernameTaken = true;
 			return;
 		}
 
-		await updateUser({ displayName: await displayName, bio: await bio, username: await username, pronouns: await pronouns });
+		await updateUser({ displayName: displayName, bio: bio, username: username, pronouns: pronouns });
 		await goto("/profile");
 		location.reload();
 	}

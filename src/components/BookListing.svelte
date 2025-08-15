@@ -1,27 +1,32 @@
 <script lang="ts">
+	import type { Book } from "../api/bookapi";
+	import type { User } from "../api/userapi";
 	import theme from "../themes/theme.svelte";
 	import StarRating from "./StarRating.svelte";
 
-	let { book, rating, user } = $props();
+	let { book, rating, user, onclick }: { book: Book, rating?: number, user: User, onclick?: () => void } = $props();
 </script>
 
-<a href="/book/{book.isbn}" style:border-color={theme().textDark}>
+<svelte:element id="outer" this={onclick ? "div" : "a"} href="/book/{book.isbn}" onclick={() => onclick?.()} style:border-color={theme().textDark}>
 	<div class="book-info">
 		<h1 style:color={theme().text}>{book.title}</h1>
 		<h2 style:color={theme().textDull}>{book.authors.join(", ")}</h2>
 	</div>
 
-	<div class="rating">
-		<span style:color={theme().text}>{user.displayName}'s rating:</span>
-		<StarRating {rating} />
-		<span style:color={theme().text}>{rating} / 10</span>
-	</div>
+	{#if rating !== undefined}
+		<div class="rating">
+			<span style:color={theme().text}>{user.displayName}'s rating:</span>
+			<StarRating {rating} size={0.6}/>
+			<span style:color={theme().text}>{rating} / 10</span>
+		</div>
+	{/if}
 
 	<img alt="{book.title} cover" src={book.cover} />
-</a>
+</svelte:element>
 
 <style>
-	a {
+	#outer {
+		cursor: pointer;
 		text-decoration: none;
 		display: flex;
 		height: 8rem;
@@ -34,19 +39,26 @@
 
 		img {
 			height: 100%;
+			aspect-ratio: 8/11;
 		}
 	}
 
 	.rating {
 		display: flex;
 		align-items: center;
+		text-align: center;
+		font-size: 0.85rem;
 		flex-direction: column;
 		gap: 0.5rem;
+		padding-right: 1rem;
+		padding-left: 1rem;
 	}
 
 	.book-info {
 		display: flex;
 		flex-direction: column;
+		gap: 0.5em;
+		width: 50%;
 
 		h1,
 		h2 {

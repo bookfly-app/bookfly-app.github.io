@@ -20,13 +20,14 @@
 	}[type];
 
 	let body: string;
+	let chosenBook: Book | null = $state(null);
+	let rating: string;
 
 	let searchResults: Book[] = $state([]);
-	let searchText: string;
+	let searchText: string = $state("");
 
 	async function search() {
 		searchResults = await searchBooks(searchText);
-		console.log($state.snapshot(searchResults));
 	}
 
 	function checkSearch(event: KeyboardEvent) {
@@ -36,40 +37,102 @@
 	}
 
 	function upload() {
-		post({ type, body });
+		validateRating();
+		validateBook();
+
+		if (ratingError || bookError) return;
+
+		let object = { type, body };
+		if (chosenBook) object = Object.assign(object, { books: [chosenBook.isbn], rating: Number(rating) });
+		post(object);
+
+		goto("/profile");
+	}
+
+	function chooseBook(book: Book) {
+		return function() {
+			chosenBook = book;
+			validateBook();
+		}
+	}
+
+	let ratingError = $state("");
+	let bookError = $state("");
+
+	function validateRating() {
+		if (!/^\d(\.\d)?$/.test(rating)) {
+			ratingError = "Value must be between 0 and 10, to at most one decimal place.";
+		} else {
+			ratingError = "";
+		}
+	}
+
+	function validateBook() {
+		if (!chosenBook) {
+			bookError = "Choose a book to rate.";
+		} else {
+			bookError = "";
+		}
 	}
 </script>
+
 
 <Background />
 <Page class="new-post-page">
 	{#if type === "rating"}
-		<h1 style:color={theme().textDull}>Choose a book to rate</h1>
-		<input
-			type="text"
-			bind:value={searchText}
-			style:background={theme().backgroundDark}
-			onkeyup={checkSearch}
-			style:color={theme().text}
-		/>
+		<h1 style:color={theme().text}>Choose a book to rate</h1>
+
+		<div class="book-search">
+			<input
+				id="search"
+				type="text"
+				bind:value={searchText}
+				style:background={theme().backgroundDark}
+				onkeyup={checkSearch}
+				style:color={theme().text}
+				style:outline={bookError ? `2px solid #f38ba8` : "none"}
+			/>
+			{#if bookError}
+				<span class="error">{bookError}</span>
+			{/if}
+		</div>
+
 		<div class="search-results">
-			{#each searchResults as book}
-				<BookListing {book} rating={0} user={user()!} />
-			{/each}
+			{#if chosenBook}
+				<BookListing book={chosenBook} user={user()!} />
+			{:else}
+				{#each searchResults as book}
+					<BookListing {book} user={user()!} onclick={chooseBook(book)} />
+				{/each}
+			{/if}
+		</div>
+
+		<h2 class="body-name" style:color={theme().textDull}>Rating</h2>
+		<div class="stars">
+			<input 
+				bind:value={rating}
+				id="rating"
+				style:background={theme().backgroundDark}
+				style:color={theme().text}
+				oninput={validateRating}
+				style:outline={ratingError ? `2px solid #f38ba8` : "none"}
+			/>
+			{#if ratingError}
+				<span class="error">{ratingError}</span>
+			{/if}
 		</div>
 	{/if}
 
-	<h2 style:color={theme().textDull}>{bodyName}</h2>
+	<h2 class="body-name" style:color={theme().textDull}>{bodyName}</h2>
 	<textarea
+		id="body"
 		bind:value={body}
 		style:color={theme().text}
 		style:background={theme().backgroundDark}
 	></textarea>
 
 	<button
-		onclick={() => {
-			upload();
-			goto("/profile");
-		}}
+		onclick={upload}
 		class="post-button"
 		style:color={theme().background}
 		style:background-image={`linear-gradient(${theme().accent}, ${theme().accent2})`}
@@ -81,8 +144,48 @@
 </Page>
 
 <style>
+	.body-name {
+		margin-top: 1rem;
+	}
+
+	h1 {
+		font-size: 1.5rem;
+		font-weight: normal;
+		margin-bottom: 0.5rem;
+	}
+
+	.book-search {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.stars {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+
+	}
+
+	.error {
+		color: #f38ba8;
+		font-size: 0.85rem;
+	}
+
+	#rating {
+		width: 100%;
+		padding: 0.5rem;
+		border-radius: 0.5rem;
+	}
+
+	#search {
+		padding: 0.5rem;
+		border-radius: 0.5rem;
+	}
+
 	.search-results {
 		height: 20rem;
+		overflow: auto;
 	}
 
 	.post-button {
@@ -97,6 +200,10 @@
 		margin-right: auto;
 		margin-top: 3rem;
 		box-shadow: 0px 0px 10px black;
+	}
+
+	#body {
+		padding: 0.5rem;
 	}
 
 	:global(.new-post-page) {

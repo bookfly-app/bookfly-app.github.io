@@ -6,7 +6,9 @@
 </script>
 
 <section>
-	<p class="body" style:color={theme().text}>{@html format(body)}</p>
+	{#await format(body) then body}
+		<p class="body" style:color={theme().text}>{@html body}</p>
+	{/await}
 	{#if images.length > 0}
 		<div class="image" style:background-image={`url("${images[0]}")`}>
 			{#each images}

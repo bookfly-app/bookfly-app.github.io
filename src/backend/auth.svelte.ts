@@ -33,24 +33,32 @@ export function passwordErrors(password: string): string[] {
 	if (!/\d/.test(password)) errors.push("Must contain at least 1 number");
 	if (!/[a-z]/.test(password)) errors.push("Must contain at least 1 lowercase letter");
 	if (!/[A-Z]/.test(password)) errors.push("Must contain at least 1 uppercase letter");
-	if (!/[\$_=\+\*!@#%\^&\|\\\/\(\)\[\]\{\}<>\?:;'"`~\-]/.test(password)) errors.push("Must contain at least 1 symbol");
+	if (!/[\$_=\+\*!@#%\^&\|\\\/\(\)\[\]\{\}<>\?:;'"`~\-]/.test(password))
+		errors.push("Must contain at least 1 symbol");
 	if (password.length < 8) errors.push("Must be at least 8 characters");
 	return errors;
 }
 
 export async function usernameIsTaken(username: string): Promise<boolean> {
-	return (await getDocs(query(collection(db, "users"), where("username", "==", username)))).docs.length > 0;
+	return (
+		(await getDocs(query(collection(db, "users"), where("username", "==", username)))).docs
+			.length > 0
+	);
 }
 
 export async function emailIsTaken(email: string): Promise<boolean> {
-	return (await getDocs(query(collection(db, "users"), where("email", "==", email)))).docs.length > 0;
+	return (
+		(await getDocs(query(collection(db, "users"), where("email", "==", email)))).docs.length > 0
+	);
 }
 
 onAuthStateChanged(auth, async user => {
 	// Logged in
 	if (user) {
 		currentUser = await internalUserToUser(
-			(await getDocs(query(collection(db, "users"), where("id", "==", user.uid)))).docs[0].data() as InternalUser
+			(
+				await getDocs(query(collection(db, "users"), where("id", "==", user.uid)))
+			).docs[0].data() as InternalUser,
 		);
 		resolveUser(currentUser);
 	}
@@ -80,14 +88,19 @@ export async function updateOtherUser(user: User, userInfo: Partial<User>) {
 	await setDoc(doc(db, "users", newUser.id), newUser);
 }
 
-export async function signUp(email: string, password: string, username: string): Promise<unknown | null> {
+export async function signUp(
+	email: string,
+	password: string,
+	username: string,
+): Promise<unknown | null> {
 	try {
 		let userInfo = await createUserWithEmailAndPassword(auth, email, password);
 		let user: User = {
 			displayName: username,
 			email,
 			username,
-			picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToiRnzzyrDtkmRzlAvPPbh77E-Mvsk3brlxQ&s",
+			picture:
+				"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcToiRnzzyrDtkmRzlAvPPbh77E-Mvsk3brlxQ&s",
 			bio: "",
 			pronouns: "",
 			likes: [],

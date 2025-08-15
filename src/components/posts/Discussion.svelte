@@ -7,7 +7,9 @@
 </script>
 
 <section>
-	<p class="body" style:color={theme().text}>{@html format(body)}</p>
+	{#await format(body) then body}
+		<p class="body" style:color={theme().text}>{@html body}</p>
+	{/await}
 	{#if images.length > 0}
 		<ImageCarousel {images} />
 	{/if}

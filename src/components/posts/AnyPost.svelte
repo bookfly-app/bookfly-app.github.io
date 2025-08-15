@@ -91,7 +91,7 @@
 			} else if (elapsedSeconds < 60 * 60 * 24 * 30) {
 				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24 / 7)}w ago`;
 			} else if (elapsedSeconds < 60 * 60 * 24 * 365) {
-				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24 / 30)}m ago`;
+				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24 / 30)}mo ago`;
 			} else {
 				elapsedTime = `${Math.floor(elapsedSeconds / 60 / 60 / 24 / 365)}y ago`;
 			}
@@ -387,6 +387,7 @@
 		align-items: center;
 		gap: 0.5rem;
 		width: 100%;
+		margin-bottom: 0.25rem;
 
 		a {
 			text-decoration: none;

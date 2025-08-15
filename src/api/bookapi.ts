@@ -17,37 +17,53 @@ export type Book = {
 let { db } = initializeFirebase();
 
 export async function getBookDiscussions(isbn: ISBN): Promise<Post[]> {
-	let posts = (await getDocs(query(collection(db, "posts"), where("books", "array-contains", isbn), orderBy("timestamp", "desc")))).docs.map(doc =>
-		doc.data()
-	) as InternalPost[];
+	let posts = (
+		await getDocs(
+			query(
+				collection(db, "posts"),
+				where("books", "array-contains", isbn),
+				orderBy("timestamp", "desc"),
+			),
+		)
+	).docs.map(doc => doc.data()) as InternalPost[];
 
 	return await Promise.all(posts.map(post => internalPostToPost(post)));
 }
 
 export async function getBook(isbn: ISBN): Promise<Book> {
-	let response = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN%3A${isbn}&format=json&jscmd=data`);
+	const item = localStorage.getItem(`book-${isbn}`);
+	if (item) return JSON.parse(item);
 
-	let data = (await response.json())[`ISBN:${isbn}`];
+	let [response, second] = await Promise.all([
+		fetch(`https://openlibrary.org/isbn/${isbn}.json`),
+		fetch(`https://openlibrary.org/search.json?isbn=${isbn}`),
+	]);
+	let [data, secondData] = await Promise.all([response.json(), await second.json()]);
 
-	let googleResonse = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
-	let googleData = (await googleResonse.json())?.items?.[0];
-
-	return {
+	const book: Book = {
 		title: data.title,
-		authors: data.authors?.map((author: any) => author.name) ?? [],
+		authors: Array.from(new Set(secondData.docs[0].author_name)),
 		isbn,
-		cover: data.cover?.large ?? "",
+		cover: `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`,
 		pageCount: data.number_of_pages,
 		genres: data.subjects?.map((subject: { name: string }) => subject.name) ?? [],
-		description: googleData?.volumeInfo.description ?? "",
+		description: data.description ?? "",
 	};
+
+	localStorage.setItem(`book-${isbn}`, JSON.stringify(book));
+
+	return book;
 }
 
-export async function searchBooks(searchTerm: string): Promise<Book[]> {
-	let response = await fetch(`https://openlibrary.org/search.json?q=${searchTerm}`);
-	console.log(await response.json());
-	let books = (await response.json()).docs.filter(
-		(book: { title: string; isbn?: unknown[] }) => book.title.toLowerCase().includes(searchTerm.replace("+", " ")) && book.isbn
+export async function searchBooks(searchTerm: string, max = 10): Promise<Book[]> {
+	if (/^\d{13}$/.test(searchTerm)) getBook(searchTerm).then(book => [book]);
+
+	const query = new URLSearchParams({ q: searchTerm });
+	let response = await fetch(`https://openlibrary.org/search.json?${query}&fields=isbn,editions`);
+	const data = await response.json();
+	console.log(data);
+	let books = data.docs.filter((book: Book) => book.isbn).slice(0, max);
+	return await Promise.all(
+		books.map((book: any) => getBook(book.isbn.find((isbn: string) => /^\d{13}$/.test(isbn)))),
 	);
-	return (await Promise.all(books.map((book: Book) => getBook(book.isbn[0])))).filter(book => book.cover);
 }

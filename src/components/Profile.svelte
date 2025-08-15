@@ -50,7 +50,7 @@
 				.filter(post => post.type === "rating")
 				.toSorted(
 					{
-						best: (a: Post, b: Post) => a.rating - b.rating,
+						best: (a: Post, b: Post) => b.rating - a.rating,
 						recent: (a: Post, b: Post) => a.timestamp - b.timestamp,
 					}[ratingSort],
 				),
@@ -145,7 +145,10 @@
 				</div>
 			{/if}
 		</div>
-		<p style:color={theme().text} class="bio">{@html format(profileUser.bio)}</p>
+
+		{#await format(profileUser.bio) then bio}
+			<p style:color={theme().text} class="bio">{@html bio}</p>
+		{/await}
 
 		<!-- Line 2: Profile stats -->
 		<div class="profile-line-2">
@@ -231,8 +234,6 @@
 			{/each}
 		{:else if view === "ratings"}
 			<div class="ratings">
-				{#await ratings then ratings}
-					{#each ratings as post}
 						<div class="rating-options" style:border-color={theme().textDark}>
 							<span style:color={theme().textDull}>
 								<label for="show-full-reviews">Show full reviews</label>
@@ -253,6 +254,8 @@
 								</button>
 							</ContextMenu>
 						</div>
+				{#await ratings then ratings}
+					{#each ratings as post}
 						{#if showFullReviews}
 							<AnyPost {post} />
 						{:else}
@@ -355,8 +358,9 @@
 	}
 
 	.truncate {
-		max-width: 10rem;
+		max-width: 7rem;
 		text-overflow: ellipsis;
+		text-wrap: nowrap;
 		display: inline-block;
 		overflow-x: hidden;
 		font-size: 0.85rem;
@@ -423,16 +427,14 @@
 	.profile-line-2 {
 		display: flex;
 		align-items: center;
-		gap: 1.5rem;
+		gap: 1.0rem;
 		padding-bottom: 0.5rem;
 		margin-left: 1rem;
 
-		> span {
+		> a, > span {
 			display: flex;
+			gap: 0.5em;
 			align-items: center;
-			gap: 0.25rem;
-			white-space: nowrap;
-			font-size: 0.85rem;
 		}
 	}
 
@@ -445,7 +447,7 @@
 		}
 
 		h2 {
-			font-size: 1.25rem;
+			font-size: 1rem;
 			font-weight: normal;
 		}
 
@@ -459,7 +461,7 @@
 			padding-left: 1rem;
 			padding-right: 1rem;
 			border-radius: 100vmax;
-			font-weight: 600;
+			font-weight: 500;
 		}
 	}
 

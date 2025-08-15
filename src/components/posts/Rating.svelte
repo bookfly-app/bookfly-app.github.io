@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getBook } from "../../api/bookapi";
-	import StarIcon from "../../assets/images/icons/StarIcon.svelte";
+	import { format } from "../../api/postapi";
 	import theme from "../../themes/theme.svelte";
 	import StarRating from "../StarRating.svelte";
 
@@ -33,11 +33,15 @@
 				<img alt={`Cover for book "${book?.title}"`} src={book?.cover} />
 			</a>
 		</div>
-		<p class="review" style:color={theme().text}>{review}</p>
+		{#await format(review) then body}
+			<p class="review" style:color={theme().text}>{@html body}</p>
+		{/await}
 	{/await}
 </div>
 
 <style>
+
+
 	.info {
 		display: flex;
 		align-items: center;
@@ -60,9 +64,10 @@
 
 		.title,
 		.author {
-			font-size: 1rem;
+			font-size: 0.85rem;
 			font-weight: normal;
 			text-decoration: none;
+			text-align: center;
 		}
 	}
 
@@ -72,12 +77,17 @@
 	}
 
 	img {
-		width: 8.5rem;
-		height: 13rem;
+		width: 6rem;
+		height: 9rem;
+		margin-left: 1rem;
 	}
 
 	.review {
 		padding-top: 1rem;
 		font-size: 0.85rem;
+
+		:global(a) {
+			color: cornflowerblue;
+		}
 	}
 </style>

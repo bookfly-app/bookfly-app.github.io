@@ -8,7 +8,7 @@
 	let stroke = props.stroke;
 	let fill = props.fill;
 	let fillEnd = props.fillEnd;
-	let fillPercent = props.fillPercent;
+	let fillPercent = $derived(props.fillPercent);
 
 	props = { ...props };
 	props.stroke = undefined;

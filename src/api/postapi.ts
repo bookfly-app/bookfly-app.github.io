@@ -1,4 +1,15 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, or, query, updateDoc, where } from "firebase/firestore";
+import {
+	addDoc,
+	collection,
+	deleteDoc,
+	doc,
+	getDoc,
+	getDocs,
+	or,
+	query,
+	updateDoc,
+	where,
+} from "firebase/firestore";
 import { updateUser, user } from "../backend/auth.svelte";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
@@ -130,7 +141,9 @@ let { db } = initializeFirebase();
  *
  * @returns The created post object.
  */
-export async function post(post: Partial<Omit<InternalPost, "id">> & { body: string; type: PostType }): Promise<Post> {
+export async function post(
+	post: Partial<Omit<InternalPost, "id">> & { body: string; type: PostType },
+): Promise<Post> {
 	let toPost: InternalPost = {
 		timestamp: Date.now(),
 		poster: user()!.id,
@@ -144,6 +157,7 @@ export async function post(post: Partial<Omit<InternalPost, "id">> & { body: str
 		...post,
 	} as InternalPost;
 	let { pictures, ...postData } = toPost;
+	console.log(toPost);
 
 	let doc = await addDoc(collection(db, "posts"), toPost);
 	updateDoc(doc, { id: doc.id });
@@ -207,7 +221,9 @@ export async function getPostFromId(postid: PostId): Promise<Post | null> {
 }
 
 export async function searchPosts(searchTerm: string): Promise<Post[]> {
-	let internalPosts = (await getDocs(query(collection(db, "posts")))).docs.map(doc => doc.data()) as InternalPost[];
+	let internalPosts = (await getDocs(query(collection(db, "posts")))).docs.map(doc =>
+		doc.data(),
+	) as InternalPost[];
 
 	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
 	return posts.filter(post => post.body.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -219,7 +235,9 @@ export async function getFollowedPosts(user: User, includeSelf: boolean): Promis
 	let postQuery: any = where("poster", "in", user.following);
 	if (includeSelf) postQuery = or(postQuery, where("poster", "==", user.id));
 
-	let internalPosts = (await getDocs(query(collection(db, "posts"), postQuery))).docs.map(doc => doc.data()) as InternalPost[];
+	let internalPosts = (await getDocs(query(collection(db, "posts"), postQuery))).docs.map(doc =>
+		doc.data(),
+	) as InternalPost[];
 	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
 
 	return posts;
@@ -227,18 +245,22 @@ export async function getFollowedPosts(user: User, includeSelf: boolean): Promis
 
 export async function getReplies(post: Post): Promise<Post[]> {
 	return Promise.all(
-		(await getDocs(query(collection(db, "posts"), where("parent", "==", post.id)))).docs.map(doc =>
-			internalPostToPost(doc.data() as InternalPost)
-		)
+		(await getDocs(query(collection(db, "posts"), where("parent", "==", post.id)))).docs.map(
+			doc => internalPostToPost(doc.data() as InternalPost),
+		),
 	);
 }
 
 export async function getLikes(post: Post): Promise<InternalUser[]> {
-	return (await getDocs(query(collection(db, "users"), where("likes", "array-contains", post.id)))).docs.map(doc => doc.data() as InternalUser);
+	return (
+		await getDocs(query(collection(db, "users"), where("likes", "array-contains", post.id)))
+	).docs.map(doc => doc.data() as InternalUser);
 }
 
 export async function getShares(post: Post): Promise<InternalUser[]> {
-	return (await getDocs(query(collection(db, "users"), where("shares", "array-contains", post.id)))).docs.map(doc => doc.data() as InternalUser);
+	return (
+		await getDocs(query(collection(db, "users"), where("shares", "array-contains", post.id)))
+	).docs.map(doc => doc.data() as InternalUser);
 }
 
 /**
@@ -249,7 +271,22 @@ export async function getShares(post: Post): Promise<InternalUser[]> {
  *
  * This is used in `format()` to detect links.
  */
-let linkRegex = /(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
+let linkRegex =
+	/(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g;
+
+async function replaceAllAsync(
+	str: string,
+	regex: RegExp,
+	asyncFn: (...strings: string[]) => Promise<string>,
+) {
+	const promises: Promise<string>[] = [];
+	str.replaceAll(regex, (full, ...args) => {
+		promises.push(asyncFn(full, ...args));
+		return full;
+	});
+	const data = await Promise.all(promises);
+	return str.replaceAll(regex, () => data.shift()!);
+}
 
 /**
  * Formats the given text into an HTML string that's styled for things like **bold**, *italic*,
@@ -261,19 +298,33 @@ let linkRegex = /(https?:\/\/)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}
  * @returns The formatted string as a raw string of HTML code, that can be inserted using
  * Svelte's `@html` tag.
  */
-export function format(text: string): string {
-	return text
+export async function format(text: string): Promise<string> {
+	text = text
 		.replaceAll("&", "&amp;")
 		.replaceAll("<", "&lt;")
 		.replaceAll(">", "&gt;")
 		.replaceAll('"', "&quot;")
-		.replaceAll("'", "&#x27;")
-		.replaceAll(/@(\w+)/g, (match, username) => `<a style="text-decoration: none;" href="/profile/${username}">${match}</a>`)
+		.replaceAll("'", "&#x27;");
+
+	text = await replaceAllAsync(text, /@(\d{13})/g, async (_match, isbn) => {
+		const book = await getBook(isbn);
+		return `<a style="text-decoration: none;" href="/book/${isbn}"><i>${book.title}</i></a>`;
+	});
+
+	return text
+		.replaceAll(
+			/@(\w+)/g,
+			(match, username) =>
+				`<a style="text-decoration: none;" href="/profile/${username}">${match}</a>`,
+		)
 		.replaceAll(/\*\*([^\*]+)\*\*/g, (_match, content) => `<b>${content}</b>`)
 		.replaceAll(/\*([^\*]+)\*/g, (_match, content) => `<i>${content}</i>`)
 		.replaceAll(/`([^\`]+)`/g, (_match, code) => `<code>${code}</code>`)
 		.replaceAll(/~~([^~]+)~~/g, (_match, code) => `<s>${code}</s>`)
-		.replaceAll(linkRegex, match => `<a target="_blank" rel="noopener noreferrer" href="${match}">${match}</a>`)
+		.replaceAll(
+			linkRegex,
+			match => `<a target="_blank" rel="noopener noreferrer" href="${match}">${match}</a>`,
+		)
 		.replaceAll(/\\\*/g, "*")
 		.replaceAll(/\\`/g, "`")
 		.replaceAll("`", "&#x60;");
@@ -289,7 +340,9 @@ export function format(text: string): string {
  * the database and calculated, returning the total number of views.
  */
 export async function getPostViews(post: Post): Promise<number> {
-	let storedViews = (await getDocs(query(collection(db, "users"), where("views", "array-contains", post.id)))).docs;
+	let storedViews = (
+		await getDocs(query(collection(db, "users"), where("views", "array-contains", post.id)))
+	).docs;
 	let stored = storedViews.length;
 	if (!user() || !storedViews.map(user => user.id).includes(user()!.id)) {
 		stored += 1;
@@ -312,11 +365,15 @@ export async function getPostViews(post: Post): Promise<number> {
  * @returns A promise that resolves when the database is updated with the post like.
  */
 export async function likePost(post: Post): Promise<void> {
-	await updateDoc(doc(collection(db, "users"), user()!.id), { likes: [...new Set([...user()!.likes, post.id])] });
+	await updateDoc(doc(collection(db, "users"), user()!.id), {
+		likes: [...new Set([...user()!.likes, post.id])],
+	});
 }
 
 export async function sharePost(post: Post): Promise<void> {
-	await updateDoc(doc(collection(db, "users"), user()!.id), { shares: [...new Set([...user()!.shares, post.id])] });
+	await updateDoc(doc(collection(db, "users"), user()!.id), {
+		shares: [...new Set([...user()!.shares, post.id])],
+	});
 }
 
 /**
@@ -334,7 +391,9 @@ export async function sharePost(post: Post): Promise<void> {
  * @returns A promise that resolves when the database is updated with the post like.
  */
 export async function unlikePost(post: Post): Promise<void> {
-	await updateDoc(doc(collection(db, "users"), user()!.id), { likes: user()!.likes.filter(id => id !== post.id) });
+	await updateDoc(doc(collection(db, "users"), user()!.id), {
+		likes: user()!.likes.filter(id => id !== post.id),
+	});
 }
 
 /**
@@ -380,5 +439,15 @@ export async function didShare(post: Post): Promise<boolean> {
  * to the given post.
  */
 export async function didComment(post: Post): Promise<boolean> {
-	return (await getDocs(query(collection(db, "posts"), where("parent", "==", post.id), where("poster", "==", user()!.id)))).docs.length > 0;
+	return (
+		(
+			await getDocs(
+				query(
+					collection(db, "posts"),
+					where("parent", "==", post.id),
+					where("poster", "==", user()!.id),
+				),
+			)
+		).docs.length > 0
+	);
 }

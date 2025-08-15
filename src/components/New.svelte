@@ -3,7 +3,7 @@
 	import theme, { accentGradient } from "../themes/theme.svelte";
 </script>
 
-<div style:background={theme().backgroundDark}></div>
+<div></div>
 <a href="/new" style:background={accentGradient()} style:color={theme().backgroundDark}>
 	<PlusIcon stroke={theme().backgroundDark} style="width: 2rem;" />
 </a>
@@ -12,7 +12,8 @@
 	a {
 		position: fixed;
 		bottom: 5rem;
-		left: calc(50% + 0.5 * var(--max-width) - 6rem);
+		right: 1rem;
+		bottom: 5rem;
 		font-size: 3rem;
 		width: 4rem;
 		height: 4rem;
@@ -24,15 +25,16 @@
 
 	div {
 		position: fixed;
+		right: 1rem;
 		bottom: 5rem;
-		left: calc(50% + 0.5 * var(--max-width) - 6rem);
+		bottom: 5rem;
 		font-size: 3rem;
 		width: 4rem;
 		height: 4rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: var(--crust);
+		background: black;
 		filter: blur(10px);
 		border-radius: 50%;
 	}

@@ -1,0 +1,1 @@
+import{a0 as h,C as k,B as q,q as B,a1 as S}from"./B60NIL-c.js";function t(r,i){return r===i||(r==null?void 0:r[S])===i}function x(r={},i,a,T){return h(()=>{var f,s;return k(()=>{f=s,s=[],q(()=>{r!==a(...s)&&(i(r,...s),f&&t(a(...f),r)&&i(null,...f))})}),()=>{B(()=>{s&&t(a(...s),r)&&i(null,...s)})}}),r}export{x as b};

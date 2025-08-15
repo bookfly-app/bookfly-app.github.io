@@ -6,7 +6,7 @@
 	import Footer from "../../../components/Footer.svelte";
 	import Page from "../../../components/Page.svelte";
 	import AnyPost from "../../../components/posts/AnyPost.svelte";
-	import Sidebar, { showSidebar } from "../../../components/Sidebar.svelte";
+	import Sidebar from "../../../components/Sidebar.svelte";
 	import theme from "../../../themes/theme.svelte.js";
 
 	let { data } = $props();
@@ -15,6 +15,7 @@
 	let view: "info" | "discussion" = $state("info");
 
 	let discussions = getBookDiscussions(book.isbn);
+	let sidebar: Sidebar;
 
 	function makeReadable(description: string, interval = 3) {
 		description = description.replaceAll("--", "—");
@@ -42,7 +43,7 @@
 <Page style="overflow-y: hidden;">
 	<nav style:background={theme().backgroundDark}>
 		<div class="banner">
-			<button style:background-image={`url("${user()?.picture ?? ""}")`} onclick={showSidebar} aria-label="Open sidebar"></button>
+			<button style:background-image={`url("${user()?.picture ?? ""}")`} onclick={() => sidebar.show()} aria-label="Open sidebar"></button>
 			<div class="book-name">
 				<h1 style:color={theme().textBright}>{book.title}</h1>
 				<h2 style:color={theme().textDim}>{book.authors.join(", ")}</h2>
@@ -84,7 +85,7 @@
 		{/if}
 	</section>
 	<Footer selected="search" />
-	<Sidebar />
+	<Sidebar bind:this={sidebar} />
 </Page>
 
 <style>

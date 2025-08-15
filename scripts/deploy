@@ -17,4 +17,4 @@ git commit -m "New build deployment"
 git push
 
 # Push the build to the `gh-pages` branch
-git subtree push --prefix build origin gh-pages
+git push origin `git subtree split --prefix build main`:gh-pages --force

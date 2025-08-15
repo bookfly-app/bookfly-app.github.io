@@ -227,7 +227,7 @@
 	tabindex="0"
 	role="link"
 	onclick={clickPost}
-	style:border-bottom={`1px solid ${theme().textDark}`}
+	style:border={`1px solid ${theme().textDark}`}
 >
 	<!-- Poster's profile picture -->
 	<div class="profile">

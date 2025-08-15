@@ -1,21 +1,55 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import theme from "../themes/theme.svelte";
+	import Sidebar from "./Sidebar.svelte";
 
 	let props = $props();
 	let children = props.children;
 
 	props = { ...props };
 	props.children = undefined;
+
+	let sidebar: Sidebar;
+
+	onMount(() => {
+		if (window.innerWidth > window.innerHeight) {
+			sidebar.show();
+		}
+	});
 </script>
 
-<main style:border-color={theme().textDark} {...props}>
-	{@render children?.()}
-</main>
+<div class="outer">
+	{#if window.innerWidth > window.innerHeight}
+		<Sidebar bind:this={sidebar} />
+	{/if}
+	<main style:border-color={theme().textDark} {...props}>
+		{@render children?.()}
+	</main>
+	{#if window.innerWidth > window.innerHeight}
+		<div class="inner"></div>
+	{/if}
+</div>
 
 <style>
+	.outer {
+		display: flex;
+		position: relative;
+		width: 100%;
+		height: 100%;
+
+		.inner {
+			width: 40%;
+		}
+	}
+
+	@media (orientation: landscape) {
+		main {
+			margin-left: 20rem;
+		}
+	}
+
 	main {
 		width: 100%;
-		max-width: var(--max-width);
 		height: 100%;
 		overflow-y: auto;
 		overflow-x: hidden;

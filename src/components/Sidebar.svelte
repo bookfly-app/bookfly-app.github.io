@@ -1,4 +1,4 @@
-<script lang="ts" module>
+<script lang="ts">
 	import { goto } from "$app/navigation";
 	import BookmarkIcon from "../assets/images/icons/BookmarkIcon.svelte";
 	import CloseIcon from "../assets/images/icons/CloseIcon.svelte";
@@ -12,7 +12,7 @@
 
 	let sidebar: HTMLElement;
 
-	export function showSidebar() {
+	export function show() {
 		sidebar.style.left = "0px";
 	}
 
@@ -95,8 +95,7 @@
 <style>
 	section {
 		position: absolute;
-		left: -83%;
-		width: 80%;
+		left: -22rem;
 		height: 100vh;
 		top: 0px;
 		display: flex;
@@ -104,7 +103,7 @@
 		border-right-width: 1px;
 		border-right-style: solid;
 		transition: left 0.25s;
-		box-shadow: 0px 0px 10px black;
+		width: 20rem;
 
 		.listing {
 			text-decoration: none;
@@ -125,8 +124,8 @@
 	}
 
 	.profile-picture {
-		width: 5rem;
-		height: 5rem;
+		width: 4rem;
+		height: 4rem;
 		border-radius: 50%;
 		margin-right: 2rem;
 		margin-left: 2rem;
@@ -135,8 +134,8 @@
 		overflow: hidden;
 
 		img {
-			width: 5rem;
-			height: 5rem;
+			width: 4rem;
+			height: 4rem;
 		}
 	}
 
@@ -149,12 +148,23 @@
 		display: flex;
 		align-items: center;
 
+		h1 {
+			font-size: 1.5rem;
+		}
+
 		h2 {
 			font-weight: normal;
+			font-size: 1.5rem;
 		}
 
 		a {
 			text-decoration: none;
+		}
+	}
+
+	@media (orientation: portrait) {
+		section {
+			box-shadow: 0px 0px 10px black;
 		}
 	}
 </style>

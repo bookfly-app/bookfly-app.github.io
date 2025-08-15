@@ -358,7 +358,7 @@
 	}
 
 	.truncate {
-		max-width: 7rem;
+		max-width: 100%;
 		text-overflow: ellipsis;
 		text-wrap: nowrap;
 		display: inline-block;
@@ -435,6 +435,7 @@
 			display: flex;
 			gap: 0.5em;
 			align-items: center;
+			max-width: 30%;
 		}
 	}
 

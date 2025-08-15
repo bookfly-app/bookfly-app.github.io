@@ -39,11 +39,10 @@
 		position: fixed;
 		width: 100%;
 		bottom: 0px;
-		left: 50%;
+		left: 0px;
 		display: flex;
 		align-items: center;
 		max-width: var(--max-width);
-		transform: translateX(-50%);
 
 		a {
 			padding-top: 1rem;
@@ -52,6 +51,12 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
+		}
+	}
+
+	@media (orientation: landscape) {
+		footer {
+			margin-left: 20rem;
 		}
 	}
 

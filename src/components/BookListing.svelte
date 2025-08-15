@@ -17,7 +17,7 @@
 		<div class="rating">
 			<span style:color={theme().text}>{user.displayName}'s rating:</span>
 			<StarRating {rating} size={0.6}/>
-			<span style:color={theme().text}>{rating} / 10</span>
+			<span style:color={theme().text}>{rating === 10 ? rating : rating.toFixed(1)} / 10</span>
 		</div>
 	{/if}
 

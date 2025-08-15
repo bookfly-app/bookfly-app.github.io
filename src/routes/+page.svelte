@@ -10,7 +10,7 @@
 	import Footer from "../components/Footer.svelte";
 	import Page from "../components/Page.svelte";
 	import AnyPost from "../components/posts/AnyPost.svelte";
-	import Sidebar, { showSidebar } from "../components/Sidebar.svelte";
+	import Sidebar from "../components/Sidebar.svelte";
 	import theme from "../themes/theme.svelte";
 
 	initializeFirebase();
@@ -18,6 +18,8 @@
 	let view: "following" | "for you" = $state("following");
 
 	let followedPosts = $derived(user() ? getFollowedPosts(user()!, true) : Promise.resolve([]));
+
+	let sidebar: Sidebar;
 </script>
 
 <Background />
@@ -25,14 +27,14 @@
 <Page>
 	<nav style:background={theme().backgroundDark}>
 		<div class="banner">
-			<button onclick={showSidebar} aria-label="Open sidebar">
+			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
 				{#if user()}
 					<img alt="Your profile" src={user()!.picture ?? ""} class="profile-link" />
 				{:else}
 					<PersonIcon stroke={theme().textDull} style="width: 2.5rem;" />
 				{/if}
 			</button>
-			<button onclick={showSidebar} aria-label="Open sidebar">
+			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
 				<LogoIcon style="width: 3rem; height: 3rem;" stroke={theme().textDull} />
 			</button>
 			<SearchIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
@@ -86,7 +88,7 @@
 	</section>
 
 	<Footer selected="home" />
-	<Sidebar />
+	<Sidebar bind:this={sidebar}/>
 </Page>
 
 <style>

@@ -60,9 +60,9 @@
 		</button>
 
 		<div class="profile">
-			<div class="profile-top" style:background={theme().backgroundDark}>
+			<div class="profile-top">
 				<!-- Profile Picture -->
-				<button class="profile-picture" style:border-color={theme().backgroundDark} style:background-image="url('{currentUser!.picture}')">
+				<button class="profile-picture" style:border-color={theme().background} style:background-image="url('{currentUser!.picture}')">
 					<div class="overlay"></div>
 					<EditIcon
 						stroke="#CCCCFF"

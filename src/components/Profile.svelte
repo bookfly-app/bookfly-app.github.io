@@ -241,26 +241,26 @@
 			{/each}
 		{:else if view === "books"}
 			<div class="ratings">
-						<div class="rating-options" style:border-color={theme().textDark}>
-							<span style:color={theme().textDull}>
-								<label for="show-full-reviews">Show full reviews</label>
-								<RadioInput id="show-full-reviews" size={0.5} bind:on={showFullReviews} />
-							</span>
-							<span style:color={theme().textDull}>
-								<label for="change-rating-sort">{ratingSortName}</label>
-								<button onclick={event => ratingSortMenu.open(event)} id="change-rating-sort">
-									<SortIcon stroke={theme().textDull} style="width: 1.5rem;" />
-								</button>
-							</span>
-							<ContextMenu bind:this={ratingSortMenu}>
-								<button onclick={sortRatingsBy("best")} style:color={theme().text} style:background={theme().backgroundDim}>
-									Highest Rated
-								</button>
-								<button onclick={sortRatingsBy("recent")} style:color={theme().text} style:background={theme().backgroundDim}>
-									Recently Finished
-								</button>
-							</ContextMenu>
-						</div>
+				<div class="rating-options" style:border-color={theme().textDark}>
+					<span style:color={theme().textDull}>
+						<label for="show-full-reviews">Show full reviews</label>
+						<RadioInput id="show-full-reviews" size={0.5} bind:on={showFullReviews} />
+					</span>
+					<span style:color={theme().textDull}>
+						<label for="change-rating-sort">{ratingSortName}</label>
+						<button onclick={event => ratingSortMenu.open(event)} id="change-rating-sort">
+							<SortIcon stroke={theme().textDull} style="width: 1.5rem;" />
+						</button>
+					</span>
+					<ContextMenu bind:this={ratingSortMenu}>
+						<button onclick={sortRatingsBy("best")} style:color={theme().text} style:background={theme().backgroundDim}>
+							Highest Rated
+						</button>
+						<button onclick={sortRatingsBy("recent")} style:color={theme().text} style:background={theme().backgroundDim}>
+							Recently Finished
+						</button>
+					</ContextMenu>
+				</div>
 				{#await ratings then ratings}
 					{#each ratings as post}
 						{#if showFullReviews}
@@ -292,6 +292,7 @@
 	.rating-options {
 		display: flex;
 		justify-content: space-between;
+		align-items: center;
 		padding: 1rem;
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
@@ -300,6 +301,11 @@
 			display: flex;
 			align-items: center;
 			gap: 1rem;
+		}
+
+		button {
+			width: 1.5rem;
+			height: 1.5rem;
 		}
 	}
 

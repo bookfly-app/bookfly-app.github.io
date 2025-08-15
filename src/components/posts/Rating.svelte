@@ -14,7 +14,7 @@
 		<p class="rating-line" style:color={theme().textDull}>
 			{user.displayName} rated
 			<i style:color={theme().text}>{book?.title}</i>
-			{rating} / 10:
+			<span>{rating} / 10</span>:
 		</p>
 		<div class="info">
 			<div class="content">
@@ -74,6 +74,11 @@
 	.rating-line {
 		padding-bottom: 1rem;
 		font-size: 0.85rem;
+
+		span {
+			font-size: inherit;
+			color: #f9e2af;
+		}
 	}
 
 	img {

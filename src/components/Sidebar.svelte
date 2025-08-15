@@ -2,11 +2,13 @@
 	import { goto } from "$app/navigation";
 	import BookmarkIcon from "../assets/images/icons/BookmarkIcon.svelte";
 	import CloseIcon from "../assets/images/icons/CloseIcon.svelte";
+	import EmptyHomeIcon from "../assets/images/icons/EmptyHomeIcon.svelte";
 	import EnterIcon from "../assets/images/icons/EnterIcon.svelte";
 	import ExitIcon from "../assets/images/icons/ExitIcon.svelte";
 	import GearIcon from "../assets/images/icons/GearIcon.svelte";
 	import HomeIcon from "../assets/images/icons/HomeIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
+	import ProfileIcon from "../assets/images/icons/ProfileIcon.svelte";
 	import { logOut, user } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
 
@@ -33,6 +35,7 @@
 	style:background-image={`linear-gradient(${theme().background}, ${theme().backgroundDim})`}
 	style:border-color={theme().textDark}
 	bind:this={sidebar}
+	style:--hover={theme().textDark}
 >
 	<div class="profile" style:background={theme().backgroundDark}>
 		<a class="profile-picture" href="/profile" aria-label="Go to profile">
@@ -66,30 +69,30 @@
 
 	<!-- Navigation buttons -->
 	<button class="listing" style:color={theme().text} onclick={nav("/")}>
-		<HomeIcon stroke={theme().text} style="width: 2rem;" />
+		<EmptyHomeIcon stroke={theme().text} style="width: 1.5rem;" />
 		Home
 	</button>
 	<button class="listing" style:color={theme().text} onclick={nav("/profile")}>
-		<PersonIcon stroke={theme().text} style="width: 2rem;" />
+		<ProfileIcon stroke={theme().text} style="width: 1.5rem;" />
 		Profile
 	</button>
 	<button class="listing" style:color={theme().text} onclick={nav("/settings")}>
-		<BookmarkIcon stroke={theme().text} style="width: 2rem;" />
+		<BookmarkIcon stroke={theme().text} style="width: 1.5rem;" />
 		Saved
 	</button>
 	<button class="listing" style:color={theme().text} onclick={nav("/settings")}>
-		<GearIcon stroke={theme().text} style="width: 2rem;" />
+		<GearIcon stroke={theme().text} style="width: 1.5rem;" />
 		Settings
 	</button>
 
 	{#if user()}
 		<button class="listing" style:color={theme().text} onclick={signOut}>
-			<ExitIcon stroke={theme().text} style="width: 2rem;" />
+			<ExitIcon stroke={theme().text} style="width: 1.5rem;" />
 			Log Out
 		</button>
 	{:else}
 		<a class="listing" style:color={theme().text} href="/login">
-			<EnterIcon stroke={theme().text} style="width: 2rem;" />
+			<EnterIcon stroke={theme().text} style="width: 1.5rem;" />
 			Log In
 		</a>
 	{/if}
@@ -107,10 +110,11 @@
 		border-right-style: solid;
 		transition: left 0.25s;
 		width: 20rem;
+		z-index: 999999;
 
 		.listing {
 			text-decoration: none;
-			font-size: 1.25rem;
+			font-size: 1rem;
 			display: flex;
 			align-items: center;
 			width: fit-content;
@@ -118,6 +122,11 @@
 			padding-left: 2rem;
 			padding-top: 1rem;
 			padding-bottom: 1rem;
+			width: 100%;
+
+			&:hover {
+				background: var(--hover);
+			}
 
 			&:last-child {
 				margin-top: auto;

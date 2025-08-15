@@ -3,13 +3,11 @@
 	import theme from "../themes/theme.svelte";
 	import Sidebar from "./Sidebar.svelte";
 
-	let props = $props();
+	let { sidebar = $bindable(), ...props } = $props();
 	let children = props.children;
 
 	props = { ...props };
 	props.children = undefined;
-
-	let sidebar: Sidebar;
 
 	onMount(() => {
 		if (window.innerWidth > window.innerHeight) {
@@ -36,6 +34,7 @@
 		position: relative;
 		width: 100%;
 		height: 100%;
+		padding-bottom: 4rem;
 
 		.inner {
 			width: 40%;

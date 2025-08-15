@@ -3,6 +3,7 @@
 	import { awaitUser, usernameErrors } from "../../../api/userapi";
 	import EditIcon from "../../../assets/images/icons/EditIcon.svelte";
 	import { updateUser, usernameIsTaken } from "../../../backend/auth.svelte";
+	import BackButton from "../../../components/BackButton.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
 	import Page from "../../../components/Page.svelte";
@@ -52,6 +53,7 @@
 	{#await awaitUser then currentUser}
 		<!-- Banner -->
 		<button class="banner" style:background-image="url('{currentUser.banner}')">
+			<BackButton style="position: absolute; top: 0.5rem; left: 0.5rem;"/>
 			<div class="overlay"></div>
 			<EditIcon
 				stroke="#CCCCFF"

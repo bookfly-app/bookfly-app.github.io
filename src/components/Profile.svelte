@@ -19,7 +19,7 @@
 	import AnyPost from "./posts/AnyPost.svelte";
 	import RadioInput from "./RadioInput.svelte";
 
-	let props = $props();
+	let { sidebar, ... props } = $props();
 	let profileUser: User = props.user;
 
 	let view: "all" | "books" | "discussion" | "activity" | "list" = $state(new URLSearchParams(window.location.search).get("view") as any ?? "all");
@@ -107,7 +107,7 @@
 
 <section>
 	<div class="banner" style:background-image={`url("${profileUser.banner}")`}></div>
-	<button class="back-arrow" onclick={() => goto("/")}>
+	<button class="back-arrow" onclick={() => sidebar.show()}>
 		<LeftArrowIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem;" />
 	</button>
 	<div class="profile" style:background={theme().backgroundDark}>
@@ -167,7 +167,7 @@
 			{#await favoriteBook then favorite}
 				{#if favorite}
 					<a href={`/book/${favorite.isbn}`} title={`${profileUser.displayName}'s highest rated book is ${favorite.title}`}>
-						<StarIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
+						<StarIcon stroke={theme().textDull} style="width: 1rem; height: 1rem; flex-shrink: 0;" />
 						<span class="truncate" style:color={theme().textDull}>{favorite.title}</span>
 					</a>
 				{/if}
@@ -177,7 +177,7 @@
 			{#await currentlyReading then current}
 				{#if current}
 					<a href="/book/{current.isbn}" title={`${profileUser.displayName} is currently reading ${current.title}`}>
-						<ClockIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
+						<ClockIcon stroke={theme().textDull} style="width: 1rem; height: 1rem; flex-shrink: 0;" />
 						<span class="truncate" style:color={theme().textDull}>{current.title}</span>
 					</a>
 				{/if}
@@ -185,10 +185,10 @@
 
 			<!-- Number of books read -->
 			{#await booksRead then booksRead}
-				<span title="{profileUser.displayName} has read {booksRead} book{booksRead === 1 ? '' : 's'}">
+				<a onclick={() => view = "books"} href="/profile/{profileUser.username}?view=books" title="{profileUser.displayName} has read {booksRead} book{booksRead === 1 ? '' : 's'}">
 					<BookIcon stroke={theme().textDull} style="width: 1.25rem; height: 1.25rem;" />
 					<span style:color={theme().textDull}>{booksRead}</span>
-				</span>
+				</a>
 			{/await}
 		</div>
 		<a style:border-color={theme().textDull} style:color={theme().textDull} class="follows" href={`/profile/${profileUser.username}/follows`}>

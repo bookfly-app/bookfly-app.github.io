@@ -1,5 +1,6 @@
 <script>
 	import LeftArrowIcon from "../../../assets/images/icons/LeftArrowIcon.svelte";
+	import BackButton from "../../../components/BackButton.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
 	import Page from "../../../components/Page.svelte";
@@ -8,12 +9,10 @@
 
 <Background />
 <Page class="about">
-	<a href="/settings" class="back-button" style:background-image={`linear-gradient(${theme().accent}, ${theme().accent2})`}>
-		<LeftArrowIcon style="width: 1.5rem; height: 1.5rem;" stroke={theme().background} />
-	</a>
-
-	<!-- About -->
-	<h1 style:color={theme().textBright}>About</h1>
+	<span class="heading">
+		<BackButton href="/settings" />
+		<h1 style:color={theme().textBright}>About</h1>
+	</span>
 	<p style:color={theme().textDull}>
 		Bookfly is a non-profit organization originally created by
 		<a href="/profile/vi">@vi</a>
@@ -27,11 +26,11 @@
 	<!-- Team & Values -->
 	<h2 style:color={theme().text}>Team &amp; Values</h2>
 	<p style:color={theme().textDull}>
-		Bookfly is still lead by its original creator,
+		Bookfly is still led by its original creator,
 		<a href="/profile/vi">@vi</a>
-		, a transgender female reader, writer, and developer (sort of). Bookfly will always support kindness, acceptance, diversity, and equality.
+		, a nonbinary reader, writer, and developer (sort of). Bookfly will always support kindness, acceptance, diversity, equity, and inclusion.
 	</p>
-	<p style:color={theme().textDull}>Currently, Bookfly has no other team members.</p>
+	<p style:color={theme().textDull}>Currently, Bookfly has no other team members :(</p>
 
 	<!-- Moderation -->
 	<h2 style:color={theme().text}>Moderation</h2>
@@ -46,7 +45,7 @@
 	</p>
 	<p style:color={theme().textDull}>
 		These moderation rules are loosely defined. Each situation will be handled by a case-by-case basis and judged by Bookfly's moderators, who are
-		trusted to trusted to make educated judgements.
+		trusted to make educated judgements.
 	</p>
 	<p style:color={theme().textDull}>
 		If your account was suspended or banned and you feel it was wrongful, you can submit an appeal. Your content will be reviewed and a secondary,
@@ -109,18 +108,14 @@
 			color: cornflowerblue;
 		}
 
-		h2,
-		h1 {
+		h2 {
 			padding-top: 1rem;
 		}
 	}
 
-	.back-button {
-		width: 2rem;
-		height: 2rem;
-		border-radius: 50%;
+	.heading {
 		display: flex;
+		gap: 1rem;
 		align-items: center;
-		justify-content: center;
 	}
 </style>

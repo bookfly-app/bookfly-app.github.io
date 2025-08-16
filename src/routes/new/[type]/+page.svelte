@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { post, type PostType } from "../../../api/postapi";
+	import { format, post, type PostType } from "../../../api/postapi";
 	import Background from "../../../components/Background.svelte";
 	import Page from "../../../components/Page.svelte";
 	import Footer from "../../../components/Footer.svelte";
@@ -9,6 +9,7 @@
 	import Select from "../../../components/Select.svelte";
 	import BackButton from "../../../components/BackButton.svelte";
 	import TrashIcon from "../../../assets/images/icons/TrashIcon.svelte";
+	import EyeIcon from "../../../assets/images/icons/EyeIcon.svelte";
 
 	let { data }: { data: { type: PostType } } = $props();
 	let { type } = data;
@@ -103,6 +104,8 @@
 			bookError = "";
 		}
 	}
+
+	let showPreview = $state(false);
 </script>
 
 {#snippet bookSearch(title: string = "Add a book")}
@@ -197,18 +200,29 @@
 		{/if}
 	{/if}
 
-	<h2 class="body-name" style:color={theme().textDull}>{bodyName}</h2>
-	<textarea
-		id="body"
-		bind:value={body}
-		style:color={theme().text}
-		style:background={theme().backgroundDark}
-	></textarea>
+	<div class="body-header">
+		<h2 class="body-name preview-body" style:color={theme().textDull}>{bodyName}</h2>
+		<button onclick={() => showPreview = !showPreview}><EyeIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" /></button>
+	</div>
 
-
+	{#if showPreview}
+		{#await format(body) then body}
+			<div class="preview" style:color={theme().text} style:background={theme().backgroundDark}>{@html body}</div>
+		{/await}
+	{:else}
+		<textarea
+			id="body"
+			bind:value={body}
+			style:color={theme().text}
+			style:background={theme().backgroundDark}
+		></textarea>
+	{/if}
 
 	{#if type !== "rating" && type !== "update"}
-		{@render bookSearch()}
+		{#if chosenBooks.length !== 0}
+			{@render chosenBookList()}
+		{/if}
+		{@render bookSearch("Add a book")}
 	{/if}
 
 	<button
@@ -238,6 +252,17 @@
 		text-transform: capitalize;
 		font-weight: normal;
 		font-size: 1.5rem;
+	}
+
+	.body-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 1rem;
+	}
+
+	.body-name:not(.preview-body) {
+		margin-top: 1rem;
 	}
 
 	.book {
@@ -271,9 +296,6 @@
 		}
 	}
 
-	.body-name {
-		margin-top: 1rem;
-	}
 
 	.book-search {
 		display: flex;
@@ -335,7 +357,7 @@
 		flex-direction: column;
 	}
 
-	textarea {
+	textarea, .preview {
 		border-radius: 0.75rem;
 		width: 100%;
 		height: 10rem;
@@ -343,6 +365,10 @@
 		padding: 0.5rem;
 		resize: none;
 		flex-shrink: 0;
+
+		:global(a) {
+			color: #89b4fa;
+		}
 	}
 
 	h2 {

@@ -16,11 +16,24 @@
 
 	let discussions = getBookDiscussions(book.isbn);
 	let sidebar: Sidebar;
+	let isInReadingList = $derived(user()?.readingList.includes(book.isbn) ?? false)
 
+	$effect(() => {
+		console.log($state.snapshot(user()?.readingList));
+	});
+	
 	async function addToReadingList() {
 		const readingList = user()!.readingList;
 		updateUser({ readingList: [...readingList, book.isbn]  })
 		user()?.readingList.push(book.isbn);
+	}
+
+	async function removeFromReadingList() {
+		console.log("Removing");
+		const readingList = user()!.readingList.filter(isbn => isbn !== book.isbn);
+		updateUser({ readingList })
+		user()!.readingList = readingList;
+		console.log(user()!.readingList);
 	}
 
 	function makeReadable(description: string, interval = 3) {
@@ -90,7 +103,15 @@
 			{/await}
 		{/if}
 
-		<button id="add-to-reading-list" style:background={accentGradient()} onclick={addToReadingList}>Add to Reading List</button>
+		{#if isInReadingList}
+			<button id="add-to-reading-list" class="remove-from-reading-list" onclick={removeFromReadingList}>
+				Remove from Reading List
+			</button>
+		{:else}
+			<button id="add-to-reading-list" style:background={accentGradient()} onclick={addToReadingList}>
+				Add to Reading List
+			</button>
+		{/if}
 	</section>
 
 
@@ -113,10 +134,15 @@
 		box-shadow: 0px 0px 0.5rem black;
 		transition: scale 0.1s;
 		margin-top: 1rem;
+		margin-bottom: 8rem;
 
 		&:hover {
 			scale: 105%;
 		}
+	}
+
+	.remove-from-reading-list {
+		background: linear-gradient(#f38ba8, #ff7788);
 	}
 
 	.book-info {

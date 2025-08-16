@@ -68,9 +68,17 @@
 
 		.title,
 		.author {
-			font-size: 0.85rem;
 			font-weight: normal;
 			text-decoration: none;
+			text-align: center;
+		}
+
+		.title {
+			font-size: 1.2rem;
+		}
+
+		.author {
+			font-size: 0.9rem;
 		}
 
 		p {

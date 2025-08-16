@@ -7,6 +7,7 @@
 	let { book, rating, user, onclick }: { book: Book, rating?: number, user: User, onclick?: () => void } = $props();
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <svelte:element data-rating="{rating}" id="outer" this={onclick ? "div" : "a"} href="/book/{book.isbn}" onclick={() => onclick?.()} style:border-color={theme().textDark}>
 	<div class="book-info">
 		<h1 style:color={theme().text}>{book.title}</h1>
@@ -25,18 +26,6 @@
 </svelte:element>
 
 <style>
-	#outer[data-rating="10"]::before {
-		content: '';
-		width: calc(100% - 6px);
-		height: 100%;
-		border-image-slice: 1;
-		border-image-source: linear-gradient(to bottom right, white, #FFFFAA);
-		border-style: solid;
-		border-width: 3px;
-		position: absolute;
-		top: 0px;
-		left: 0px;
-	}
 
 	#outer {
 		position: relative;

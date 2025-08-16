@@ -89,6 +89,7 @@
 							<AddImageIcon stroke={theme().textDull} style="width: 1.5rem;" />
 						</label>
 						<input multiple bind:files={imageAttachment} id="attach-image-reply" type="file" class="attach-image" />
+
 						<button onmousedown={sendReply}>
 							<SendIcon stroke={theme().textDull} style="width: 1.5rem;" />
 						</button>
@@ -130,7 +131,6 @@
 		width: 100%;
 		transition: height 0.2s;
 		height: 2.3rem;
-		width: calc(100% - 2rem);
 		border-radius: 100vmax;
 		display: flex;
 		align-items: center;
@@ -154,9 +154,7 @@
 	.reply {
 		display: flex;
 		width: 100%;
-		padding-left: 1rem;
-		padding-top: 1rem;
-		padding-bottom: 1rem;
+		padding: 1rem;
 		gap: 1rem;
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
@@ -179,7 +177,7 @@
 		gap: 0.5rem;
 		height: fit-content;
 		position: absolute;
-		right: 2.1rem;
+		right: 0.5rem;
 
 		> * {
 			display: flex;

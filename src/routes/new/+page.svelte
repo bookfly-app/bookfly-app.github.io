@@ -1,33 +1,36 @@
 <script lang="ts">
 	import Background from "../../components/Background.svelte";
 	import Footer from "../../components/Footer.svelte";
-	import theme from "../../themes/theme.svelte";
+	import theme, { accentGradient } from "../../themes/theme.svelte";
 	import Page from "../../components/Page.svelte";
+	import BackButton from "../../components/BackButton.svelte";
 </script>
 
 <Background />
 <Page class="new-page">
+	<BackButton style="position: absolute; left: 1rem; top: 1rem;" href="/profile" />
+
 	<h1 style:color={theme().textBright}>New Post</h1>
-	<p style:color={theme().textDull}>What kind of post do you want to make?</p>
+	<p class="kind" style:color={theme().textDull}>What kind of post do you want to make?</p>
 
 	<!-- General post -->
-	<a href="/new/general" style:background={theme().backgroundDark}>
-		<h2 style:color={theme().text}>General</h2>
-		<p style:color={theme().textDull}>
+	<a href="/new/general" style:background={accentGradient()}>
+		<h2 style:color={theme().textDark}>General</h2>
+		<p style:color={theme().textDim}>
 			A general post with some text and optionally images or videos.
 		</p>
 	</a>
 
 	<!-- Rating post -->
-	<a href="/new/rating" style:background={theme().backgroundDark}>
-		<h2 style:color={theme().text}>Rating</h2>
-		<p style:color={theme().textDull}>Rate or review a book</p>
+	<a href="/new/rating" style:background={accentGradient()}>
+		<h2 style:color={theme().textDark}>Rating</h2>
+		<p style:color={theme().textDim}>Rate or review a book</p>
 	</a>
 
 	<!-- Update post -->
-	<a href="/new/update" style:background={theme().backgroundDark}>
-		<h2 style:color={theme().text}>Update</h2>
-		<p style:color={theme().textDull}>
+	<a href="/new/update" style:background={accentGradient()}>
+		<h2 style:color={theme().textDark}>Update</h2>
+		<p style:color={theme().textDim}>
 			An update on starting, finishing, or abandoning a book.
 		</p>
 	</a>
@@ -48,10 +51,18 @@
 		gap: 2rem;
 	}
 
+	h1 {
+		font-size: 1.5rem;
+		font-weight: normal;
+	}
+
+	h1 + p {
+		margin-top: -1.5rem;
+	}
+
 	.note {
 		padding-left: 4rem;
 		padding-right: 4rem;
-		margin-top: -1.5rem;
 	}
 
 	h2 {
@@ -76,5 +87,12 @@
 		text-align: center;
 		gap: 0.5rem;
 		height: 8rem;
+		text-decoration: none;
+		box-shadow: 0px 0px 1rem black;
+		transition: scale 0.1s;
+
+		&:hover {
+			scale: 105%;
+		}
 	}
 </style>

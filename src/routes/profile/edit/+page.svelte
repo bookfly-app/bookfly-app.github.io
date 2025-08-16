@@ -2,7 +2,7 @@
 	import { goto } from "$app/navigation";
 	import { awaitUser, usernameErrors } from "../../../api/userapi";
 	import EditIcon from "../../../assets/images/icons/EditIcon.svelte";
-	import { updateUser, usernameIsTaken } from "../../../backend/auth.svelte";
+	import { updateUser, user, usernameIsTaken } from "../../../backend/auth.svelte";
 	import BackButton from "../../../components/BackButton.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
@@ -79,11 +79,13 @@
 			<input style:background={theme().backgroundDark} style:color={theme().text} type="text" id="display-name" bind:value={displayName} />
 
 			<label style:color={theme().textDull} for="username">Username</label>
-			<span style:color={theme().text} class="at">@</span>
-			{#await usernameErrorList then usernameErrorList}
+			<div
+				style:outline={usernameTaken || usernameErrorList.length > 0 ? "2px solid indianred" : "none"}
+				class="username" 
+				style:background={theme().backgroundDark}
+			>
+				<span style:color={theme().text} class="at">@</span>
 				<input
-					style:outline={usernameTaken || usernameErrorList.length > 0 ? "2px solid indianred" : "none"}
-					style:background={theme().backgroundDark}
 					style:color={theme().text}
 					type="text"
 					id="username"
@@ -91,6 +93,8 @@
 					bind:value={username}
 					bind:this={usernameInput}
 				/>
+			</div>
+			{#await usernameErrorList then usernameErrorList}
 				{#each usernameErrorList as usernameError}
 					<span class="error">{usernameError}</span>
 				{/each}
@@ -124,21 +128,59 @@
 			<textarea style:color={theme().text} style:background={theme().backgroundDark} class="bio" id="bio" bind:value={bio}>
 				{currentUser.bio}
 			</textarea>
+
+			<hr style:background={theme().textDark} />
+
+			<label style:color={theme().textDull}>Badges</label>
+			{#if currentUser.tags.includes("dev")}
+				<span style:color={theme().textDull} class="badge-line">
+					Show developer badge
+					<RadioInput size={0.6} />
+				</span>
+			{/if}
+			{#if currentUser.tags.includes("mod")}
+				<span style:color={theme().textDull} class="badge-line">
+					Show moderator badge
+					<RadioInput size={0.6} />
+				</span>
+			{/if}
+			{#if currentUser.tags.includes("developer")}
+				<span style:color={theme().textDull} class="badge-line">
+					Show moderator badge
+					<RadioInput size={0.6} />
+				</span>
+			{/if}
 		</div>
 	{/await}
+
+	<button class="save-bottom" style:background="linear-gradient({theme().accent}, {theme().accent2})" onclick={update}>Save</button>
+
 	<Footer selected="profile" />
 </Page>
 
 <style>
-	#username {
-		padding-left: 1.4rem;
+	.username {
+		width: calc(100% - 4rem);
+		display: flex;
+		align-items: center;
+		margin-left: 2rem;
+		padding-left: 0.5rem;
+		border-radius: 0.5rem;
+		margin-right: 2rem;
+	}
+
+	.badge-line {
+		display :flex;
+		margin-left: 2rem;
+		align-items: center;
+		justify-content: space-between;
+		margin-right: 2rem;
+		font-size: 0.85rem;
 	}
 
 	.at {
-		position: absolute;
-		top: 21.1rem;
-		left: 2.4rem;
 		font-size: 0.85rem;
+		height: 100%;
 	}
 
 	hr {
@@ -174,16 +216,34 @@
 		padding-top: 0.5rem;
 		padding-bottom: 0.5rem;
 		border-radius: 100vmax;
-		font-weight: 600;
 		font-size: 0.85rem;
+		box-shadow: 0px 0px 0.5rem black;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		margin-left: auto;
 		margin-right: 2rem;
+		margin-bottom: -1rem;
+		margin-top: -1rem;
 	}
 
-	input,
+	.save-bottom {
+		padding-left: 4rem;
+		padding-right: 4rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		border-radius: 100vmax;
+		font-size: 0.85rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 1rem;
+		box-shadow: 0px 0px 0.5rem black;
+	}
+
+	input:not(#username),
 	textarea,
 	label,
 	.profile-picture {
@@ -231,9 +291,5 @@
 		position: relative;
 		border-width: 0.5rem;
 		border-style: solid;
-	}
-
-	.profile-top {
-		padding-bottom: 2rem;
 	}
 </style>

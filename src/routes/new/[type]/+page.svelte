@@ -6,9 +6,9 @@
 	import Footer from "../../../components/Footer.svelte";
 	import theme from "../../../themes/theme.svelte";
 	import { searchBooks, type Book } from "../../../api/bookapi";
-	import BookListing from "../../../components/BookListing.svelte";
-	import { user } from "../../../backend/auth.svelte";
 	import Select from "../../../components/Select.svelte";
+	import BackButton from "../../../components/BackButton.svelte";
+	import TrashIcon from "../../../assets/images/icons/TrashIcon.svelte";
 
 	let { data }: { data: { type: PostType } } = $props();
 	let { type } = data;
@@ -16,14 +16,14 @@
 	let bodyName = {
 		general: "Post Body",
 		rating: "Review (Optional)",
-		update: "Comments",
+		update: "Comments (Optional)",
 		reply: null!,
 	}[type];
 
-	let body: string;
-	let chosenBook: Book | null = $state(null);
+	let body: string = $state("");
 	let rating: string | null = $state(null);
 	let updateType = $state("start");
+	let chosenBooks: Book[] = $state([]);
 
 	let searchResults: Book[] = $state([]);
 	let searchText: string = $state("");
@@ -38,16 +38,24 @@
 		}
 	}
 
-	function upload() {
-		if (type === "rating") {
-			validateRating();
-			validateBook();
+	let bodyError = $state("");
+
+	function validateBody() {
+		if (type === "general" && body.trim().length === 0) {
+			bodyError = "Body cannot be empty";
+		} else {
+			bodyError = "";
 		}
+	}
 
-		if (ratingError || bookError) return;
+	function upload() {
+		if (type === "rating") validateRating();
+		if (type === "rating" || type === "update") validateBook();
+		if (type === "general") validateBody();
 
-		let object = { type, body };
-		if (chosenBook) object = Object.assign(object, { books: [chosenBook.isbn] });
+		if (ratingError || bookError || bodyError) return;
+
+		let object = { type, body, books: chosenBooks.map(book => book.isbn) };
 		if (rating !== null) object = Object.assign(object, { rating: Number(rating) });
 		if (type === "update") object = Object.assign(object, { updateType });
 
@@ -58,7 +66,14 @@
 
 	function chooseBook(book: Book) {
 		return function() {
-			chosenBook = book;
+			chosenBooks.push(book);
+			validateBook();
+		}
+	}
+
+	function removeBook(book: Book) {
+		return function() {
+			chosenBooks = chosenBooks.filter(other => other.isbn !== book.isbn);
 			validateBook();
 		}
 	}
@@ -82,7 +97,7 @@
 	}
 
 	function validateBook() {
-		if (type === "rating" && !chosenBook) {
+		if (type === "rating" && chosenBooks.length === 0) {
 			bookError = "Choose a book to rate.";
 		} else {
 			bookError = "";
@@ -90,10 +105,8 @@
 	}
 </script>
 
-
-<Background />
-<Page class="new-post-page">
-	<h1 style:color={theme().text}>Choose a book</h1>
+{#snippet bookSearch(title: string = "Add a book")}
+	<h2 style:color={theme().textDull} class="body-name">{title}</h2>
 
 	<div class="book-search">
 		<input
@@ -111,16 +124,52 @@
 	</div>
 
 	<div class="search-results">
-		{#if chosenBook}
-			<BookListing book={chosenBook} user={user()!} />
-		{:else}
-			{#each searchResults as book}
-				<BookListing {book} user={user()!} onclick={chooseBook(book)} />
-			{/each}
-		{/if}
+		{#each searchResults as book}
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<!-- svelte-ignore a11y_no_static_element_interactions -->
+			<div class="book search-book" onclick={chooseBook(book)}>
+				<img alt="{book.title} cover" src={book.cover} />
+				<div class="info">
+					<span class="title" style:color={theme().text}>{book.title}</span>
+					<span class="authors" style:color={theme().textDull}>{book.authors.join(",")}</span>
+				</div>
+			</div>
+		{/each}
 	</div>
+{/snippet}
+
+{#snippet chosenBookList()}
+	<div class="books">
+		{#each chosenBooks as book (book.isbn) }
+			<div class="book">
+				<img alt="{book.title} cover" src={book.cover} />
+				<div class="info">
+					<span class="title" style:color={theme().text}>{book.title}</span>
+					<span class="authors" style:color={theme().textDull}>{book.authors.join(",")}</span>
+				</div>
+				<button class="close" onclick={removeBook(book)}>
+					<TrashIcon stroke="#f38ba8" style="width: 1.25rem; height: 1.25rem;" />
+				</button>
+			</div>
+		{/each}
+	</div>
+{/snippet}
+
+<Background />
+<Page class="new-post-page">
+
+	<span>
+		<BackButton />
+		<h1 style:color={theme().text}>New {type} Post</h1>
+	</span>
 
 	{#if type === "rating"}
+		{#if chosenBooks.length === 0}
+			{@render bookSearch("Choose a book")}
+		{:else}
+			{@render chosenBookList()}
+		{/if}
+
 		<h2 class="body-name" style:color={theme().textDull}>Rating</h2>
 		<div class="stars">
 			<input 
@@ -140,6 +189,12 @@
 	{#if type === "update"}
 		<h2 class="body-name" style:color={theme().textDull}>Update Type</h2>
 		<Select options={["start", "finish", "abandon"]} bind:value={updateType} />
+
+		{#if chosenBooks.length === 0}
+			{@render bookSearch("Choose a book")}
+		{:else}
+			{@render chosenBookList()}
+		{/if}
 	{/if}
 
 	<h2 class="body-name" style:color={theme().textDull}>{bodyName}</h2>
@@ -149,6 +204,12 @@
 		style:color={theme().text}
 		style:background={theme().backgroundDark}
 	></textarea>
+
+
+
+	{#if type !== "rating" && type !== "update"}
+		{@render bookSearch()}
+	{/if}
 
 	<button
 		onclick={upload}
@@ -163,14 +224,55 @@
 </Page>
 
 <style>
-	.body-name {
-		margin-top: 1rem;
+	span:has(> h1) {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+	}
+
+	.search-book {
+		cursor: pointer;
 	}
 
 	h1 {
-		font-size: 1.5rem;
+		text-transform: capitalize;
 		font-weight: normal;
-		margin-bottom: 0.5rem;
+		font-size: 1.5rem;
+	}
+
+	.book {
+		display: flex;	
+		align-items: center;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		gap: 1rem;
+
+		&:first-child {
+			margin-top: 0.5rem;
+		}
+
+		.info {
+			display: flex;
+			flex-direction: column;
+			padding-right: 2rem;
+		}
+
+		img {
+			width: 10%;
+			aspect-ratio: 1 / 1.5;
+		}
+
+		.authors {
+			font-size: 0.85rem;
+		}
+
+		.close {
+			margin-left: auto;
+		}
+	}
+
+	.body-name {
+		margin-top: 1rem;
 	}
 
 	.book-search {
@@ -240,6 +342,7 @@
 		font-size: 0.85rem;
 		padding: 0.5rem;
 		resize: none;
+		flex-shrink: 0;
 	}
 
 	h2 {

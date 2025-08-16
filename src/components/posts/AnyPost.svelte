@@ -329,7 +329,7 @@
 	.stats {
 		display: flex;
 		justify-content: space-between;
-		padding-top: 0.5rem;
+		padding-top: 1rem;
 		padding-right: 1rem;
 		align-items: center;
 

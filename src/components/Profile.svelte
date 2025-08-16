@@ -19,7 +19,7 @@
 	import AnyPost from "./posts/AnyPost.svelte";
 	import RadioInput from "./RadioInput.svelte";
 
-	let { sidebar, ... props } = $props();
+	let props = $props();
 	let profileUser: User = props.user;
 
 	let view: "all" | "books" | "discussion" | "activity" | "list" = $state(new URLSearchParams(window.location.search).get("view") as any ?? "all");
@@ -44,7 +44,7 @@
 	let booksRead = posts.then(posts => posts.filter(post => post.type === "rating").length);
 
 	let showFullReviews = $state(false);
-	let ratingSortMenu: ContextMenu;
+	let ratingSortMenu: ContextMenu = $state(null!);
 
 	let ratingSort: "best" | "recent" = $state("best");
 	let ratingSortName = $derived({ best: "Highest Rated", recent: "Recently Finished" }[ratingSort]);
@@ -107,7 +107,7 @@
 
 <section>
 	<div class="banner" style:background-image={`url("${profileUser.banner}")`}></div>
-	<button class="back-arrow" onclick={() => sidebar.show()}>
+	<button class="back-arrow">
 		<LeftArrowIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem;" />
 	</button>
 	<div class="profile" style:background={theme().backgroundDark}>
@@ -163,30 +163,32 @@
 
 		<!-- Line 2: Profile stats -->
 		<div class="profile-line-2">
-			<!-- Favorite Book -->
-			{#await favoriteBook then favorite}
-				{#if favorite}
-					<a href={`/book/${favorite.isbn}`} title={`${profileUser.displayName}'s highest rated book is ${favorite.title}`}>
-						<StarIcon stroke={theme().textDull} style="width: 1rem; height: 1rem; flex-shrink: 0;" />
-						<span class="truncate" style:color={theme().textDull}>{favorite.title}</span>
-					</a>
-				{/if}
-			{/await}
+			<span class="profile-books">
+				<!-- Favorite Book -->
+				{#await favoriteBook then favorite}
+					{#if favorite}
+						<a href={`/book/${favorite.isbn}`} title={`${profileUser.displayName}'s highest rated book is ${favorite.title}`}>
+							<StarIcon stroke={theme().textDull} style="width: 1rem; height: 1rem; flex-shrink: 0;" />
+							<span class="truncate" style:color={theme().textDull}>{favorite.title}</span>
+						</a>
+					{/if}
+				{/await}
 
-			<!-- Current book -->
-			{#await currentlyReading then current}
-				{#if current}
-					<a href="/book/{current.isbn}" title={`${profileUser.displayName} is currently reading ${current.title}`}>
-						<ClockIcon stroke={theme().textDull} style="width: 1rem; height: 1rem; flex-shrink: 0;" />
-						<span class="truncate" style:color={theme().textDull}>{current.title}</span>
-					</a>
-				{/if}
-			{/await}
+				<!-- Current book -->
+				{#await currentlyReading then current}
+					{#if current}
+						<a href="/book/{current.isbn}" title={`${profileUser.displayName} is currently reading ${current.title}`}>
+							<ClockIcon stroke={theme().textDull} style="width: 1rem; height: 1rem; flex-shrink: 0;" />
+							<span class="truncate" style:color={theme().textDull}>{current.title}</span>
+						</a>
+					{/if}
+				{/await}
+			</span>
 
 			<!-- Number of books read -->
 			{#await booksRead then booksRead}
 				<a onclick={() => view = "books"} href="/profile/{profileUser.username}?view=books" title="{profileUser.displayName} has read {booksRead} book{booksRead === 1 ? '' : 's'}">
-					<BookIcon stroke={theme().textDull} style="width: 1.25rem; height: 1.25rem;" />
+					<BookIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
 					<span style:color={theme().textDull}>{booksRead}</span>
 				</a>
 			{/await}
@@ -212,13 +214,6 @@
 				All
 			</button>
 			<button
-				style:color={view === "discussion" ? theme().text : theme().textDim}
-				style:border-bottom={view === "discussion" ? `3px solid ${theme().accent}` : "3px solid transparent"}
-				onclick={gotoView("discussion")}
-			>
-				Discussion
-			</button>
-			<button
 				style:color={view === "books" ? theme().text : theme().textDim}
 				style:border-bottom={view === "books" ? `3px solid ${theme().accent}` : "3px solid transparent"}
 				onclick={gotoView("books")}
@@ -238,6 +233,13 @@
 				onclick={gotoView("list")}
 			>
 				List
+			</button>
+			<button
+				style:color={view === "discussion" ? theme().text : theme().textDim}
+				style:border-bottom={view === "discussion" ? `3px solid ${theme().accent}` : "3px solid transparent"}
+				onclick={gotoView("discussion")}
+			>
+				Discussion
 			</button>
 		</div>
 	</div>
@@ -392,7 +394,6 @@
 	}
 
 	.truncate {
-		max-width: 100%;
 		text-overflow: ellipsis;
 		text-wrap: nowrap;
 		display: inline-block;
@@ -465,11 +466,24 @@
 		padding-bottom: 0.5rem;
 		margin-left: 1rem;
 
-		> a, > span {
+		> a {
 			display: flex;
-			gap: 0.5em;
+			gap: 0.5rem;
 			align-items: center;
-			max-width: 30%;
+			margin-right: 1rem;
+		}
+	}
+
+	.profile-books {
+		display: grid;
+		grid-template-columns: 50% 50%;
+		overflow: hidden;
+		gap: 1rem;
+
+		> a {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
 		}
 	}
 

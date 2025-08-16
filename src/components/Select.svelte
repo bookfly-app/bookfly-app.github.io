@@ -1,14 +1,29 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import theme from "../themes/theme.svelte";
+	import RightArrowIcon from "../assets/images/icons/RightArrowIcon.svelte";
 
 	let { options, value = $bindable() }: { options: string[], value?: string } = $props();
 
 	let expanded = $state(false);
+
+	let optionsElement: HTMLElement;
+
+	onMount(() => {
+		document.addEventListener("click", event => {
+			if (!event.composedPath().includes(optionsElement)) {
+				expanded = false;
+			}
+		});
+	});
 </script>
 
-<div class="select">
-	<button class="value" onclick={() => expanded = !expanded} style:color={theme().text} style:background={theme().backgroundDark}>{value}</button>
-	<div class="options" style:display={expanded ? "flex" : "none"}>
+<div class="select" bind:this={optionsElement}>
+	<button class="value" onclick={() => expanded = !expanded} style:color={theme().text} style:background={theme().backgroundDark}>
+		{value}
+		<RightArrowIcon stroke={theme().text} style="width: 1rem; height: 1rem;" />
+	</button>
+	<div class="options" style:border-color={theme().textDark} style:display={expanded ? "flex" : "none"}>
 		{#each options as option}
 			<button 
 				style:--gray={theme().textDark} 
@@ -30,6 +45,13 @@
 
 	.value {
 		border-radius: 0.5rem;
+		display: flex;
+		align-items: center;
+
+		:global(>*:last-child) {
+			margin-left: auto;
+			margin-right: -0.5rem;
+		}
 	}
 
 	.options {
@@ -40,6 +62,9 @@
 		left: 0px;
 		z-index: 999;
 		width: 100%;
+		border-style: solid;
+		border-width: 1px;
+		border-radius: 0.5rem;
 		box-shadow: 0px 0px 0.5rem black;
 	}
 

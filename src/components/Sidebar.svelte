@@ -6,7 +6,6 @@
 	import EnterIcon from "../assets/images/icons/EnterIcon.svelte";
 	import ExitIcon from "../assets/images/icons/ExitIcon.svelte";
 	import GearIcon from "../assets/images/icons/GearIcon.svelte";
-	import HomeIcon from "../assets/images/icons/HomeIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import ProfileIcon from "../assets/images/icons/ProfileIcon.svelte";
 	import { logOut, user } from "../backend/auth.svelte";
@@ -21,7 +20,7 @@
 	function nav(to: string) {
 		return function () {
 			goto(to);
-			sidebar.style.left = "-83%";
+			sidebar.style.left = window.innerHeight > window.innerWidth ? "-17rem" : "-23rem";
 		};
 	}
 
@@ -100,8 +99,7 @@
 
 <style>
 	section {
-		position: absolute;
-		left: -22rem;
+		position: fixed;
 		height: 100vh;
 		top: 0px;
 		display: flex;
@@ -109,7 +107,6 @@
 		border-right-width: 1px;
 		border-right-style: solid;
 		transition: left 0.25s;
-		width: 20rem;
 		z-index: 999999;
 
 		.listing {
@@ -177,6 +174,15 @@
 	@media (orientation: portrait) {
 		section {
 			box-shadow: 0px 0px 10px black;
+			width: 15rem;
+			left: -17rem;
+		}
+	}
+
+	@media (orientation: landscape) {
+		section {
+			width: 20rem;
+			left: -23rem;
 		}
 	}
 </style>

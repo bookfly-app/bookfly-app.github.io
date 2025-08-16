@@ -30,7 +30,7 @@
 <style>
 	.media {
 		margin-top: 1rem;
-		width: 23rem;
+		width: 100%;
 		overflow: hidden;
 		position: relative;
 

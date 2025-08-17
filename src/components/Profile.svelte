@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
+	import { onMount } from "svelte";
 	import { getBook } from "../api/bookapi";
 	import { format, type Post } from "../api/postapi";
 	import { getFavoriteBook, getFollowers, getUserPosts, type User } from "../api/userapi";
@@ -48,18 +49,18 @@
 
 	let ratingSort: "best" | "recent" = $state("best");
 	let ratingSortName = $derived({ best: "Highest Rated", recent: "Recently Finished" }[ratingSort]);
-	let ratings = $derived(
-		posts.then(posts =>
-			posts
+	let ratings = $derived.by(async () => {
+		ratingSort;
+
+		return posts.then(posts => {
+			return posts
 				.filter(post => post.type === "rating")
-				.toSorted(
-					{
-						best: (a: Post, b: Post) => b.rating - a.rating,
-						recent: (a: Post, b: Post) => a.timestamp - b.timestamp,
-					}[ratingSort],
-				),
-		),
-	);
+				.toSorted({
+					best: (a: Post, b: Post) => b.rating - a.rating,
+					recent: (a: Post, b: Post) => b.timestamp - a.timestamp,
+				}[ratingSort]);
+		});
+	});
 
 	function sortRatingsBy(sorter: "best" | "recent") {
 		return () => {
@@ -103,6 +104,44 @@
 			view = viewName as any;
 		}
 	}
+
+	let ratingOptions: HTMLElement | null = $state(null);
+
+	function hexToRgb(hex: string) {
+		const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)!;
+		return {
+			r: parseInt(result[1], 16),
+			g: parseInt(result[2], 16),
+			b: parseInt(result[3], 16)
+		};
+	}
+
+
+	function lerp(start: string, stop: string, percent: number) {
+		percent = Math.min(Math.max(percent, 0), 1)
+		const rgbA = hexToRgb(start);
+		const rgbB = hexToRgb(stop);
+		const colorVal = (prop: "r" | "g" | "b") => Math.round(rgbA[prop] * (1 - percent) + rgbB[prop] * percent);
+		return {
+			r: colorVal('r'),
+			g: colorVal('g'),
+			b: colorVal('b'),
+		}
+	}
+
+	onMount(() => {
+		document.addEventListener("scroll", () => {
+			ratingSortMenu?.close();
+
+			if (ratingOptions) {
+				const top = ratingOptions.getBoundingClientRect().top;
+				const percent = top / 100;
+
+				const { r, g, b } = lerp(theme().backgroundDark, theme().background, percent);
+				ratingOptions.style.background = `rgb(${r}, ${g}, ${b})`
+			}
+		}, true);
+	})
 </script>
 
 <section>
@@ -256,7 +295,7 @@
 			{/each}
 		{:else if view === "books"}
 			<div class="ratings">
-				<div class="rating-options" style:border-color={theme().textDark}>
+				<div bind:this={ratingOptions} class="rating-options" style:border-color={theme().textDark}>
 					<span style:color={theme().textDull}>
 						<label for="show-full-reviews">Show full reviews</label>
 						<RadioInput id="show-full-reviews" size={0.5} bind:on={showFullReviews} />
@@ -264,20 +303,20 @@
 					<span style:color={theme().textDull}>
 						<label for="change-rating-sort">{ratingSortName}</label>
 						<button onclick={event => ratingSortMenu.open(event)} id="change-rating-sort">
-							<SortIcon stroke={theme().textDull} style="width: 1.5rem;" />
+							<SortIcon stroke={theme().textDull} style="width: 1.5rem; height: 1.5rem;" />
 						</button>
 					</span>
 					<ContextMenu bind:this={ratingSortMenu}>
-						<button onclick={sortRatingsBy("best")} style:color={theme().text} style:background={theme().backgroundDim}>
+						<button onclick={sortRatingsBy("best")}>
 							Highest Rated
 						</button>
-						<button onclick={sortRatingsBy("recent")} style:color={theme().text} style:background={theme().backgroundDim}>
+						<button onclick={sortRatingsBy("recent")}>
 							Recently Finished
 						</button>
 					</ContextMenu>
 				</div>
 				{#await ratings then ratings}
-					{#each ratings as post}
+					{#each ratings as post (post.id)}
 						{#if showFullReviews}
 							<AnyPost {post} />
 						{:else}
@@ -319,16 +358,22 @@
 		padding: 1rem;
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
+		position: sticky;
+		top: 0px;
+		z-index: 9999;
+
+		label {
+			font-size: 0.85rem;
+		}
 
 		> * {
 			display: flex;
 			align-items: center;
 			gap: 1rem;
-		}
 
-		button {
-			width: 1.5rem;
-			height: 1.5rem;
+			button {
+				height: 1.5rem;
+			}
 		}
 	}
 

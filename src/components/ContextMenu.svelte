@@ -41,14 +41,17 @@
 		border-radius: 0.5rem;
 		border-style: solid;
 		border-width: 1px;
-		box-shadow: 0px 0px 10px black;
+		box-shadow: 0px 0px 1rem black;
+		width: 10rem;
 
 		:global(> *) {
-			font-size: 1rem;
-			padding-left: 1rem;
-			padding-right: 1rem;
-			padding-top: 0.5rem;
-			padding-bottom: 0.5rem;
+			padding: 0.5rem 1rem 0.5rem 1rem;
+			background: #11111b;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			color: #cdd6f4;
+			font-size: 0.85rem;
 
 			&:not(:last-child) {
 				border-bottom-style: solid;

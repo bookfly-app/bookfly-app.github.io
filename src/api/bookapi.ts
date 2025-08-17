@@ -6,6 +6,7 @@ import { updateUser } from "../backend/auth.svelte";
 export type ISBN = string;
 
 export type Book = {
+	backupCover: string;
 	authors: string[];
 	isbn: ISBN;
 	title: string;
@@ -33,38 +34,31 @@ export async function getBookDiscussions(isbn: ISBN): Promise<Post[]> {
 
 export async function getBook(isbn: ISBN): Promise<Book> {
 	const item = localStorage.getItem(`book-${isbn}`);
-	const toReturn = item ? JSON.parse(item) : null;
+	if (item) return JSON.parse(item);
 
-	const update = (async () => {
-		let [response, googleResponse] = await Promise.all([
-			fetch(`https://openlibrary.org/isbn/${isbn}.json`),
-			fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`),
-		]);
-		let [data, googleData] = await Promise.all([response.json(), googleResponse.json()]);
+	let [response, googleResponse] = await Promise.all([
+		fetch(`https://openlibrary.org/isbn/${isbn}.json`),
+		fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`),
+	]);
+	let [data, googleData] = await Promise.all([response.json(), googleResponse.json()]);
 
-		googleData = googleData.items?.[0].volumeInfo;
+	googleData = googleData.items?.[0].volumeInfo;
 
-		const book: Book = {
-			title: data.title,
-			authors: Array.from(new Set(googleData?.authors ?? [])),
-			isbn,
-			cover:
-				googleData?.imageLinks?.thumbnail ??
-				`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`,
-			pageCount: data.number_of_pages,
-			genres: data.subjects?.map((subject: { name: string }) => subject.name) ?? [],
-			description: data.description ?? googleData?.description ?? "",
-		};
+	const book: Book = {
+		title: data.title,
+		authors: Array.from(new Set(googleData?.authors ?? [])),
+		isbn,
+		cover: `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`,
+		backupCover: googleData?.imageLinks?.thumbnail,
+		pageCount: data.number_of_pages,
+		genres: data.subjects?.map((subject: { name: string }) => subject.name) ?? [],
+		description: data.description ?? googleData?.description ?? "",
+	};
 
-		localStorage.setItem(`book-${isbn}`, JSON.stringify(book));
-		console.log(`Updated book "${book.title}" in localStorage`);
+	localStorage.setItem(`book-${isbn}`, JSON.stringify(book));
+	console.log(`Updated book "${book.title}" in localStorage`);
 
-		return book;
-	})();
-
-	if (toReturn) return toReturn;
-
-	return await update;
+	return book;
 }
 
 export async function searchBooks(searchTerm: string, max = 10): Promise<Book[]> {

@@ -2,6 +2,7 @@
 	import type { Book } from "../api/bookapi";
 	import type { User } from "../api/userapi";
 	import theme from "../themes/theme.svelte";
+	import BookCover from "./BookCover.svelte";
 	import StarRating from "./StarRating.svelte";
 
 	let { book, rating, user, onclick }: { book: Book, rating?: number, user: User, onclick?: () => void } = $props();
@@ -22,7 +23,7 @@
 		</div>
 	{/if}
 
-	<img alt="{book.title} cover" src={book.cover} />
+	<BookCover style="height: 100%; aspect-ratio: 8 / 11;" {book} />
 </svelte:element>
 
 <style>

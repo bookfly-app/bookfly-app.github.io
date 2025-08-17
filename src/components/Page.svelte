@@ -2,6 +2,7 @@
 	import { onMount } from "svelte";
 	import theme from "../themes/theme.svelte";
 	import Sidebar from "./Sidebar.svelte";
+	import { setTheme } from "../api/themes.svelte";
 
 	let { sidebar = $bindable(), ...props } = $props();
 	let children = props.children;
@@ -13,6 +14,8 @@
 		if (window.innerWidth > window.innerHeight) {
 			sidebar.show();
 		}
+
+		setTheme("Catppuccin Mocha");
 	});
 </script>
 

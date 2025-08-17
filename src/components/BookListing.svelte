@@ -9,7 +9,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<svelte:element data-rating="{rating}" id="outer" this={onclick ? "div" : "a"} href="/book/{book.isbn}" onclick={() => onclick?.()} style:border-color={theme().textDark}>
+<svelte:element data-rating="{rating}" id="outer" this={onclick ? "div" : "a"} href="/book/{book.isbn}" onclick={() => onclick?.()} style:border-color={theme().textDark} style:background={theme().background}>
 	<div class="book-info">
 		<h1 style:color={theme().text}>{book.title}</h1>
 		<h2 style:color={theme().textDull}>{book.authors.join(", ")}</h2>

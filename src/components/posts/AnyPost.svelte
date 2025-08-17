@@ -30,7 +30,7 @@
 	import Rating from "./Rating.svelte";
 	import Reply from "./Reply.svelte";
 
-	let { post, postpage }: { post: Post; postpage?: boolean } = $props();
+	let { post, postpage }: { post: Post; postpage?: boolean; } = $props();
 
 	/**
 	 * The context menu that appears when clicking the post actions button, which
@@ -222,7 +222,7 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <section
-	style:background={postpage ? theme().backgroundDark : "transparent"}
+	style:background={postpage ? "var(--crust)" : "var(--base)"}
 	style:display={isDeleted ? "none" : "flex"}
 	tabindex="0"
 	role="link"

@@ -85,12 +85,12 @@
 	</button>
 
 	{#if user()}
-		<button class="listing" style:color={theme().text} onclick={signOut}>
+		<button style:background={theme().backgroundDark} class="listing" style:color={theme().text} onclick={signOut}>
 			<ExitIcon stroke={theme().text} style="width: 1.5rem;" />
 			Log Out
 		</button>
 	{:else}
-		<a class="listing" style:color={theme().text} href="/login">
+		<a style:background={theme().backgroundDark} class="listing" style:color={theme().text} href="/login">
 			<EnterIcon stroke={theme().text} style="width: 1.5rem;" />
 			Log In
 		</a>
@@ -136,7 +136,7 @@
 		width: 4rem;
 		height: 4rem;
 		border-radius: 50%;
-		margin-right: 2rem;
+		margin-right: 1rem;
 		margin-left: 2rem;
 		background-size: cover;
 		background-position: center;
@@ -158,12 +158,12 @@
 		align-items: center;
 
 		h1 {
-			font-size: 1.5rem;
+			font-size: 1rem;
 		}
 
 		h2 {
 			font-weight: normal;
-			font-size: 1.5rem;
+			font-size: 0.85rem;
 		}
 
 		a {

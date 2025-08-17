@@ -13,12 +13,12 @@
 	import SortIcon from "../assets/images/icons/SortIcon.svelte";
 	import StarIcon from "../assets/images/icons/StarIcon.svelte";
 	import { updateOtherUser, updateUser, user } from "../backend/auth.svelte";
-	import theme, { accentGradient } from "../themes/theme.svelte";
 	import Badges from "./Badges.svelte";
 	import BookListing from "./BookListing.svelte";
 	import ContextMenu from "./ContextMenu.svelte";
 	import AnyPost from "./posts/AnyPost.svelte";
 	import RadioInput from "./RadioInput.svelte";
+	import { cssVar } from "../api/themes.svelte";
 
 	let props = $props();
 	let profileUser: User = props.user;
@@ -137,10 +137,10 @@
 				const top = ratingOptions.getBoundingClientRect().top;
 				const percent = top / 100;
 
-				const { r, g, b } = lerp(theme().backgroundDark, theme().background, percent);
+				const { r, g, b } = lerp(cssVar("crust"), cssVar("base"), percent);
 				ratingOptions.style.background = `rgb(${r}, ${g}, ${b})`
 			}
-		}, true);
+		}, true); // me when true
 	})
 </script>
 
@@ -149,55 +149,49 @@
 	<button class="back-arrow">
 		<LeftArrowIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem;" />
 	</button>
-	<div class="profile" style:background={theme().backgroundDark}>
+	<div class="profile">
 		<img
 			class="profile-picture"
 			src={profileUser.picture}
 			alt={`${profileUser.displayName} profile picture`}
-			style:border-color={theme().backgroundDark}
 		/>
 		<div class="profile-line-1">
 			<span class="name">
 				<!-- Username -->
-				<h1 style:color={theme().textBright}>{profileUser.displayName}</h1>
-				<h2 style:color={theme().textDim}>@{profileUser.username}</h2>
+				<h1>{profileUser.displayName}</h1>
+				<h2>@{profileUser.username}</h2>
 
 				<!-- Badges -->
 				<Badges forUser={profileUser} size={1} />
 
-				<div class="dot" style:background={theme().textDim}></div>
-				<h2 class="pronouns" style:color={theme().textDim}>{profileUser.pronouns}</h2>
+				<div class="dot"></div>
+				<h2 class="pronouns">{profileUser.pronouns}</h2>
 			</span>
 
 			<!-- Edit profile button -->
 			{#if isCurrentUser}
-				<button
-					style:color={theme().background}
-					style:background={accentGradient()}
-					class="edit-profile"
-					onclick={() => goto("/profile/edit")}
-				>
+				<button class="edit-profile" onclick={() => goto("/profile/edit")}>
 					Edit Profile
 				</button>
 			{:else}
 				<!-- Profile actions -->
 				<div class="profile-actions">
-					<button style:border-color={theme().textDull} class="profile-action-follow">
+					<button class="profile-action-follow">
 						{#if following}
-							<CheckIcon stroke={theme().textDull} style="width: 2rem;" onclick={unfollow} />
+							<CheckIcon stroke="var(--overlay-1)" style="width: 2rem;" onclick={unfollow} />
 						{:else}
-							<AddIcon stroke={theme().textDull} style="width: 2rem;" onclick={follow} />
+							<AddIcon stroke="var(--overlay-1)" style="width: 2rem;" onclick={follow} />
 						{/if}
 					</button>
-					<button style:border-color={theme().textDull} class="profile-action">
-						<MessageIcon stroke={theme().textDull} style="width: 1rem;" />
+					<button class="profile-action">
+						<MessageIcon stroke="var(--overlay-1)" style="width: 1rem;" />
 					</button>
 				</div>
 			{/if}
 		</div>
 
 		{#await format(profileUser.bio) then bio}
-			<p style:color={theme().text} class="bio">{@html bio}</p>
+			<p class="bio">{@html bio}</p>
 		{/await}
 
 		<!-- Line 2: Profile stats -->
@@ -207,8 +201,8 @@
 				{#await favoriteBook then favorite}
 					{#if favorite}
 						<a href={`/book/${favorite.isbn}`} title={`${profileUser.displayName}'s highest rated book is ${favorite.title}`}>
-							<StarIcon stroke={theme().textDull} style="width: 1rem; height: 1rem; flex-shrink: 0;" />
-							<span class="truncate" style:color={theme().textDull}>{favorite.title}</span>
+							<StarIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem; flex-shrink: 0;" />
+							<span class="truncate">{favorite.title}</span>
 						</a>
 					{/if}
 				{/await}
@@ -217,8 +211,8 @@
 				{#await currentlyReading then current}
 					{#if current}
 						<a href="/book/{current.isbn}" title={`${profileUser.displayName} is currently reading ${current.title}`}>
-							<ClockIcon stroke={theme().textDull} style="width: 1rem; height: 1rem; flex-shrink: 0;" />
-							<span class="truncate" style:color={theme().textDull}>{current.title}</span>
+							<ClockIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem; flex-shrink: 0;" />
+							<span class="truncate">{current.title}</span>
 						</a>
 					{/if}
 				{/await}
@@ -227,12 +221,12 @@
 			<!-- Number of books read -->
 			{#await booksRead then booksRead}
 				<a onclick={() => view = "books"} href="/profile/{profileUser.username}?view=books" title="{profileUser.displayName} has read {booksRead} book{booksRead === 1 ? '' : 's'}">
-					<BookIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" />
-					<span style:color={theme().textDull}>{booksRead}</span>
+					<BookIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem;" />
+					<span>{booksRead}</span>
 				</a>
 			{/await}
 		</div>
-		<a style:border-color={theme().textDull} style:color={theme().textDull} class="follows" href={`/profile/${profileUser.username}/follows`}>
+		<a class="follows" href={`/profile/${profileUser.username}/follows`}>
 			{#await followers then followers}
 				<span>
 					{followers.length} Followers
@@ -246,36 +240,36 @@
 		<!-- Line 4: Views (all, discussion, ratings, list) -->
 		<div class="views">
 			<button
-				style:color={view === "all" ? theme().text : theme().textDim}
-				style:border-bottom={view === "all" ? `3px solid ${theme().accent}` : "3px solid transparent"}
+				style:color={view === "all" ? "var(--subtext-1)" : "var(--overlay-1)"}
+				style:border-bottom={view === "all" ? `3px solid var(--lavender)` : "3px solid transparent"}
 				onclick={gotoView("all")}
 			>
 				All
 			</button>
 			<button
-				style:color={view === "books" ? theme().text : theme().textDim}
-				style:border-bottom={view === "books" ? `3px solid ${theme().accent}` : "3px solid transparent"}
+				style:color={view === "books" ? "var(--subtext-1)" : "var(--overlay-1)"}
+				style:border-bottom={view === "books" ? `3px solid var(--lavender)` : "3px solid transparent"}
 				onclick={gotoView("books")}
 			>
 				Books
 			</button>
 			<button
-				style:color={view === "activity" ? theme().text : theme().textDim}
-				style:border-bottom={view === "activity" ? `3px solid ${theme().accent}` : "3px solid transparent"}
+				style:color={view === "activity" ? "var(--subtext-1)" : "var(--overlay-1)"}
+				style:border-bottom={view === "activity" ? `3px solid var(--lavender)` : "3px solid transparent"}
 				onclick={gotoView("activity")}
 			>
 				Activity
 			</button>
 			<button
-				style:color={view === "list" ? theme().text : theme().textDim}
-				style:border-bottom={view === "list" ? `3px solid ${theme().accent}` : "3px solid transparent"}
+				style:color={view === "list" ? "var(--subtext-1)" : "var(--overlay-1)"}
+				style:border-bottom={view === "list" ? `3px solid var(--lavender)` : "3px solid transparent"}
 				onclick={gotoView("list")}
 			>
 				List
 			</button>
 			<button
-				style:color={view === "discussion" ? theme().text : theme().textDim}
-				style:border-bottom={view === "discussion" ? `3px solid ${theme().accent}` : "3px solid transparent"}
+				style:color={view === "discussion" ? "var(--subtext-1)" : "var(--overlay-1)"}
+				style:border-bottom={view === "discussion" ? `3px solid var(--lavender)` : "3px solid transparent"}
 				onclick={gotoView("discussion")}
 			>
 				Discussion
@@ -285,8 +279,8 @@
 
 	{#await posts}
 		<div class="loading">
-			<h1 style:color={theme().text}>Loading posts...</h1>
-			<p style:color={theme().textDull}>We promise Bookfly will be faster soon.</p>
+			<h1>Loading posts...</h1>
+			<p>We promise Bookfly will be faster soon.</p>
 		</div>
 	{:then posts}
 		{#if view === "discussion"}
@@ -295,15 +289,15 @@
 			{/each}
 		{:else if view === "books"}
 			<div class="ratings">
-				<div bind:this={ratingOptions} class="rating-options" style:border-color={theme().textDark}>
-					<span style:color={theme().textDull}>
+				<div bind:this={ratingOptions} class="rating-options">
+					<span style:color="var(--overlay-1)">
 						<label for="show-full-reviews">Show full reviews</label>
 						<RadioInput id="show-full-reviews" size={0.5} bind:on={showFullReviews} />
 					</span>
-					<span style:color={theme().textDull}>
+					<span style:color="var(--overlay-1)">
 						<label for="change-rating-sort">{ratingSortName}</label>
 						<button onclick={event => ratingSortMenu.open(event)} id="change-rating-sort">
-							<SortIcon stroke={theme().textDull} style="width: 1.5rem; height: 1.5rem;" />
+							<SortIcon stroke="var(--overlay-1)" style="width: 1.5rem; height: 1.5rem;" />
 						</button>
 					</span>
 					<ContextMenu bind:this={ratingSortMenu}>
@@ -349,15 +343,16 @@
 	.pronouns {
 		display: flex;
 		align-items: center;
+		color: var(--surface-2);
 	}
 
 	.rating-options {
+		background: var(--base);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		padding: 1rem;
-		border-bottom-style: solid;
-		border-bottom-width: 1px;
+		border-bottom: 1px solid var(--surface-0);
 		position: sticky;
 		top: 0px;
 		z-index: 9999;
@@ -378,10 +373,10 @@
 	}
 
 	.dot {
-		content: "";
 		width: 0.25rem;
 		height: 0.25rem;
 		border-radius: 50%;
+		background-color: var(--surface-2);
 	}
 
 	.loading {
@@ -393,10 +388,12 @@
 
 		h1 {
 			font-size: 1.5rem;
+			color: var(--subtext-1);
 		}
 
 		p {
 			font-size: 0.85rem;
+			color: var(--overlay-1);
 		}
 	}
 
@@ -412,6 +409,7 @@
 		display: flex;
 		padding-left: 1rem;
 		gap: 1rem;
+		color: var(--overlay-1);
 	}
 
 	.profile-action {
@@ -490,6 +488,7 @@
 		padding-left: 1rem;
 		font-size: 0.85rem;
 		white-space: pre-wrap;
+		color: var(--overlay-1);
 
 		:global(a) {
 			color: cornflowerblue;
@@ -516,6 +515,8 @@
 			gap: 0.5rem;
 			align-items: center;
 			margin-right: 1rem;
+			color: var(--overlay-1);
+			text-decoration: none;
 		}
 	}
 
@@ -529,6 +530,8 @@
 			display: flex;
 			align-items: center;
 			gap: 0.5rem;
+			color: var(--overlay-1);
+			text-decoration: none;
 		}
 	}
 
@@ -538,11 +541,13 @@
 
 		h1 {
 			font-size: 1.25rem;
+			color: var(--text);
 		}
 
 		h2 {
 			font-size: 1rem;
 			font-weight: normal;
+			color: var(--surface-2);
 		}
 
 		.edit-profile {
@@ -556,6 +561,8 @@
 			padding-right: 1rem;
 			border-radius: 100vmax;
 			font-weight: 500;
+			background-image: linear-gradient(to bottom right, var(--lavender), var(--blue));
+			color: var(--crust);
 		}
 	}
 
@@ -566,13 +573,12 @@
 		height: 6rem;
 		margin-top: 4.7rem;
 		z-index: 2;
-		border-width: 0.5rem;
-		border-style: solid;
+		border: 0.5rem solid var(--crust);
 	}
 
 	.name {
 		flex-grow: 1;
-		color: var(--text);
+		color: var(--subtext-1);
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;

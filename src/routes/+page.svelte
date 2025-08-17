@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import { getFollowedPosts } from "../api/postapi";
 	import CatIcon from "../assets/images/icons/CatIcon.svelte";
 	import LogoIcon from "../assets/images/icons/LogoIcon.svelte";
@@ -13,6 +14,7 @@
 	import AnyPost from "../components/posts/AnyPost.svelte";
 	import Sidebar from "../components/Sidebar.svelte";
 	import theme from "../themes/theme.svelte";
+	import { setTheme } from "../api/themes.svelte";
 
 	initializeFirebase();
 
@@ -26,7 +28,7 @@
 <Background />
 
 <Page>
-	<nav style:background={theme().backgroundDark}>
+	<nav>
 		<div class="banner">
 			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
 				{#if user()}
@@ -165,5 +167,6 @@
 		flex-direction: column;
 		width: 100%;
 		max-width: var(--max-width);
+		background: var(--crust);
 	}
 </style>

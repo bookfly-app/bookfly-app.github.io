@@ -10,9 +10,9 @@
 </script>
 
 <div class="padding">&nbsp;</div>
-<footer style:background={theme().backgroundDark}>
+<footer>
 	<a aria-label="Home" href="/">
-		<EmptyHomeIcon stroke={selected === "home" ? theme().textBright : theme().textDull} style="width: 1.5rem;" />
+		<EmptyHomeIcon stroke={selected === "home" ? "var(--text)" : theme().textDull} style="width: 1.5rem;" />
 	</a>
 	<a aria-label="Search" href="/search">
 		<SearchIcon stroke={selected === "search" ? theme().textBright : theme().textDull} style="width: 1.5rem;" />
@@ -42,6 +42,7 @@
 		display: flex;
 		align-items: center;
 		max-width: var(--max-width);
+		background: var(--crust);
 
 		a {
 			padding-top: 1rem;

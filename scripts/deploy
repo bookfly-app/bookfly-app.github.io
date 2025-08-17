@@ -11,6 +11,10 @@ bun run build
 # fudging everything up
 touch build/.nojekyll
 
+# CNAME for domains
+touch build/CNAME
+echo "wallflower.land" >> build/CNAME
+
 # Push to the main branch
 git add .
 git commit -m "New build deployment"

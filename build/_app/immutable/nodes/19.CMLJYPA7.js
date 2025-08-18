@@ -1,0 +1,1 @@
+import"../chunks/gFbpwaTI.js";import{P as r}from"../chunks/COLtBCX6.js";const a=({params:e})=>e,p=Object.freeze(Object.defineProperty({__proto__:null,load:a},Symbol.toStringTag,{value:"Module"}));function s(e,o){const{username:t}=o.data;r(e,{username:t})}export{s as component,p as universal};

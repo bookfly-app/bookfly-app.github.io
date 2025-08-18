@@ -146,7 +146,9 @@
 </script>
 
 <section>
-	<div class="banner" style:background-image={`url("${profileUser.banner}")`}></div>
+	{#await getFile(profileUser.banner) then bnr}
+		<div class="banner" style:background-image={`url("${bnr}")`}></div>
+	{/await}
 	<button class="back-arrow">
 		<LeftArrowIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem;" />
 	</button>

@@ -5,7 +5,6 @@
 	import EditIcon from "../../../assets/images/icons/EditIcon.svelte";
 	import { updateUser, usernameIsTaken } from "../../../backend/auth.svelte";
 	import BackButton from "../../../components/BackButton.svelte";
-	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
 	import ImagePicker from "../../../components/ImagePicker.svelte";
 	import Page from "../../../components/Page.svelte";
@@ -48,24 +47,25 @@
 			return;
 		}
 
-		await updateUser({ displayName, bio, username, pronouns, picture });
+		await updateUser({ displayName, bio, username, pronouns, picture, banner });
 		await goto("/profile");
 		location.reload();
 	}
 </script>
 
-<Background />
 <Page>
 	<BackButton style="position: absolute; top: 0.5rem; left: 0.5rem;"/>
 	{#await awaitUser then currentUser}
 		<!-- Banner -->
-		<label for="set-banner" class="banner" style:background-image="url('{currentUser.banner}')">
-			<div class="overlay"></div>
-			<EditIcon
-				stroke="#CCCCFF"
-				style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 3rem; height: 3rem; z-index: 4;"
-			/>
-		</label>
+		{#await getFile(banner) then bnr}
+			<label for="set-banner" class="banner" style:background-image="url('{bnr}')">
+				<div class="overlay"></div>
+				<EditIcon
+					stroke="#CCCCFF"
+					style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 3rem; height: 3rem; z-index: 4;"
+				/>
+			</label>
+		{/await}
 		<ImagePicker circular id="set-banner" bind:imageId={banner} aspectRatio={3 / 1} />
 
 		<div class="profile">

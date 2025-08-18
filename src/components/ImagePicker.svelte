@@ -31,17 +31,6 @@
 		reset();
 	}
 
-	// let cropped = $derived.by(async() => {
-	// 	cropperHeight;
-	// 	imageHeight;
-	//
-	// 	if (file) {
-	// 		return crop()
-	// 	}
-	//
-	// 	return null;
-	// });
-
 	function reset() {
 		files = null;
 		file = null;
@@ -75,13 +64,11 @@
 				imageHeight = imageWidth * (1 / imageAspectRatio);
 				imageTop = (imageContainer!.getBoundingClientRect().height - imageHeight) / 2;
 				scale = imageContainer!.getBoundingClientRect().height / imageHeight;
-				minimumScale = scale;
 			} else {
 				imageHeight = imageContainer!.getBoundingClientRect().height;
 				imageWidth = imageHeight * imageAspectRatio;
 				imageLeft = (imageContainer!.getBoundingClientRect().width - imageWidth) / 2;
 				scale = imageContainer!.getBoundingClientRect().width / imageWidth;
-				minimumScale = scale;
 			}
 
 			if (aspectRatio) {
@@ -102,25 +89,23 @@
 		}
 	}
 
-	// let canvas: HTMLCanvasElement;
-
 	function crop(): Promise<File> {
 		return new Promise<File>((resolve, reject) => {
 			const image = new Image();
 			image.onload = () => {
 				const canvas = document.createElement("canvas")
-				canvas.width = imageContainer!.getBoundingClientRect().width;
-				canvas.height = imageContainer!.getBoundingClientRect().height;
+				canvas.width = preview.getBoundingClientRect().width;
+				canvas.height = canvas.width * (1 / aspectRatio!);
 				const ctx = canvas.getContext('2d')!;
 				const factor = preview.naturalWidth / canvas.width;
 				ctx.drawImage(
 					image,
-					factor * cropperLeft,
-					factor * cropperTop,
+					factor * (cropperLeft - imageLeft),
+					factor * (cropperTop - imageTop),
 					factor * cropperWidth,
 					factor * cropperHeight,
-					imageLeft,
-					imageTop,
+					0,
+					0,
 					canvas.width,
 					canvas.height,
 				);
@@ -340,19 +325,12 @@
 			<div bind:this={bottomRightHandle} class="bottom right handle"></div>
 		</div>
 	</div>
-	<!-- <canvas bind:this={canvas}></canvas> -->
 	<button class="upload" onclick={upload}>Done</button>
 	<button class="choose-again" onclick={chooseAgain}>Choose a different image</button>
 	<button class="cancel" onclick={cancel}>Cancel</button>
-	<!-- {#await cropped}{/await} -->
 </div>
 
 <style>
-	canvas {
-		width: 100%;
-		aspect-ratio: 1;
-	}
-
 	input {
 		display: none;
 	}

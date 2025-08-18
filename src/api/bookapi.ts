@@ -1,7 +1,6 @@
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import initializeFirebase from "../backend/backend";
 import { internalPostToPost, type InternalPost, type Post } from "./postapi";
-import { updateUser } from "../backend/auth.svelte";
 
 export type ISBN = string;
 
@@ -52,7 +51,7 @@ export async function getBook(isbn: ISBN): Promise<Book> {
 		backupCover: googleData?.imageLinks?.thumbnail,
 		pageCount: data.number_of_pages,
 		genres: data.subjects?.map((subject: { name: string }) => subject.name) ?? [],
-		description: data.description ?? googleData?.description ?? "",
+		description: googleData?.description ?? data.description?.value ?? "",
 	};
 
 	localStorage.setItem(`book-${isbn}`, JSON.stringify(book));

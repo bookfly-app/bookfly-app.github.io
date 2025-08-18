@@ -29,15 +29,15 @@
 	}
 
 	async function removeFromReadingList() {
-		console.log("Removing");
 		const readingList = user()!.readingList.filter(isbn => isbn !== book.isbn);
 		updateUser({ readingList })
 		user()!.readingList = readingList;
-		console.log(user()!.readingList);
 	}
 
 	function makeReadable(description: string, interval = 3) {
 		description = description.replaceAll("--", "—");
+		description = description.replaceAll(/\.(\S)/g, (_match, letter) => `. ${letter}`);
+
 		let sentences = description.split(/([.!?])\s*/);
 
 		let sentenceArray = [];
@@ -53,6 +53,8 @@
 				return sentence;
 			})
 			.join("");
+
+		formattedText = formattedText.replaceAll(/\.(\S)/g, (_match, letter) => `. ${letter}`);
 
 		return formattedText;
 	}
@@ -103,14 +105,16 @@
 			{/await}
 		{/if}
 
-		{#if isInReadingList}
-			<button id="add-to-reading-list" class="remove-from-reading-list" onclick={removeFromReadingList}>
-				Remove from Reading List
-			</button>
-		{:else}
-			<button id="add-to-reading-list" style:background={accentGradient()} onclick={addToReadingList}>
-				Add to Reading List
-			</button>
+		{#if user()}
+			{#if isInReadingList}
+				<button id="add-to-reading-list" class="remove-from-reading-list" onclick={removeFromReadingList}>
+					Remove from Reading List
+				</button>
+			{:else}
+				<button id="add-to-reading-list" style:background={accentGradient()} onclick={addToReadingList}>
+					Add to Reading List
+				</button>
+			{/if}
 		{/if}
 	</section>
 

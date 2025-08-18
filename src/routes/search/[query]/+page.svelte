@@ -5,6 +5,7 @@
 	import { searchUsers } from "../../../api/userapi";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
+	import Loading from "../../../components/Loading.svelte";
 	import Page from "../../../components/Page.svelte";
 	import AnyPost from "../../../components/posts/AnyPost.svelte";
 	import UserListing from "../../../components/UserListing.svelte";
@@ -84,6 +85,7 @@
 				<div class="loading">
 					<h1 style:color={theme().text}>Loading posts...</h1>
 					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+					<Loading />
 				</div>
 			{:then posts}
 				{#if posts.length === 0}
@@ -103,6 +105,7 @@
 				<div class="loading">
 					<h1 style:color={theme().text}>Loading books...</h1>
 					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+					<Loading />
 				</div>
 			{:then books}
 				{#if books.length === 0}

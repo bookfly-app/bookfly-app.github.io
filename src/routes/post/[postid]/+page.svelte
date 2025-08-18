@@ -63,12 +63,13 @@
 <Page class="post">
 	{#await thePost then post}
 		<AnyPost post={post!} postpage />
-		<div style:padding-bottom={imageAttachment === null ? "0rem" : "2.5rem"} style:border-color={theme().textDark} class="reply">
-			<a aria-label="Go to profile" href="/profile">
-				<img alt="Your profile" src={user()?.picture} />
-			</a>
 
-			{#if user()}
+		{#if user()}
+			<div style:padding-bottom={imageAttachment === null ? "0rem" : "2.5rem"} style:border-color={theme().textDark} class="reply">
+				<a aria-label="Go to profile" href="/profile">
+					<img alt="Your profile" src={user()?.picture} />
+				</a>
+
 				<div class="reply-body">
 					<textarea
 						bind:this={reply}
@@ -95,8 +96,8 @@
 						</button>
 					</div>
 				</div>
-			{/if}
-		</div>
+			</div>
+		{/if}
 
 		{#await replies then replies}
 			{#each newReplies as newReply}

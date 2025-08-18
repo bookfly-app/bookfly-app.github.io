@@ -4,9 +4,10 @@
 	import Background from "../../components/Background.svelte";
 	import Footer from "../../components/Footer.svelte";
 	import theme from "../../themes/theme.svelte";
+	import Page from "../../components/Page.svelte";
 
-	let email: string;
-	let password: string;
+	let email: string = $state("");
+	let password: string = $state("");
 
 	async function signIn() {
 		let error = await logIn(email, password);
@@ -17,40 +18,44 @@
 	}
 
 	$effect(() => {
-		if (user()!) {
-			goto("/profile");
-		}
+		if (user()!) goto("/profile");
 	});
 </script>
 
 <Background />
-<main>
-	<h1 style:color={theme().textBright}>Log In</h1>
-	<div>
-		<div class="section">
-			<p style:color={theme().textDull}>Email</p>
-			<input
-				style:color={theme().text}
-				style:background={theme().backgroundDark}
-				type="text"
-				placeholder="example@website.com"
-				bind:value={email}
-			/>
+<Page>
+	<main>
+		<h1 style:color={theme().textBright}>Log In</h1>
+		<div>
+			<div class="section">
+				<p style:color={theme().textDull}>Email</p>
+				<input
+					style:color={theme().text}
+					style:background={theme().backgroundDark}
+					type="text"
+					placeholder="example@website.com"
+					bind:value={email}
+				/>
+			</div>
+			<div class="section">
+				<p style:color={theme().textDull}>Password</p>
+				<input
+					style:color={theme().text}
+					style:background={theme().backgroundDark}
+					type="password"
+					placeholder="s3cr3tp4zzc0d3"
+					bind:value={password}
+				/>
+			</div>
+
+			<div class="section">
+				<p>Don't have an account? <a href="/signup">Create one now.</a></p>
+			</div>
 		</div>
-		<div class="section">
-			<p style:color={theme().textDull}>Password</p>
-			<input
-				style:color={theme().text}
-				style:background={theme().backgroundDark}
-				type="password"
-				placeholder="s3cr3tp4zzc0d3"
-				bind:value={password}
-			/>
-		</div>
-	</div>
-	<button style:background={`linear-gradient(${theme().accent}, ${theme().accent2})`} onclick={signIn}>Log In</button>
-</main>
-<Footer selected="profile" />
+		<button style:background={`linear-gradient(${theme().accent}, ${theme().accent2})`} onclick={signIn}>Log In</button>
+	</main>
+	<Footer selected="profile" />
+</Page>
 
 <style>
 	.section {
@@ -58,7 +63,13 @@
 		flex-direction: column;
 		gap: 0.5rem;
 
+		a {
+			color: var(--blue);
+			text-decoration: none;
+		}
+
 		p {
+			color: var(--overlay-1);
 			font-size: 0.85rem;
 		}
 	}

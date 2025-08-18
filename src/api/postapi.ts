@@ -425,7 +425,14 @@ export function didLike(post: Post): boolean {
  * the given post.
  */
 export function didShare(post: Post): boolean {
-	return user()?.shares.includes(post.id) ?? false;
+	if (!user()) {
+		let shared = localStorage.getItem("shared-posts");
+		if (!shared) return false;
+		let sharedPosts: string[] = JSON.parse(shared);
+		return sharedPosts.includes(post.id);
+	}
+
+	return user()!.shares.includes(post.id);
 }
 
 /**

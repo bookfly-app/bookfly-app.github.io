@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { onMount } from "svelte";
 	import { getFollowedPosts } from "../api/postapi";
 	import CatIcon from "../assets/images/icons/CatIcon.svelte";
-	import LogoIcon from "../assets/images/icons/LogoIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
 	import { user } from "../backend/auth.svelte";
@@ -14,7 +12,7 @@
 	import AnyPost from "../components/posts/AnyPost.svelte";
 	import Sidebar from "../components/Sidebar.svelte";
 	import theme from "../themes/theme.svelte";
-	import { setTheme } from "../api/themes.svelte";
+	import Wallflower from "../assets/images/icons/Wallflower.svelte";
 
 	initializeFirebase();
 
@@ -37,10 +35,10 @@
 					<PersonIcon stroke={theme().textDull} style="width: 2.5rem;" />
 				{/if}
 			</button>
-			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
-				<LogoIcon style="width: 3rem; height: 3rem;" stroke={theme().textDull} />
+			<button>
+				<Wallflower style="width: 2rem; height: 2rem;" stroke="var(--overlay-1)" />
 			</button>
-			<SearchIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
+			<SearchIcon style="width: 2rem; height: 2rem;" stroke="var(--text)" />
 		</div>
 	</nav>
 

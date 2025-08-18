@@ -1,13 +1,8 @@
-<script>
-	import theme from "../themes/theme.svelte";
-</script>
-
-<div
-	style:background-image={`linear-gradient(${theme().background}, ${theme().backgroundDim})`}
-></div>
+<div></div>
 
 <style>
 	div {
+		background-image: linear-gradient(var(--base), var(--mantle));
 		width: 100vw;
 		height: 100vh;
 		position: absolute;

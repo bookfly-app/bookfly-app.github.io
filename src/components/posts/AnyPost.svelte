@@ -148,7 +148,7 @@
 	/** The number of replies on the post */
 	let comments = $state(getReplies(post).then(replies => replies.length));
 	/** The number of shares on the post */
-	let shares = $state(getShares(post).then(shares => shares.length));
+	let shares = $state(getShares(post).then(shares => shares.length + ((!user() && didShare(post)) ? 1 : 0)));
 
 	/** Whether the current user liked the post. */
 	let liked = $state(didLike(post));
@@ -165,6 +165,8 @@
 	 * @returns A promise that resolves when the database is finished updating.
 	 */
 	async function toggleLike() {
+		if (!user()) return;
+
 		liked = !liked;
 
 		// Liking the post
@@ -216,6 +218,15 @@
 		shareNotification.show();
 		if (!shared) shares = shares.then(shares => shares + 1);
 		shared = true;
+
+		if (!user()) {
+			let shared = localStorage.getItem("shared-posts");
+			if (!shared) shared = "[]";
+			let sharedPosts: string[] = JSON.parse(shared);
+			sharedPosts = Array.from(new Set([...sharedPosts, post.id]));
+			localStorage.setItem("shared-posts", JSON.stringify(sharedPosts));
+		}
+
 		await sharePost(post);
 	}
 </script>

@@ -2,8 +2,9 @@
 	import { goto } from "$app/navigation";
 	import { usernameErrors } from "../../api/userapi";
 	import { emailIsTaken, passwordErrors, signUp, user, usernameIsTaken } from "../../backend/auth.svelte";
-	import Background from "../../components/Background.svelte";
+	import Footer from "../../components/Footer.svelte";
 	import theme from "../../themes/theme.svelte";
+	import Page from "../../components/Page.svelte";
 
 	let email = $state("");
 	let password = $state("");
@@ -96,7 +97,7 @@
 	});
 </script>
 
-<Background />
+<Page>
 <main>
 	<h1 style:color={theme().textBright}>Create Account</h1>
 	<div>
@@ -169,7 +170,9 @@
 	>
 		Create Account
 	</button>
-</main>
+	<Footer selected="profile" />
+	</main>
+</Page>
 
 <style>
 	.error {

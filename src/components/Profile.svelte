@@ -19,6 +19,7 @@
 	import AnyPost from "./posts/AnyPost.svelte";
 	import RadioInput from "./RadioInput.svelte";
 	import { cssVar } from "../api/themes.svelte";
+	import { getFile } from "../api/storageapi";
 
 	let props = $props();
 	let profileUser: User = props.user;
@@ -150,11 +151,13 @@
 		<LeftArrowIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem;" />
 	</button>
 	<div class="profile">
-		<img
-			class="profile-picture"
-			src={profileUser.picture}
-			alt={`${profileUser.displayName} profile picture`}
-		/>
+		{#await getFile(profileUser.picture) then pfp}
+			<img
+				class="profile-picture"
+				src={pfp}
+				alt={`${profileUser.displayName} profile picture`}
+			/>
+		{/await}
 		<div class="profile-line-1">
 			<span class="name">
 				<!-- Username -->

@@ -15,6 +15,7 @@
 		unlikePost,
 		type Post,
 	} from "../../api/postapi";
+	import { getFile } from "../../api/storageapi";
 	import CommentIcon from "../../assets/images/icons/CommentIcon.svelte";
 	import DotMenuIcon from "../../assets/images/icons/DotMenuIcon.svelte";
 	import EyeIcon from "../../assets/images/icons/EyeIcon.svelte";
@@ -242,7 +243,9 @@
 >
 	<!-- Poster's profile picture -->
 	<div class="profile">
-		<a aria-label="Go to poster's profile" style:background-image={`url("${post.poster.picture}")`} href={`/profile/${post.poster.username}`}></a>
+		{#await getFile(post.poster.picture) then pfp}
+			<a aria-label="Go to poster's profile" style:background-image={`url("${pfp}")`} href={`/profile/${post.poster.username}`}></a>
+		{/await}
 	</div>
 
 	<div class="content-outer">

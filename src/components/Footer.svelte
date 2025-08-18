@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { getFile } from "../api/storageapi";
 	import BellIcon from "../assets/images/icons/BellIcon.svelte";
 	import EmptyHomeIcon from "../assets/images/icons/EmptyHomeIcon.svelte";
 	import ProfileIcon from "../assets/images/icons/ProfileIcon.svelte";
@@ -22,7 +23,9 @@
 	</a>
 	<a aria-label="Profile" href="/profile">
 		{#if user()}
-			<img alt="Your profile" src={user()!.picture ?? ""} class="profile-link" />
+			{#await getFile(user()!.picture) then pfp}
+				<img alt="Your profile" src={pfp} class="profile-link" />
+			{/await}
 		{:else}
 			<ProfileIcon stroke={selected === "profile" ? theme().textBright : theme().textDull} style="width: 1.5rem;" />
 		{/if}

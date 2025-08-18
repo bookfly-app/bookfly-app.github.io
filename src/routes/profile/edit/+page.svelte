@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
+	import { getFile } from "../../../api/storageapi";
 	import { awaitUser, usernameErrors } from "../../../api/userapi";
 	import EditIcon from "../../../assets/images/icons/EditIcon.svelte";
-	import { updateUser, user, usernameIsTaken } from "../../../backend/auth.svelte";
+	import { updateUser, usernameIsTaken } from "../../../backend/auth.svelte";
 	import BackButton from "../../../components/BackButton.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
+	import ImagePicker from "../../../components/ImagePicker.svelte";
 	import Page from "../../../components/Page.svelte";
 	import RadioInput from "../../../components/RadioInput.svelte";
 	import theme from "../../../themes/theme.svelte";
@@ -62,15 +64,18 @@
 		</button>
 
 		<div class="profile">
-			<div class="profile-top">
+			<div>
 				<!-- Profile Picture -->
-				<button class="profile-picture" style:border-color={theme().background} style:background-image="url('{currentUser!.picture}')">
-					<div class="overlay"></div>
-					<EditIcon
-						stroke="#CCCCFF"
-						style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 2rem; height: 2rem; z-index: 4;"
-					/>
-				</button>
+				{#await getFile(currentUser.picture) then pfp}
+					<label for="set-profile-picture" class="profile-picture" style:border-color={theme().background} style:background-image="url('{pfp}')">
+						<div class="overlay"></div>
+						<EditIcon
+							stroke="#CCCCFF"
+							style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 2rem; height: 2rem; z-index: 4;"
+						/>
+					</label>
+				{/await}
+				<ImagePicker id="set-profile-picture" />
 
 				<button class="save" style:background="linear-gradient({theme().accent}, {theme().accent2})" onclick={update}>Save</button>
 			</div>
@@ -291,5 +296,6 @@
 		position: relative;
 		border-width: 0.5rem;
 		border-style: solid;
+		display: block;
 	}
 </style>

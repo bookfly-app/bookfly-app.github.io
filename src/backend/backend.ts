@@ -1,9 +1,11 @@
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { Firestore, getFirestore } from "firebase/firestore";
 import env from "../env.json";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 let app: FirebaseApp;
 let db: Firestore;
+let storage: FirebaseStorage;
 
 /**
  * Initializes the Firebase app if it's not already and returns the app and database.
@@ -13,10 +15,16 @@ let db: Firestore;
  *
  * @returns A reference to the app and database.
  */
-export default function initializeFirebase(): { app: FirebaseApp; db: Firestore } {
+export default function initializeFirebase(): {
+	app: FirebaseApp;
+	db: Firestore;
+	storage: FirebaseStorage;
+} {
 	if (!app) {
 		app = initializeApp(env.firebase);
 		db = getFirestore(app);
+		storage = getStorage(app);
 	}
-	return { app, db };
+
+	return { app, db, storage };
 }

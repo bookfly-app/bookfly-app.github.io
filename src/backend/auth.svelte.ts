@@ -112,6 +112,7 @@ export async function signUp(
 			followers: [],
 			views: [],
 			shares: [],
+			birthmoment: Date.now(),
 		};
 		await setDoc(doc(db, "users", user.id), user);
 		return null;

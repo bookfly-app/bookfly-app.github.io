@@ -40,6 +40,7 @@
 	function signOut() {
 		logOut();
 		goto("/");
+		window.location.reload();
 	}
 
 	let overlayOpacity = $state(0);

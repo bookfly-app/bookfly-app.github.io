@@ -22,6 +22,7 @@ export type InternalUser = {
 	links: {}[];
 	currentBook: string | null;
 	pronouns: string;
+	birthmoment: number;
 
 	views: PostId[];
 	likes: PostId[];
@@ -50,6 +51,7 @@ export type User = {
 	links: {}[];
 	currentBook: string | null;
 	pronouns: string;
+	birthmoment: number;
 
 	views: PostId[];
 	likes: PostId[];

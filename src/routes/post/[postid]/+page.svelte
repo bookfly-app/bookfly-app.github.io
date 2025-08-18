@@ -13,7 +13,7 @@
 	import theme from "../../../themes/theme.svelte";
 
 	let { data }: { data: { postid: PostId } } = $props();
-	let { postid } = data;
+	let postid = $derived(data.postid);
 	let thePost = getPostFromId(postid)!;
 
 	let reply: HTMLTextAreaElement;
@@ -64,7 +64,7 @@
 		<AnyPost post={post!} postpage />
 
 		{#if user()}
-			<div style:padding-bottom={imageAttachment === null ? "0rem" : "2.5rem"} style:border-color={theme().textDark} class="reply">
+			<div style:padding-bottom={imageAttachment === null ? "0.5rem" : "2.5rem"} style:border-color={theme().textDark} class="reply">
 				<a aria-label="Go to profile" href="/profile">
 					{#await getFile(user()!.picture) then pfp}
 						<img alt="Your profile" src={pfp} />

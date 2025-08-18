@@ -2,6 +2,7 @@
 	import type { User } from "../api/userapi";
 	import DeveloperIcon from "../assets/images/icons/DeveloperIcon.svelte";
 	import EditIcon from "../assets/images/icons/EditIcon.svelte";
+	import SproutIcon from "../assets/images/icons/SproutIcon.svelte";
 	import WrenchIcon from "../assets/images/icons/WrenchIcon.svelte";
 	import theme from "../themes/theme.svelte";
 
@@ -46,6 +47,18 @@
 				<WrenchIcon stroke={theme().backgroundDark} style="width: {size * 0.8}rem;" />
 			</a>
 		{/if}
+		{#if Date.now() - forUser.birthmoment < 1000 * 60 * 60 * 24 * 7}
+			<a
+				style:width="{size * 1.5}rem"
+				style:height="{size * 1.5}rem"
+				style:border-radius="{size / 2}rem"
+				href="/settings/account/become-a-moderator"
+				title="{forUser.displayName} is a Wallflower moderator"
+				class="badge new"
+			>
+				<SproutIcon stroke={theme().backgroundDark} style="width: {size * 0.8}rem;" />
+			</a>
+		{/if}
 	</span>
 {/if}
 
@@ -70,5 +83,9 @@
 
 	.mod {
 		background-image: linear-gradient(to bottom right, #f5c2e7, #b4befe);
+	}
+
+	.new {
+		background-image: linear-gradient(to bottom right, var(--yellow), var(--green));
 	}
 </style>

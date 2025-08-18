@@ -190,9 +190,9 @@
 							<AddIcon stroke="var(--overlay-1)" style="width: 2rem;" onclick={follow} />
 						{/if}
 					</button>
-					<button class="profile-action">
-						<MessageIcon stroke="var(--overlay-1)" style="width: 1rem;" />
-					</button>
+					<!-- <button class="profile-action"> -->
+					<!-- 	<MessageIcon stroke="var(--overlay-1)" style="width: 1rem;" /> -->
+					<!-- </button> -->
 				</div>
 			{/if}
 		</div>
@@ -421,14 +421,13 @@
 	}
 
 	.profile-action {
-		border-style: solid;
-		border-width: 2px;
 		border-radius: 50%;
 		width: 2rem;
 		height: 2rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		border: 2px solid var(--overlay-1);
 	}
 
 	.profile-action-follow {

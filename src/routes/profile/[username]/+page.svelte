@@ -3,7 +3,7 @@
 
 	let { data } = $props();
 
-	const { username } = data;
+	let username = $derived(data.username);
 </script>
 
 <ProfilePage {username} />

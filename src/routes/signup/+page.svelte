@@ -25,7 +25,9 @@
 	let passwordValid = $state(true);
 	let password2Valid = $state(true);
 
-	let valid = $derived(usernameValid && passwordValid && password2Valid);
+	let waiver = $state(false);
+
+	let valid = $derived(usernameValid && passwordValid && password2Valid && waiver);
 
 	function checkUsername() {
 		usernameErrorList = usernameErrors(username);
@@ -98,92 +100,121 @@
 </script>
 
 <Page>
-<main>
-	<h1 style:color={theme().textBright}>Create Account</h1>
-	<div>
-		<div class="section">
-			<p style:color={theme().textDull}>Username</p>
-			<input
-				bind:this={usernameInput}
-				oninput={checkUsername}
-				style:color={theme().text}
-				style:background={theme().backgroundDark}
-				type="text"
-				placeholder="Username"
-				bind:value={username}
-			/>
-			{#each usernameErrorList as error}
-				<span class="error">{error}</span>
-			{/each}
+	<main>
+		<h1 style:color={theme().textBright}>Create Account</h1>
+		<p class="warning">
+			<strong>Hold up!</strong> wallflower.land is still in alpha, and probably
+			has lots of bugs cuz vi is a really shitty programmer. if you want to
+			continue, just be aware that things will break :p
+		</p>
+
+		<div>
+			<div class="section">
+				<p style:color={theme().textDull}>Username</p>
+				<input
+					bind:this={usernameInput}
+					oninput={checkUsername}
+					style:color={theme().text}
+					style:background={theme().backgroundDark}
+					type="text"
+					placeholder="Username"
+					bind:value={username}
+				/>
+				{#each usernameErrorList as error}
+					<span class="error">{error}</span>
+				{/each}
+			</div>
+
+			<div class="section">
+				<p style:color={theme().textDull}>Email</p>
+				<input
+					type="text"
+					bind:this={emailInput}
+					oninput={checkEmail}
+					style:color={theme().text}
+					style:background={theme().backgroundDark}
+					placeholder="example@website.com"
+					bind:value={email}
+				/>
+				{#each emailErrorList as error}
+					<span class="error">{error}</span>
+				{/each}
+			</div>
+			<div class="section">
+				<p style:color={theme().textDull}>Password</p>
+				<input
+					style:color={theme().text}
+					style:background={theme().backgroundDark}
+					type="password"
+					placeholder="sUp3rS3cr37!"
+					oninput={checkPassword}
+					bind:value={password}
+					bind:this={passwordInput}
+				/>
+				{#each passwordErrorList as error}
+					<span class="error">{error}</span>
+				{/each}
+			</div>
+			<div class="section">
+				<p style:color={theme().textDull}>Retype Password</p>
+				<input
+					style:color={theme().text}
+					style:background={theme().backgroundDark}
+					type="password"
+					oninput={checkPasswordRetype}
+					placeholder="sUp3rS3cr37!"
+					bind:value={password2}
+					bind:this={passwordInput2}
+				/>
+				{#if passwordMatchError}
+					<span class="error">Passwords much match</span>
+				{/if}
+			</div>
+		
+			<!-- im fucking cackling that i called this div class waiver -->
+			<div class="waiver">
+				<input type="checkbox" bind:checked={waiver} />
+				I am prepared to use a buggy ass website
+			</div>
 		</div>
 
-		<div class="section">
-			<p style:color={theme().textDull}>Email</p>
-			<input
-				type="text"
-				bind:this={emailInput}
-				oninput={checkEmail}
-				style:color={theme().text}
-				style:background={theme().backgroundDark}
-				placeholder="example@website.com"
-				bind:value={email}
-			/>
-			{#each emailErrorList as error}
-				<span class="error">{error}</span>
-			{/each}
-		</div>
-		<div class="section">
-			<p style:color={theme().textDull}>Password</p>
-			<input
-				style:color={theme().text}
-				style:background={theme().backgroundDark}
-				type="password"
-				placeholder="sUp3rS3cr37!"
-				oninput={checkPassword}
-				bind:value={password}
-				bind:this={passwordInput}
-			/>
-			{#each passwordErrorList as error}
-				<span class="error">{error}</span>
-			{/each}
-		</div>
-		<div class="section">
-			<p style:color={theme().textDull}>Retype Password</p>
-			<input
-				style:color={theme().text}
-				style:background={theme().backgroundDark}
-				type="password"
-				oninput={checkPasswordRetype}
-				placeholder="sUp3rS3cr37!"
-				bind:value={password2}
-				bind:this={passwordInput2}
-			/>
-			{#if passwordMatchError}
-				<span class="error">Passwords much match</span>
-			{/if}
-		</div>
-	</div>
-	<button
-		style:color={theme().background}
-		style:background={valid ? `linear-gradient(${theme().accent}, ${theme().accent2})` : theme().backgroundDark}
-		onclick={createAccount}
-	>
-		Create Account
-	</button>
-	<Footer selected="profile" />
+		<button
+			style:color={theme().background}
+			style:background={valid ? `linear-gradient(${theme().accent}, ${theme().accent2})` : theme().backgroundDark}
+			onclick={createAccount}
+		>
+			Create Account
+		</button>
 	</main>
+	<Footer selected="profile" />
 </Page>
 
 <style>
+	h1 {
+		margin-top: 2rem;
+	}
+
 	.error {
 		font-size: 0.8rem;
-		color: indianred;
+		color: var(--red);
+	}
+
+	.warning {
+		color: var(--yellow);
+		margin-left: 3rem;
+		margin-right: 3rem;
+		padding: 1rem;
+		font-size: 0.85rem;
+		border: 2px solid #FFFFCC;
+		background: #202000;
+		border-radius: 0.5rem;
+		box-shadow: 0px 0px 0.5rem var(--yellow), inset 0px 0px 0.5rem var(--yellow);
 	}
 
 	.section {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: 0.25rem;
 
 		p {
 			font-size: 0.85rem;
@@ -194,9 +225,8 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
-		gap: 5rem;
 		height: 100%;
+		gap: 2rem;
 
 		> div {
 			display: flex;
@@ -207,7 +237,7 @@
 
 			input {
 				padding: 1rem;
-				border-radius: 1rem;
+				border-radius: 0.5rem;
 				width: 15rem;
 				font-size: 0.85rem;
 			}
@@ -218,6 +248,18 @@
 			width: 15rem;
 			border-radius: 1rem;
 			font-weight: bold;
+		}
+	}
+
+	.waiver {
+		color: var(--overlay-1);
+		accent-color: var(--lavender);
+		font-size: 0.85rem;
+		
+		input {
+			margin-right: 0.5rem;
+			width: fit-content;
+			display: inline;
 		}
 	}
 </style>

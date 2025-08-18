@@ -12,6 +12,9 @@ const themes = [
 			"subtext-1": "#bac2de",
 			lavender: "#b4befe",
 			blue: "#89b4fa",
+			yellow: "#f9e2af",
+			green: "#a6e3a1",
+			red: "#f38ba8",
 		},
 	},
 ] as const satisfies {
@@ -27,6 +30,9 @@ const themes = [
 		"subtext-1": string;
 		lavender: string;
 		blue: string;
+		yellow: string;
+		green: string;
+		red: string;
 	};
 }[];
 

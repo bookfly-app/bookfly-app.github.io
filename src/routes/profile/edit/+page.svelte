@@ -48,11 +48,10 @@
 			return;
 		}
 
-		await updateUser({ displayName: displayName, bio: bio, username: username, pronouns: pronouns });
+		await updateUser({ displayName, bio, username, pronouns, picture });
 		await goto("/profile");
 		location.reload();
 	}
-
 </script>
 
 <Background />
@@ -67,7 +66,7 @@
 				style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 3rem; height: 3rem; z-index: 4;"
 			/>
 		</label>
-		<ImagePicker id="set-banner" bind:imageId={banner} />
+		<ImagePicker circular id="set-banner" bind:imageId={banner} aspectRatio={3 / 1} />
 
 		<div class="profile">
 			<div>
@@ -81,7 +80,7 @@
 						/>
 					</label>
 				{/await}
-				<ImagePicker id="set-profile-picture" bind:imageId={picture} />
+				<ImagePicker id="set-profile-picture" bind:imageId={picture} aspectRatio={1 / 1} />
 
 				<button class="save" style:background="linear-gradient({theme().accent}, {theme().accent2})" onclick={update}>Save</button>
 			</div>
@@ -205,13 +204,12 @@
 	}
 
 	.banner {
+		display: block;
 		width: 100%;
-		height: 7.5rem;
-		position: absolute;
+		aspect-ratio: 3 / 1;
 		background-size: cover;
 		background-position: center;
-		left: 0px;
-		top: 0px;
+		position: relative;
 	}
 
 	.error {
@@ -294,9 +292,9 @@
 		border-radius: 50%;
 		width: 5rem;
 		height: 5rem;
-		margin-top: 5rem;
 		z-index: 2;
 		background-size: cover;
+		margin-top: -2.5rem;
 		background-position: center;
 		overflow: hidden;
 		position: relative;

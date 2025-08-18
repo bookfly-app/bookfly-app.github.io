@@ -89,13 +89,23 @@
 		}
 	}
 
+	function cropAspectRatio() {
+		return cropperWidth / cropperHeight;
+	}
+
+	/**
+	 * Despite my atheistic views, I found myself praying to a higher
+	 * power quite frequently while writing this function. I can't express
+	 * what a PAIN IN MY GIRLDICK getting these values right was. I pray
+	 * that you (and I) never have to touch this logic again.
+	 */
 	function crop(): Promise<File> {
 		return new Promise<File>((resolve, reject) => {
 			const image = new Image();
 			image.onload = () => {
 				const canvas = document.createElement("canvas")
 				canvas.width = preview.getBoundingClientRect().width;
-				canvas.height = canvas.width * (1 / aspectRatio!);
+				canvas.height = canvas.width * (1 / cropAspectRatio());
 				const ctx = canvas.getContext('2d')!;
 				const factor = preview.naturalWidth / canvas.width;
 				ctx.drawImage(

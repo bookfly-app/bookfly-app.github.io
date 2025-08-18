@@ -1,31 +1,92 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import Background from "../../components/Background.svelte";
+	import { onMount } from "svelte";
+	import { searchBooks, type Book } from "../../api/bookapi";
+	import { searchPosts, type Post } from "../../api/postapi";
+	import { searchUsers, type User } from "../../api/userapi";
 	import Footer from "../../components/Footer.svelte";
+	import Loading from "../../components/Loading.svelte";
 	import Page from "../../components/Page.svelte";
+	import AnyPost from "../../components/posts/AnyPost.svelte";
+	import UserListing from "../../components/UserListing.svelte";
 	import theme from "../../themes/theme.svelte";
+	import { getFile } from "../../api/storageapi";
+	import { user } from "../../backend/auth.svelte";
+	import SearchIcon from "../../assets/images/icons/SearchIcon.svelte";
+	import Wallflower from "../../assets/images/icons/Wallflower.svelte";
+	import PersonIcon from "../../assets/images/icons/PersonIcon.svelte";
+	import Sidebar from "../../components/Sidebar.svelte";
 
 	let search;
+	let sidebar: Sidebar;
 
-	let { data }: { data: { searchTerm: string } } = $props();
+	let view: "posts" | "books" | "people" = $state(new URLSearchParams(window.location.search).get("view") as any ?? "posts");
 
-	let view: "posts" | "books" | "people" = $state("posts");
+	let searchTerm: string = $state("");
 
-	let searchTerm: string;
+	async function doSearch() {
+		const params = new URLSearchParams({ term: searchTerm, view });
+		goto(`/search?${params}`);
+
+		if (view === "posts") posts = searchPosts(searchTerm);
+		if (view === "books") books = searchBooks(searchTerm);
+		if (view === "people") users = searchUsers(searchTerm);
+	}
+
+	onMount(() => {
+		if (searchTerm) doSearch();
+	});
+
+	let searchTimeout: number | null = $state(null);
 
 	function handleSearch(event: KeyboardEvent) {
 		if (event.key === "Enter") {
-			goto(`/search/${searchTerm.replace(" ", "+")}`);
+			if (searchTimeout) clearTimeout(searchTimeout)
+			doSearch();
+		} else {
+			if (searchTimeout) clearTimeout(searchTimeout)
+			searchTimeout = setTimeout(doSearch, 3000) as unknown as number;
+		}
+	}
+
+	let posts: Promise<Post[]> = $state(Promise.resolve([]));
+	let books: Promise<Book[]> = $state(Promise.resolve([]));
+	let users: Promise<User[]> = $state(Promise.resolve([]));
+
+	function setView(viewName: "posts" | "books" | "people") {
+		return function() {
+			const params = new URLSearchParams({ view: viewName });
+			if (searchTerm) params.set("term", searchTerm);
+			goto(`/search?${params}`);
+			view = viewName;
 		}
 	}
 </script>
 
-<Background />
 <Page>
+	<nav>
+		<div class="banner">
+			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
+				{#if user()}
+					{#await getFile(user()!.picture) then pfp}
+						<img alt="Your profile" src={pfp} class="profile-link" />
+					{/await}
+				{:else}
+					<PersonIcon stroke="var(--overlay-1)" style="width: 2.5rem;" />
+				{/if}
+			</button>
+
+			<button>
+				<Wallflower style="width: 2rem; height: 2rem;" stroke="var(--overlay-1)" />
+			</button>
+
+			<a class="search" href="/search">
+				<SearchIcon style="width: 2rem; height: 2rem;" stroke="var(--subtext-1)" />
+			</a>
+		</div>
+	</nav>
 	<section>
 		<input
-			style:background={theme().backgroundDark}
-			style:color={theme().textBright}
 			type="text"
 			bind:value={searchTerm}
 			onkeyup={handleSearch}
@@ -33,17 +94,169 @@
 		/>
 
 		<div class="views" style:border-color={theme().textDark}>
-			<button style:color={view === "posts" ? theme().textBright : theme().textDull} onclick={() => (view = "posts")}>Posts</button>
-			<button style:color={view === "books" ? theme().textBright : theme().textDull} onclick={() => (view = "books")}>Books</button>
-			<button style:color={view === "people" ? theme().textBright : theme().textDull} onclick={() => (view = "people")}>People</button>
+			<button class={view === "posts" ? "selected" : ""} onclick={setView("posts")}>Posts</button>
+			<button class={view === "books" ? "selected" : ""} onclick={setView("books")}>Books</button>
+			<button class={view === "people" ? "selected" : ""} onclick={setView("people")}>People</button>
 		</div>
 	</section>
+		{#if view === "posts"}
+			{#await posts}
+				<div class="loading">
+					<h1 style:color={theme().text}>Loading posts...</h1>
+					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+					<Loading />
+				</div>
+			{:then posts}
+				{#if posts.length === 0}
+					<div class="loading">
+						<h1 style:color={theme().text}>No posts found</h1>
+						<p style:color={theme().textDull}>
+							No posts were found relating to your search term. Make sure you spelled everything right!
+						</p>
+					</div>
+				{/if}
+				{#each posts as post}
+					<AnyPost {post} />
+				{/each}
+			{/await}
+		{:else if view === "books"}
+			{#await books}
+				<div class="loading">
+					<h1 style:color={theme().text}>Loading books...</h1>
+					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+					<Loading />
+				</div>
+			{:then books}
+				{#if books.length === 0}
+					<div class="loading">
+						<h1 style:color={theme().text}>No books found</h1>
+						<p style:color={theme().textDull}>
+							No books were found relating to your search term. Make sure you spelled everything right!
+						</p>
+					</div>
+				{/if}
+				<div class="books">
+					{#each books as book}
+						<a href={`/book/${book.isbn}`} class="book" style:border-color={theme().textDark}>
+							<div class="book-info">
+								<h1 style:color={theme().textBright}>
+									{book.title}
+								</h1>
+								<h2 style:color={theme().textDim}>
+									{book.authors.join(", ")}
+								</h2>
+							</div>
+							{#if book.cover}
+								<img alt={`Cover for ${book.title}`} class="cover" src={book.cover} />
+							{:else}
+								<div
+									class="nocover"
+									style:background-image={`linear-gradient(${theme().accent}, ${theme().accent2})`}
+									style:color={theme().backgroundDark}
+								>
+									?
+								</div>
+							{/if}
+						</a>
+					{/each}
+				</div>
+			{/await}
+		{:else if view === "people"}
+			{#await users}
+				<div class="loading">
+					<h1 style:color={theme().text}>Loading accounts...</h1>
+					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+				</div>
+			{:then users}
+				{#if users.length === 0}
+					<div class="loading">
+						<h1 style:color={theme().text}>No users found</h1>
+						<p style:color={theme().textDull}>
+							No users were found relating to your search term. Make sure you spelled everything right!
+						</p>
+					</div>
+				{/if}
+				<div class="people">
+					{#each users as user}
+						<UserListing {user} />
+					{/each}
+				</div>
+			{/await}
+		{/if}
 	<Footer selected="search" />
+	<Sidebar bind:this={sidebar} />
 </Page>
 
 <style>
 	section {
 		padding-top: 1rem;
+		background-color: var(--crust);
+		margin-top: 4rem;
+	}
+
+	.loading {
+		padding-top: 2rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		padding-left: 3rem;
+		padding-right: 3rem;
+		text-align: center;
+
+		h1 {
+			font-size: 1.5rem;
+		}
+
+		p {
+			font-size: 0.85rem;
+		}
+	}
+
+	a {
+		text-decoration: none;
+	}
+
+	.book {
+		display: flex;
+		padding-left: 2rem;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+		padding-right: 2rem;
+		border-bottom-width: 1px;
+		border-bottom-style: solid;
+
+		.nocover {
+			width: 3.25rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 2rem;
+			font-weight: bold;
+		}
+
+		.book-info {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+		}
+
+		.cover,
+		.nocover {
+			margin-left: auto;
+			height: 5rem;
+		}
+	}
+
+	.books {
+		display: flex;
+		flex-direction: column;
+
+		h1,
+		h2 {
+			font-weight: normal;
+			font-size: 1rem;
+		}
 	}
 
 	.views {
@@ -57,6 +270,15 @@
 
 		> * {
 			padding-bottom: 0.75rem;
+			border-color: var(--lavender);
+			color: var(--overlay-1);
+			padding-left: 1rem;
+			padding-right: 1rem;
+
+			&.selected {
+				color: var(--text);
+				border-bottom: 3px solid var(--lavender);
+			}
 		}
 	}
 
@@ -67,5 +289,36 @@
 		padding-left: 1.5rem;
 		padding-top: 0.75rem;
 		padding-bottom: 0.75rem;
+		background-color: var(--base);
+		color: var(--subtext-1);
+	}
+
+	.banner {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 1rem;
+
+		button {
+			background-size: cover;
+			background-position: center;
+			overflow: hidden;
+
+			img {
+				border-radius: 50%;
+				width: 3rem;
+				height: 3rem;
+			}
+		}
+	}
+
+	nav {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		max-width: var(--max-width);
+		background: var(--crust);
+		position: fixed;
+		top: 0px;
 	}
 </style>

@@ -104,7 +104,7 @@
 		</div>
 
 		{#if window.innerWidth < window.innerHeight}
-			<button onclick={() => (sidebar.style.left = "-83vw")}>
+			<button onclick={hide}>
 				<CloseIcon stroke={theme().textBright} style="width: 1.5rem; height: 1.5rem; position: absolute; top: 1.5rem; right: 1.5rem;" />
 			</button>
 		{/if}

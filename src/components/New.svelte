@@ -1,12 +1,15 @@
 <script lang="ts">
 	import PlusIcon from "../assets/images/icons/PlusIcon.svelte";
+	import { user } from "../backend/auth.svelte";
 	import theme, { accentGradient } from "../themes/theme.svelte";
 </script>
 
-<div></div>
-<a href="/new" style:background={accentGradient()} style:color={theme().backgroundDark}>
-	<PlusIcon stroke={theme().backgroundDark} style="width: 2rem;" />
-</a>
+{#if user()}
+	<div></div>
+	<a href="/new" style:background={accentGradient()} style:color={theme().backgroundDark}>
+		<PlusIcon stroke={theme().backgroundDark} style="width: 2rem;" />
+	</a>
+{/if}
 
 <style>
 	a {

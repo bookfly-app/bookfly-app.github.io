@@ -24,7 +24,7 @@
 		<PaintBrushIcon style="width: 1.5rem; height: 1.5rem;" stroke={theme().textBright} />
 		<span style:color={theme().textBright}>Appearance</span>
 	</a>
-	<a href="/settings/about">
+	<a href="/about">
 		<InfoIcon style="width: 1.5rem; height: 1.5rem;" stroke={theme().textBright} />
 		<span style:color={theme().textBright}>About</span>
 	</a>
@@ -54,7 +54,7 @@
 		font-size: 1rem;
 		display: flex;
 		align-items: center;
-		gap: 2rem;
+		gap: 1rem;
 		padding: 1rem;
 		padding-left: 2rem;
 	}

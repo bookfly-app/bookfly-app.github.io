@@ -1,5 +1,6 @@
 <script>
-	import theme from "../themes/theme.svelte";
+	import { getFile } from "../api/storageapi";
+import theme from "../themes/theme.svelte";
 
 	let { user } = $props();
 </script>
@@ -9,7 +10,9 @@
 	class="book"
 	style:border-color={theme().textDark}
 >
-	<img class="profile-picture" src={user.picture} />
+	{#await getFile(user.picture) then pfp}
+		<img class="profile-picture" src={pfp} />
+	{/await}
 	<div class="person-info-wrapper">
 		<div class="person-info">
 			<h1 style:color={theme().textBright}>

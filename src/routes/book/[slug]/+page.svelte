@@ -18,10 +18,6 @@
 	let sidebar: Sidebar;
 	let isInReadingList = $derived(user()?.readingList.includes(book.isbn) ?? false)
 
-	$effect(() => {
-		console.log($state.snapshot(user()?.readingList));
-	});
-	
 	async function addToReadingList() {
 		const readingList = user()!.readingList;
 		updateUser({ readingList: [...readingList, book.isbn]  })

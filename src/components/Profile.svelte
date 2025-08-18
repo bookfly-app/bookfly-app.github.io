@@ -20,9 +20,11 @@
 	import RadioInput from "./RadioInput.svelte";
 	import { cssVar } from "../api/themes.svelte";
 	import { getFile } from "../api/storageapi";
+	import Sidebar from "./Sidebar.svelte";
 
 	let props = $props();
 	let profileUser: User = props.user;
+	let sidebar: Sidebar = props.sidebar;
 
 	let view: "all" | "books" | "discussion" | "activity" | "list" = $state(new URLSearchParams(window.location.search).get("view") as any ?? "all");
 
@@ -149,7 +151,7 @@
 	{#await getFile(profileUser.banner) then bnr}
 		<div class="banner" style:background-image={`url("${bnr}")`}></div>
 	{/await}
-	<button class="back-arrow">
+	<button class="back-arrow" onclick={() => sidebar.show()}>
 		<LeftArrowIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem;" />
 	</button>
 	<div class="profile">
@@ -319,7 +321,7 @@
 						{#if showFullReviews}
 							<AnyPost {post} />
 						{:else}
-							<BookListing book={post.books[0]} rating={post.rating} user={profileUser} />
+							<BookListing book={post.books[0]} rating={post.rating} user={profileUser} onclick={() => goto(`/post/${post.id}`)} />
 						{/if}
 					{/each}
 				{/await}

@@ -41,8 +41,8 @@
 	<h2>Team &amp; Values</h2>
 	<p>
 		Wallflower is still led by its original creator,
-		<a href="/profile/vi">@vi</a>
-		, a nonbinary reader and writer. Wallflower will always support kindness, acceptance, diversity, equity, and inclusion.
+		<a href="/profile/vi">@vi</a>, 
+		a nonbinary reader and writer. Wallflower will always support kindness, acceptance, diversity, equity, and inclusion.
 	</p>
 	<p>Currently, Wallflower has no other team members.</p>
 
@@ -50,12 +50,12 @@
 	<h2>Moderation</h2>
 	<p>
 		The Wallflower team moderates content posted to Wallflower. Harmful and hateful content will be removed. Wallflower also may remove content that's
-		off-topic. Posting repeatedly with zero relation to books or writing may get your account flagged. This was designed to be a safe and cozy
+		off-topic&mdash;Posting repeatedly with no relation to books or writing may get your account flagged. Wallflower was designed to be a safe and cozy
 		space for people to talk about and discover books. Nothing more, nothing less.
 	</p>
 	<p>
 		Wallflower will never remove relevant constructive content based on opinion. Users are free to share as much dislike and distaste for books,
-		writing styles, and author's specific works or styles. Do not attack authors as people. Criticize the works, not the people.
+		writing styles, and author's specific works or styles. Do not attack authors themselves. Criticize the works, not the people.
 	</p>
 	<p>
 		These moderation rules are loosely defined. Each situation will be handled by a case-by-case basis and judged by Wallflower's moderators, who are
@@ -65,44 +65,19 @@
 		If your account was suspended or banned and you feel it was wrongful, you can submit an appeal. Your content will be reviewed and a secondary,
 		more thorough judgement will be passed to you.
 	</p>
-	<!-- <!-- Technical Details -->
-	<!-- <h2 style:color={theme().text}>Technical Details</h2> -->
-	<!-- <p style:color={theme().textDull}> -->
-	<!-- 	On the front end, Wallflower is written using -->
-	<!-- 	<a href="https://svelte.dev/">Svelte</a> -->
-	<!-- 	and -->
-	<!-- 	<a href="https://svelte.dev/docs/kit/introduction">Sveltekit</a> -->
-	<!-- 	for the web (flavored with -->
-	<!-- 	<a href="https://www.typescriptlang.org/">TypeScript</a> -->
-	<!-- 	and bundled with -->
-	<!-- 	<a href="https://bun.sh/">Bun</a> -->
-	<!-- 	), and ported to mobile with -->
-	<!-- 	<a href="https://v2.tauri.app/">Tauri</a> -->
-	<!-- 	. -->
-	<!-- </p> -->
-	<!-- <p style:color={theme().textDull}> -->
-	<!-- 	In the back, Wallflower uses <a href="https://firebase.google.com/">Firebase</a> -->
-	<!-- 	to store data and manage authentication. -->
-	<!-- </p> -->
-	<!-- <p style:color={theme().textDull}> -->
-	<!-- 	This stack was chosen by -->
-	<!-- 	<a href="/profile/vi">@vi</a> -->
-	<!-- 	in the very beginning, somewhat arbitrarily and based on limited experience. The goal was a simple but powerful stack that allowed seamless porting -->
-	<!-- 	between platforms. -->
-	<!-- </p> -->
-	<!-- Legal -->
 	<h2>Legal</h2>
-	<p>Wallflower is open source, meaning anyone can view and contribute to the code that makes up the project.</p>
+	<p>Wallflower is open source, meaning anyone can view and contribute to its code
+		(<a href="https://github.com/wallflower-app/wallflower-app.github.io">here</a>, if you're curious).
+	</p>
 	<p>
-		Wallflower is licensed as <i>all rights reserved</i>
-		, meaning you are legally not allowed to use, copy, or distribute its code without explicit authorization from its creator,
-		<a href="/profile/vi">@vi</a>
-		.
+		Wallflower is licensed as <i>all rights reserved</i>, 
+		meaning you are legally not allowed to use, copy, or distribute its code without explicit authorization from its creator,
+		<a href="/profile/vi">@vi</a>.
 	</p>
 
 	<p>
-		You are freely allowed to contact <a href="/profile/vi">@vi</a>
-		to ask for permission to use Wallflower's code for some specific circumstance.
+		You are free to contact <a href="/profile/vi">@vi</a>
+		to ask for permission to use Wallflower's code for some specific circumstance. I don't bite, I promise.
 	</p>
 	<Footer selected="profile" />
 </Page>

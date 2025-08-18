@@ -38,7 +38,6 @@ type ThemeName = typeof themes extends (infer T)[]
 
 export function setTheme(name: ThemeName): void {
 	const theme = themes.find(theme => theme.name === name)!;
-	console.log("setting");
 
 	Array.from(document.querySelectorAll("*[data-theme]")).forEach(element => element.remove());
 

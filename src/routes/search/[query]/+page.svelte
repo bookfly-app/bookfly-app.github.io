@@ -83,7 +83,7 @@
 			{#await posts}
 				<div class="loading">
 					<h1 style:color={theme().text}>Loading posts...</h1>
-					<p style:color={theme().textDull}>We promise Bookfly will be faster soon.</p>
+					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
 				</div>
 			{:then posts}
 				{#if posts.length === 0}
@@ -102,7 +102,7 @@
 			{#await books}
 				<div class="loading">
 					<h1 style:color={theme().text}>Loading books...</h1>
-					<p style:color={theme().textDull}>We promise Bookfly will be faster soon.</p>
+					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
 				</div>
 			{:then books}
 				{#if books.length === 0}
@@ -143,7 +143,7 @@
 			{#await users}
 				<div class="loading">
 					<h1 style:color={theme().text}>Loading accounts...</h1>
-					<p style:color={theme().textDull}>We promise Bookfly will be faster soon.</p>
+					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
 				</div>
 			{:then users}
 				{#if users.length === 0}

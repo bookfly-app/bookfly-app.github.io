@@ -173,7 +173,7 @@
 				<button class="edit-profile" onclick={() => goto("/profile/edit")}>
 					Edit Profile
 				</button>
-			{:else}
+			{:else if user()}
 				<!-- Profile actions -->
 				<div class="profile-actions">
 					<button class="profile-action-follow">
@@ -280,7 +280,7 @@
 	{#await posts}
 		<div class="loading">
 			<h1>Loading posts...</h1>
-			<p>We promise Bookfly will be faster soon.</p>
+			<p>We promise Wallflower will be faster soon.</p>
 		</div>
 	{:then posts}
 		{#if view === "discussion"}
@@ -400,6 +400,7 @@
 	section {
 		min-height: 100%;
 		position: relative;
+		background-color: var(--crust);
 	}
 
 	.follows {

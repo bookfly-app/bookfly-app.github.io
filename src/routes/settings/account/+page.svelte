@@ -31,7 +31,7 @@
 			<WrenchIcon style="width: 1.25rem; height: 1.25rem;" stroke={theme().textBright} />
 			<span style:color={theme().textBright}>Become a moderator</span>
 		</div>
-		<p style:color={theme().textDull}>Bookfly is powered by volunteering moderators who keep Bookfly content safe, relevant, and accessible.</p>
+		<p style:color={theme().textDull}>Wallflower is powered by volunteering moderators who keep Wallflower content safe, relevant, and accessible.</p>
 	</a>
 
 	<!-- Become a developer -->
@@ -41,7 +41,7 @@
 			<span style:color={theme().textBright}>Become a developer</span>
 		</div>
 		<p style:color={theme().textDull}>
-			Bookfly is a non-profit organization powered by volunteers. Paying positions are currently not available.
+			Wallflower is a non-profit organization powered by volunteers. Paying positions are currently not available.
 		</p>
 	</a>
 

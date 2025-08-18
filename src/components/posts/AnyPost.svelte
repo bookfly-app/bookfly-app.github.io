@@ -165,10 +165,10 @@
 	 * @returns A promise that resolves when the database is finished updating.
 	 */
 	async function toggleLike() {
-		liked = liked.then(liked => !liked);
+		liked = !liked;
 
 		// Liking the post
-		if (await liked) {
+		if (liked) {
 			likes = likes.then(likes => likes + 1);
 			await likePost(post);
 		}
@@ -212,10 +212,10 @@
 	 * reflect the shared post. The This needn't be awaited to update the UI.
 	 */
 	async function share() {
-		navigator.clipboard.writeText(`https://bookfly-app.github.io/post/${post.id}`);
+		navigator.clipboard.writeText(`https://wallflower.land/post/${post.id}`);
 		shareNotification.show();
-		if (!(await shared)) shares = shares.then(shares => shares + 1);
-		shared = Promise.resolve(true);
+		if (!shared) shares = shares.then(shares => shares + 1);
+		shared = true;
 		await sharePost(post);
 	}
 </script>

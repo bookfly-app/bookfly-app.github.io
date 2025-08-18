@@ -408,8 +408,8 @@ export async function unlikePost(post: Post): Promise<void> {
  * @returns A promise that, when resolved, returns whether or not the current user liked
  * the given post.
  */
-export async function didLike(post: Post): Promise<boolean> {
-	return user()!.likes.includes(post.id);
+export function didLike(post: Post): boolean {
+	return user()?.likes.includes(post.id) ?? false;
 }
 
 /**
@@ -424,8 +424,8 @@ export async function didLike(post: Post): Promise<boolean> {
  * @returns A promise that, when resolved, returns whether or not the current user shared
  * the given post.
  */
-export async function didShare(post: Post): Promise<boolean> {
-	return user()!.shares.includes(post.id);
+export function didShare(post: Post): boolean {
+	return user()?.shares.includes(post.id) ?? false;
 }
 
 /**
@@ -439,15 +439,15 @@ export async function didShare(post: Post): Promise<boolean> {
  * to the given post.
  */
 export async function didComment(post: Post): Promise<boolean> {
-	return (
-		(
-			await getDocs(
-				query(
-					collection(db, "posts"),
-					where("parent", "==", post.id),
-					where("poster", "==", user()!.id),
-				),
-			)
-		).docs.length > 0
-	);
+	return user()
+		? (
+				await getDocs(
+					query(
+						collection(db, "posts"),
+						where("parent", "==", post.id),
+						where("poster", "==", user()!.id),
+					),
+				)
+			).docs.length > 0
+		: false;
 }

@@ -60,5 +60,6 @@
 		border-left-width: 1px;
 		border-right-width: 1px;
 		position: relative;
+		background-color: var(--base);
 	}
 </style>

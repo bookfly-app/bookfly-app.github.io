@@ -41,7 +41,7 @@
 			{#if user()}
 				<img alt="Your profile" src={user()!.picture ?? ""} class="profile-link" />
 			{:else}
-				<PersonIcon stroke={theme().textDull} style="width: 5rem;" />
+				<PersonIcon stroke={theme().textDull} style="width: 4rem; height: 4rem;" />
 			{/if}
 		</a>
 		<div>
@@ -127,7 +127,6 @@
 
 			&:last-child {
 				margin-top: auto;
-				margin-bottom: 0.5rem;
 			}
 		}
 	}

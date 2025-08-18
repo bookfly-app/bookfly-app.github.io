@@ -16,7 +16,7 @@
 				style:height="{size * 1.5}rem"
 				style:border-radius="{size / 2}rem"
 				href="/settings/account/become-a-developer"
-				title="{forUser.displayName} is a Bookfly developer"
+				title="{forUser.displayName} is a Wallflower developer"
 				class="badge dev"
 			>
 				<DeveloperIcon stroke={theme().backgroundDark} style="width: {size}rem;" />
@@ -40,7 +40,7 @@
 				style:height="{size * 1.5}rem"
 				style:border-radius="{size / 2}rem"
 				href="/settings/account/become-a-moderator"
-				title="{forUser.displayName} is a Bookfly moderator"
+				title="{forUser.displayName} is a Wallflower moderator"
 				class="badge mod"
 			>
 				<WrenchIcon stroke={theme().backgroundDark} style="width: {size * 0.8}rem;" />

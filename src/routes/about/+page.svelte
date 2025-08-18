@@ -1,21 +1,20 @@
 <script>
-	import BackButton from "../../../components/BackButton.svelte";
-	import Background from "../../../components/Background.svelte";
-	import Footer from "../../../components/Footer.svelte";
-	import Page from "../../../components/Page.svelte";
-	import theme from "../../../themes/theme.svelte";
+	import BackButton from "../../components/BackButton.svelte";
+	import Background from "../../components/Background.svelte";
+	import Footer from "../../components/Footer.svelte";
+	import Page from "../../components/Page.svelte";
+	import theme from "../../themes/theme.svelte";
 </script>
 
 <Background />
 <Page class="about">
 	<span class="heading">
-		<BackButton href="/settings" />
-		<h1>About</h1>
+		<BackButton href="/" />
 	</span>
 
 	<div class="definition">
 		<span>
-			<h2>Wall&middot;flow&middot;er</h2>
+			<h2 class="wallflower"><i>Wall&middot;flow&middot;er</i></h2>
 			<span class="ipa" aria-label="US IPA">&#x2F;&#x2C8;w&#x0251;l;&#x02D0;fla&#x028A;.&#x0259;r&#x2F;</span>
 		</span>
 		<p class="body">
@@ -25,11 +24,12 @@
 		</p>
 	</div>
 
+	<h2>About</h2>
 	<p style:color={theme().textDull}>
 		Wallflower is a non-profit organization originally created by
 		<a href="/profile/vi">@vi</a>
 		as a passion project in college. The name <i>Wallflower</i> comes from 
-		<a href="/profile/vi">@vi</a>'s favorite book, 
+		<a href="/profile/vi">@vi</a>'s favorite book 
 		<a href="/book/9780671027346"><i>The Perks of Being a Wallflower</i></a>
 		by Stephen Chbosky.
 	</p>
@@ -43,7 +43,7 @@
 	<p style:color={theme().textDull}>
 		Wallflower is still led by its original creator,
 		<a href="/profile/vi">@vi</a>
-		, a nonbinary reader, writer, and developer (sort of). Wallflower will always support kindness, acceptance, diversity, equity, and inclusion.
+		, a nonbinary reader and writer. Wallflower will always support kindness, acceptance, diversity, equity, and inclusion.
 	</p>
 	<p style:color={theme().textDull}>Currently, Wallflower has no other team members.</p>
 
@@ -66,8 +66,7 @@
 		If your account was suspended or banned and you feel it was wrongful, you can submit an appeal. Your content will be reviewed and a secondary,
 		more thorough judgement will be passed to you.
 	</p>
-
-	<!-- <!-- Technical Details --> -->
+	<!-- <!-- Technical Details -->
 	<!-- <h2 style:color={theme().text}>Technical Details</h2> -->
 	<!-- <p style:color={theme().textDull}> -->
 	<!-- 	On the front end, Wallflower is written using -->
@@ -92,8 +91,6 @@
 	<!-- 	in the very beginning, somewhat arbitrarily and based on limited experience. The goal was a simple but powerful stack that allowed seamless porting -->
 	<!-- 	between platforms. -->
 	<!-- </p> -->
-	<!---->
-
 	<!-- Legal -->
 	<h2 style:color={theme().text}>Legal</h2>
 	<p style:color={theme().textDull}>Wallflower is open source, meaning anyone can view and contribute to the code that makes up the project.</p>
@@ -129,10 +126,6 @@
 		}
 	}
 
-	h1 {
-		color: var(--text);
-	}
-
 	.heading {
 		display: flex;
 		gap: 1rem;
@@ -140,12 +133,13 @@
 	}
 
 	.definition {
+		margin-top: 0.5rem;
 		padding-top: 1rem;
 		color: var(--overlay-1);
 		display: flex;
 		flex-direction: column;
-		border-bottom: 1px solid var(--surface-0);
-		border-top: 1px solid var(--surface-0);
+		border-bottom: 1px solid var(--overlay-1);
+		border-top: 1px solid var(--overlay-1);
 		padding-bottom: 1rem;
 
 		span {
@@ -154,8 +148,9 @@
 			gap: 1rem;
 		}
 
-		h2 {
+		h2, h2 > i {
 			color: var(--subtext-1);
+			font-family: "Garamond";
 		}
 
 		.body {
@@ -165,5 +160,11 @@
 				color: var(--surface-2);
 			}
 		}
+	}
+
+	h2:not(.wallflower) {
+		color: var(--subtext-1);
+		margin-bottom: -0.5rem;
+		margin-top: 0.5rem;
 	}
 </style>

@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
+	import { onMount } from "svelte";
+	import { getFile } from "../api/storageapi";
 	import BookmarkIcon from "../assets/images/icons/BookmarkIcon.svelte";
 	import CloseIcon from "../assets/images/icons/CloseIcon.svelte";
 	import EmptyHomeIcon from "../assets/images/icons/EmptyHomeIcon.svelte";
 	import EnterIcon from "../assets/images/icons/EnterIcon.svelte";
 	import ExitIcon from "../assets/images/icons/ExitIcon.svelte";
 	import GearIcon from "../assets/images/icons/GearIcon.svelte";
+	import InfoIcon2 from "../assets/images/icons/InfoIcon2.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import ProfileIcon from "../assets/images/icons/ProfileIcon.svelte";
 	import { logOut, user } from "../backend/auth.svelte";
@@ -15,12 +18,22 @@
 
 	export function show() {
 		sidebar.style.left = "0px";
+		overlayDisplay = "block";
+		overlayOpacity = 0.5;
+	}
+
+	export function hide() {
+		sidebar.style.left = window.innerHeight > window.innerWidth ? "-17rem" : "-23rem";
+		overlayOpacity = 0;
+		setTimeout(() => {
+			overlayDisplay = "none";
+		}, 200);
 	}
 
 	function nav(to: string) {
 		return function () {
 			goto(to);
-			sidebar.style.left = window.innerHeight > window.innerWidth ? "-17rem" : "-23rem";
+			hide();
 		};
 	}
 
@@ -28,8 +41,37 @@
 		logOut();
 		goto("/");
 	}
+
+	let overlayOpacity = $state(0);
+	let overlayDisplay = $state("none");
+
+	onMount(() => {
+		let touchStartX = 0;
+		let touchEndX = 0;
+
+		const SWIPE_THRESHOLD = 30;
+		const EDGE_ZONE = 100;
+
+		document.addEventListener("touchstart", (event) => {
+			touchStartX = event.touches[0].clientX;
+		});
+
+		document.addEventListener("touchmove", (event) => {
+			touchEndX = event.touches[0].clientX;
+		});
+
+		document.addEventListener("touchend", () => {
+			const swipeDistance = touchEndX - touchStartX;
+			if (touchStartX < EDGE_ZONE && swipeDistance > SWIPE_THRESHOLD) {
+				show();
+			}
+		});
+	});
 </script>
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div onclick={hide} class="overlay" style:opacity={overlayOpacity} style:display={overlayDisplay}></div>
 <section
 	style:background-image={`linear-gradient(${theme().background}, ${theme().backgroundDim})`}
 	style:border-color={theme().textDark}
@@ -39,7 +81,9 @@
 	<div class="profile" style:background={theme().backgroundDark}>
 		<a class="profile-picture" href="/profile" aria-label="Go to profile">
 			{#if user()}
-				<img alt="Your profile" src={user()!.picture ?? ""} class="profile-link" />
+				{#await getFile(user()!.picture) then pfp}
+					<img alt="Your profile" src={pfp} class="profile-link" />
+				{/await}
 			{:else}
 				<PersonIcon stroke={theme().textDull} style="width: 4rem; height: 4rem;" />
 			{/if}
@@ -82,6 +126,10 @@
 	<button class="listing" style:color={theme().text} onclick={nav("/settings")}>
 		<GearIcon stroke={theme().text} style="width: 1.5rem;" />
 		Settings
+	</button>
+	<button class="listing" style:color={theme().text} onclick={nav("/about")}>
+		<InfoIcon2 stroke={theme().text} style="width: 1.5rem;" />
+		About
 	</button>
 
 	{#if user()}
@@ -152,7 +200,6 @@
 		border-bottom-style: solid;
 		border-bottom-width: 1px;
 		padding-bottom: 2rem;
-		margin-bottom: 0.5rem;
 		display: flex;
 		align-items: center;
 
@@ -183,5 +230,15 @@
 			width: 20rem;
 			left: -23rem;
 		}
+	}
+
+	.overlay {
+		position: fixed;
+		top: 0px;
+		left: 0px;
+		width: 100dvw;
+		height: 100dvh;
+		background-color: black;
+		transition: opacity 0.2s;
 	}
 </style>

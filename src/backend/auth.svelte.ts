@@ -7,7 +7,7 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 } from "firebase/auth";
-import { collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { collection, doc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { internalUserToUser, resolveUser, type InternalUser, type User } from "../api/userapi";
 import initializeFirebase from "./backend";
 
@@ -79,13 +79,11 @@ export async function logOut(): Promise<unknown | null> {
 }
 
 export async function updateUser(userInfo: Partial<User>) {
-	let user = { ...currentUser!, ...userInfo };
-	await setDoc(doc(db, "users", user.id), user);
+	await updateDoc(doc(db, "users", user()!.id), userInfo);
 }
 
 export async function updateOtherUser(user: User, userInfo: Partial<User>) {
-	let newUser = { ...user, ...userInfo };
-	await setDoc(doc(db, "users", newUser.id), newUser);
+	await setDoc(doc(db, "users", user.id), userInfo);
 }
 
 export async function signUp(

@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { getPostFromId, getReplies, post, type Post, type PostId } from "../../../api/postapi";
-	import { serializeImage } from "../../../api/serializer";
+	import { getFile } from "../../../api/storageapi";
 	import AddImageIcon from "../../../assets/images/icons/AddImageIcon.svelte";
 	import SendIcon from "../../../assets/images/icons/SendIcon.svelte";
 	import { user } from "../../../backend/auth.svelte";
 	import Background from "../../../components/Background.svelte";
 	import Footer from "../../../components/Footer.svelte";
 	import ImageCarousel from "../../../components/ImageCarousel.svelte";
+	import ImagePicker from "../../../components/ImagePicker.svelte";
 	import Page from "../../../components/Page.svelte";
 	import AnyPost from "../../../components/posts/AnyPost.svelte";
 	import theme from "../../../themes/theme.svelte";
@@ -41,9 +42,7 @@
 	let replyBody = $state("");
 
 	let imageAttachment: FileList | null = $state(null);
-	let images = $derived(
-		imageAttachment ? Promise.all(Array.from(imageAttachment).map(image => serializeImage(image as Blob))) : Promise.resolve([]),
-	);
+	let images: string[] = $state([]);
 
 	async function sendReply() {
 		let body = replyBody;
@@ -52,7 +51,7 @@
 			body,
 			type: "reply",
 			parent: (await thePost)!.id,
-			...(imageAttachment && { pictures: await images }),
+			...(imageAttachment && { pictures: images }),
 		});
 		newReplies = [replyPost, ...newReplies];
 		imageAttachment = null;
@@ -67,7 +66,9 @@
 		{#if user()}
 			<div style:padding-bottom={imageAttachment === null ? "0rem" : "2.5rem"} style:border-color={theme().textDark} class="reply">
 				<a aria-label="Go to profile" href="/profile">
-					<img alt="Your profile" src={user()?.picture} />
+					{#await getFile(user()!.picture) then pfp}
+						<img alt="Your profile" src={pfp} />
+					{/await}
 				</a>
 
 				<div class="reply-body">
@@ -81,15 +82,13 @@
 						placeholder="Leave a reply"
 					></textarea>
 
-					{#await images then images}
-						<ImageCarousel {images} />
-					{/await}
+					<ImageCarousel {images} />
 
 					<div style:bottom={imageAttachment === null ? "1.4rem" : "-2rem"} title="Post" class="send">
 						<label for="attach-image-reply">
 							<AddImageIcon stroke={theme().textDull} style="width: 1.5rem;" />
 						</label>
-						<input multiple bind:files={imageAttachment} id="attach-image-reply" type="file" class="attach-image" />
+						<ImagePicker id="attach-image-reply" onupload={imageId => images.push(imageId)} />
 
 						<button onmousedown={sendReply}>
 							<SendIcon stroke={theme().textDull} style="width: 1.5rem;" />
@@ -184,10 +183,6 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
-		}
-
-		.attach-image {
-			display: none;
 		}
 	}
 </style>

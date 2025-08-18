@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { deserializeImage, type Image } from "../api/serializer";
 	import TriangleLeftIcon from "../assets/images/icons/TriangleLeftIcon.svelte";
 	import TriangleRight from "../assets/images/icons/TriangleRight.svelte";
 
-	let { images }: { images: Image[] } = $props();
+	let { images }: { images: string[] } = $props();
 
 	let imageIndex = $state(0);
 	function cycleImage(amount: number) {
@@ -15,7 +14,7 @@
 	<div class="images" style:margin-left="{imageIndex * -23}rem">
 		{#each images as image}
 			<div class="media-wrapper">
-				<img alt="user content" src={deserializeImage(image)} />
+				<img alt="user content" src={image} />
 			</div>
 		{/each}
 	</div>

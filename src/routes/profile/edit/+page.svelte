@@ -17,12 +17,16 @@
 		username = user.username;
 		bio = user.bio;
 		pronouns = user.pronouns;
+		picture = user.picture;
+		banner = user.banner;
 	});
 
 	let displayName = $state("");
+	let banner = $state("");
 	let username = $state("");
 	let bio = $state("");
 	let pronouns = $state("");
+	let picture = $state("")
 
 	let usernameErrorList = $derived(usernameErrors(username));
 
@@ -48,25 +52,27 @@
 		await goto("/profile");
 		location.reload();
 	}
+
 </script>
 
 <Background />
 <Page>
+	<BackButton style="position: absolute; top: 0.5rem; left: 0.5rem;"/>
 	{#await awaitUser then currentUser}
 		<!-- Banner -->
-		<button class="banner" style:background-image="url('{currentUser.banner}')">
-			<BackButton style="position: absolute; top: 0.5rem; left: 0.5rem;"/>
+		<label for="set-banner" class="banner" style:background-image="url('{currentUser.banner}')">
 			<div class="overlay"></div>
 			<EditIcon
 				stroke="#CCCCFF"
 				style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 3rem; height: 3rem; z-index: 4;"
 			/>
-		</button>
+		</label>
+		<ImagePicker id="set-banner" bind:imageId={banner} />
 
 		<div class="profile">
 			<div>
 				<!-- Profile Picture -->
-				{#await getFile(currentUser.picture) then pfp}
+				{#await getFile(picture) then pfp}
 					<label for="set-profile-picture" class="profile-picture" style:border-color={theme().background} style:background-image="url('{pfp}')">
 						<div class="overlay"></div>
 						<EditIcon
@@ -75,7 +81,7 @@
 						/>
 					</label>
 				{/await}
-				<ImagePicker id="set-profile-picture" />
+				<ImagePicker id="set-profile-picture" bind:imageId={picture} />
 
 				<button class="save" style:background="linear-gradient({theme().accent}, {theme().accent2})" onclick={update}>Save</button>
 			</div>
@@ -99,11 +105,9 @@
 					bind:this={usernameInput}
 				/>
 			</div>
-			{#await usernameErrorList then usernameErrorList}
 				{#each usernameErrorList as usernameError}
 					<span class="error">{usernameError}</span>
 				{/each}
-			{/await}
 			{#if usernameTaken}
 				<span class="error">Username already taken</span>
 			{/if}
@@ -206,6 +210,8 @@
 		position: absolute;
 		background-size: cover;
 		background-position: center;
+		left: 0px;
+		top: 0px;
 	}
 
 	.error {
@@ -250,7 +256,7 @@
 
 	input:not(#username),
 	textarea,
-	label,
+	label:not(.banner),
 	.profile-picture {
 		margin-left: 2rem;
 		font-size: 0.85rem;

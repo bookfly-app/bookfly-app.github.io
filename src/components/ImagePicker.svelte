@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import { updateUser } from "../backend/auth.svelte";
-	import { goto } from "$app/navigation";
 	import { uploadFile } from "../api/storageapi";
 
 	let files: FileList | null = $state(null);
@@ -9,22 +7,36 @@
 	let previewDiv: HTMLElement;
 	let input: HTMLInputElement;
 
-	let { aspectRatio = null, ...rest } = $props();
+	let { 
+		aspectRatio = undefined, 
+		onupload = (_imageId: string) => {}, 
+		imageId = $bindable(null),
+		...rest 
+	}: {
+		aspectRatio?: number;
+		onupload?: (imageId: string) => void;
+		imageId?: string | null;
+		[key: string]: unknown
+	} = $props();
 
 	let scale = $state(2);
 
 	async function upload() {
 		if (!file) return;
 		const cropped = await crop(file, parseInt(cropperLeft), parseInt(cropperTop), parseInt(cropperWidth), parseInt(cropperHeight));
-		const fileId = (await uploadFile(cropped))!;
-		await updateUser({ picture: fileId })
-		goto("/profile");
+		imageId = (await uploadFile(cropped))!;
+		onupload(imageId);
+		reset();
 	}
 
-	function cancel() {
+	function reset() {
 		files = null;
 		file = null;
 		previewDiv.style.display = "none";
+	}
+
+	function cancel() {
+		reset();
 	}
 
 	function chooseAgain() {

@@ -13,14 +13,23 @@
 	import Sidebar from "../components/Sidebar.svelte";
 	import theme from "../themes/theme.svelte";
 	import Wallflower from "../assets/images/icons/Wallflower.svelte";
+	import { getFile } from "../api/storageapi";
 
 	initializeFirebase();
 
 	let view: "following" | "for you" = $state("following");
 
-	let followedPosts = $derived(user() ? getFollowedPosts(user()!, true) : Promise.resolve([]));
+	let followedPosts = $derived(user() ? getFollowedPosts(user()!, true).then(posts => posts.toSorted((a, b) => b.timestamp - a.timestamp)) : Promise.resolve([]));
 
 	let sidebar: Sidebar;
+	let spinLogo = $state(false);
+
+	function spin() {
+		if (!spinLogo) {
+			spinLogo = true;
+			setTimeout(() => spinLogo = false, 2000);
+		}
+	}
 </script>
 
 <Background />
@@ -30,15 +39,21 @@
 		<div class="banner">
 			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
 				{#if user()}
-					<img alt="Your profile" src={user()!.picture ?? ""} class="profile-link" />
+					{#await getFile(user()!.picture) then pfp}
+						<img alt="Your profile" src={pfp} class="profile-link" />
+					{/await}
 				{:else}
-					<PersonIcon stroke={theme().textDull} style="width: 2.5rem;" />
+					<PersonIcon stroke="var(--overlay-1)" style="width: 2.5rem;" />
 				{/if}
 			</button>
-			<button>
-				<Wallflower style="width: 2rem; height: 2rem;" stroke="var(--overlay-1)" />
+
+			<button onclick={spin}>
+				<Wallflower class={spinLogo ? "spin" : ""} style="width: 2rem; height: 2rem;" stroke="var(--overlay-1)" />
 			</button>
-			<SearchIcon style="width: 2rem; height: 2rem;" stroke="var(--text)" />
+
+			<a class="search" href="/search">
+				<SearchIcon style="width: 2rem; height: 2rem;" stroke="var(--subtext-1)" />
+			</a>
 		</div>
 	</nav>
 
@@ -115,6 +130,25 @@
 
 	.footer-padding {
 		height: 4rem;
+	}
+
+	.search {
+		padding-bottom: 1rem;
+	}
+
+	@keyframes spin {
+		from {
+			rotate: 0deg;
+		}
+
+		to {
+			rotate: 360deg;
+		}
+	}
+	
+	:global(.spin) {
+		animation-name: spin;
+		animation-duration: 2s;
 	}
 
 	.views {

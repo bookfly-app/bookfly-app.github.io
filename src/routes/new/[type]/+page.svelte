@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import { format, post, type PostType } from "../../../api/postapi";
-	import Background from "../../../components/Background.svelte";
 	import Page from "../../../components/Page.svelte";
-	import Footer from "../../../components/Footer.svelte";
 	import theme from "../../../themes/theme.svelte";
 	import { searchBooks, type Book } from "../../../api/bookapi";
 	import Select from "../../../components/Select.svelte";
@@ -158,7 +156,6 @@
 	</div>
 {/snippet}
 
-<Background />
 <Page class="new-post-page">
 
 	<span>
@@ -233,8 +230,6 @@
 	>
 		Post
 	</button>
-
-	<Footer selected="profile" />
 </Page>
 
 <style>

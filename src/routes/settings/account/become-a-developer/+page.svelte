@@ -1,7 +1,6 @@
 
 <script>
 	import BackButton from "../../../../components/BackButton.svelte";
-	import Footer from "../../../../components/Footer.svelte";
 	import Page from "../../../../components/Page.svelte";
 </script>
 
@@ -37,7 +36,6 @@
 		between platforms.
 	</p>
 	Legal
-	<Footer selected="profile" />
 </Page>
 
 <style>

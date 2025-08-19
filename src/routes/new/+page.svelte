@@ -1,12 +1,9 @@
 <script lang="ts">
-	import Background from "../../components/Background.svelte";
-	import Footer from "../../components/Footer.svelte";
 	import theme, { accentGradient } from "../../themes/theme.svelte";
 	import Page from "../../components/Page.svelte";
 	import BackButton from "../../components/BackButton.svelte";
 </script>
 
-<Background />
 <Page class="new-page">
 	<BackButton style="position: absolute; left: 1rem; top: 1rem;" href="/profile" />
 
@@ -38,8 +35,6 @@
 		If you rate a book, it'll automatically mark it as finished. Only post an update when you
 		finish a book if you don't want to rate it.
 	</p>
-
-	<Footer selected="profile" />
 </Page>
 
 <style>

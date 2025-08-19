@@ -101,10 +101,10 @@
 				</div>
 				<BookCover {book} style="width: 10rem" />
 				{#await getBookRating(book.isbn) then { rating, count } }
-					<span class="rating">
+					<button class="rating" onclick={setView("discussion")}>
 						<StarRating {rating} /> {rating.toFixed(1)}
 						<span class="count">({count})</span>
-					</span>
+					</button>
 				{/await}
 				<p class="description" style:color={theme().textDull}>
 					{makeReadable(book.description)}

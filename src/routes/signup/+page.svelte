@@ -73,7 +73,7 @@
 	});
 </script>
 
-<Page>
+<Page type="profile">
 	<main>
 		<BackButton style="position: absolute; top: 1rem; left: 1rem;"/>
 		<div class="header">
@@ -81,13 +81,12 @@
 			<a href="/about">Wait, what <i>is</i> wallflower.land?</a>
 		</div>
 		<p class="warning">
-			<strong>Hold up!</strong> wallflower.land is still in alpha, and probably
-			has lots of bugs cuz vi is a really shitty programmer. if you want to
-			continue, just be aware that things will break :p
+			<strong>Hold up!</strong> wallflower.land is still in alpha, and bugs
+			may be present. Proceed with the knowledge that stuff might break.
 			<br />
 			<br />
 			(wallflower.land is secure, and despite any bugs, your information is
-			guaranteed to be kept safe)
+			guaranteed to be kept safe.)
 		</p>
 
 		<div>
@@ -105,6 +104,7 @@
 					bind:value={username}
 					style:outline={usernameValid ? "none" : "2px solid var(--red)"}
 					onblur={checkUsernameAvailability}
+					autocomplete="off"
 				/>
 				{#each usernameErrorList as error}
 					<span class="error">{error}</span>
@@ -112,7 +112,7 @@
 				{#if !usernameIsAvailable}
 					<span class="error">Username is taken.</span>
 				{/if}
-				<p>You can change this at any time.</p>
+				<p class="canchange">You can change this at any time.</p>
 			</div>
 
 			<div class="section">
@@ -167,7 +167,6 @@
 			Create Account
 		</button>
 	</main>
-	<Footer selected="profile" />
 </Page>
 
 <style>
@@ -195,6 +194,10 @@
 		background: #202000;
 		border-radius: 0.5rem;
 		box-shadow: 0px 0px 0.5rem var(--yellow), inset 0px 0px 0.5rem var(--yellow);
+	}
+
+	.canchange {
+		padding-bottom: 0.5rem;
 	}
 
 	.section {

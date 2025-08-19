@@ -58,8 +58,7 @@
 	}
 </script>
 
-<Background />
-<Page class="post">
+<Page type="search" class="post">
 	{#await thePost then post}
 		<AnyPost post={post!} postpage />
 
@@ -109,7 +108,6 @@
 			</div>
 		{/await}
 	{/await}
-	<Footer selected="search" />
 </Page>
 
 <style>

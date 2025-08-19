@@ -5,7 +5,6 @@
 	import EditIcon from "../../../assets/images/icons/EditIcon.svelte";
 	import { updateUser, usernameIsTaken } from "../../../backend/auth.svelte";
 	import BackButton from "../../../components/BackButton.svelte";
-	import Footer from "../../../components/Footer.svelte";
 	import ImagePicker from "../../../components/ImagePicker.svelte";
 	import Page from "../../../components/Page.svelte";
 	import RadioInput from "../../../components/RadioInput.svelte";
@@ -53,7 +52,7 @@
 	}
 </script>
 
-<Page>
+<Page type="profile">
 	<BackButton style="position: absolute; top: 0.5rem; left: 0.5rem;"/>
 	{#await awaitUser then currentUser}
 		<!-- Banner -->
@@ -162,8 +161,6 @@
 	{/await}
 
 	<button class="save-bottom" style:background="linear-gradient({theme().accent}, {theme().accent2})" onclick={update}>Save</button>
-
-	<Footer selected="profile" />
 </Page>
 
 <style>

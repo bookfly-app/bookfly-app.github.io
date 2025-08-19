@@ -13,7 +13,7 @@
 	let sidebar: Sidebar = $state(null!);
 </script>
 
-<Page bind:sidebar>
+<Page bind:sidebar type="profile">
 	{#await userProfile then userProfile}
 		{#if userProfile}
 			<Profile {sidebar} user={userProfile} />
@@ -23,7 +23,6 @@
 		{/if}
 	{/await}
 	<div></div>
-	<Footer selected="profile" />
 </Page>
 
 <style>

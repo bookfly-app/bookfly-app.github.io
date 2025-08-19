@@ -9,7 +9,6 @@
 	import theme from "../../../themes/theme.svelte";
 </script>
 
-<Background />
 <Page class="settings">
 	<span class="settings-header">
 		<BackButton />

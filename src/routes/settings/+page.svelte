@@ -3,13 +3,10 @@
 	import InfoIcon from "../../assets/images/icons/InfoIcon.svelte";
 	import PaintBrushIcon from "../../assets/images/icons/PaintBrushIcon.svelte";
 	import BackButton from "../../components/BackButton.svelte";
-	import Background from "../../components/Background.svelte";
-	import Footer from "../../components/Footer.svelte";
 	import Page from "../../components/Page.svelte";
 	import theme from "../../themes/theme.svelte";
 </script>
 
-<Background />
 <Page class="settings">
 	<span class="settings-header">
 		<BackButton href="/" />
@@ -28,7 +25,6 @@
 		<InfoIcon style="width: 1.5rem; height: 1.5rem;" stroke={theme().textBright} />
 		<span style:color={theme().textBright}>About</span>
 	</a>
-	<Footer selected="profile" />
 </Page>
 
 <style>

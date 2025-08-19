@@ -10,7 +10,6 @@
 	let showMyPostsInFollowing = true;
 </script>
 
-<Background />
 <Page class="settings">
 	<span class="settings-header">
 		<button
@@ -50,7 +49,6 @@
 			<span style:color={theme().textDull}>{otherTheme.name}</span>
 		</button>
 	{/each}
-	<Footer selected="profile" />
 </Page>
 
 <style>

@@ -11,7 +11,6 @@
 		<CatIcon stroke="var(--mantle)" style="width: 50; height: 50%; margin-left: auto; margin-right: auto; margin-top: 2rem;"/>
 		<a href="/">Go to Wallflower Home</a>
 	</section>
-	<Footer selected="profile" />
 </Page>
 
 <style>

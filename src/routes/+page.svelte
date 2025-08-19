@@ -5,7 +5,6 @@
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
 	import { user } from "../backend/auth.svelte";
 	import initializeFirebase from "../backend/backend";
-	import Footer from "../components/Footer.svelte";
 	import New from "../components/New.svelte";
 	import Page from "../components/Page.svelte";
 	import AnyPost from "../components/posts/AnyPost.svelte";
@@ -13,8 +12,6 @@
 	import theme from "../themes/theme.svelte";
 	import Wallflower from "../assets/images/icons/Wallflower.svelte";
 	import { getFile } from "../api/storageapi";
-
-	initializeFirebase();
 
 	let view: "following" | "for you" = $state(user() ? "following" : "for you");
 
@@ -32,7 +29,7 @@
 	}
 </script>
 
-<Page bind:sidebar>
+<Page bind:sidebar type="home">
 	<nav>
 		<div class="banner">
 			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
@@ -99,9 +96,7 @@
 		{/if}
 		<div class="footer-padding"></div>
 	</section>
-
 	<New />
-	<Footer selected="home" />
 </Page>
 
 <style>

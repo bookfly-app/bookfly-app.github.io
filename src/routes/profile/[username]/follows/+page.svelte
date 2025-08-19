@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { getUserFromId, getUserFromUsername, getFollowers } from "../../../../api/userapi";
-	import { user } from "../../../../backend/auth.svelte";
 	import Background from "../../../../components/Background.svelte";
 	import Footer from "../../../../components/Footer.svelte";
-	import New from "../../../../components/New.svelte";
 	import Page from "../../../../components/Page.svelte";
 	import UserListing from "../../../../components/UserListing.svelte";
 	import theme from "../../../../themes/theme.svelte";
@@ -18,8 +16,7 @@
 	let followers = profileUser.then(user => getFollowers(user));
 </script>
 
-<Background />
-<Page>
+<Page type="profile">
 	{#await profileUser then}
 		<div class="view" style:background={theme().backgroundDark}>
 			{#await following then following}
@@ -56,9 +53,6 @@
 			{/await}
 		{/if}
 	{/await}
-
-
-	<Footer selected="profile" />
 </Page>
 
 <style>

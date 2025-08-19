@@ -15,12 +15,3 @@
 		}
 	});
 </script>
-
-<Background />
-<Page>
-	{#if user()}
-		<Profile user={user()!} />
-	{/if}
-	<New />
-	<Footer selected="profile" />
-</Page>

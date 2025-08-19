@@ -68,7 +68,7 @@
 	}
 </script>
 
-<Page bind:sidebar>
+<Page bind:sidebar type="search">
 	<nav>
 		<div class="banner">
 			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
@@ -111,112 +111,111 @@
 			<button class={view === "people" ? "selected" : ""} onclick={setView("people")}>Users</button>
 		</div>
 	</section>
-		{#if view === "posts"}
-			{#await posts}
+	{#if view === "posts"}
+		{#await posts}
+			<div class="loading">
+				<h1 style:color={theme().text}>Loading posts...</h1>
+				<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+				<Loading />
+			</div>
+		{:then posts}
+			{#if searchTerm == ""}
 				<div class="loading">
-					<h1 style:color={theme().text}>Loading posts...</h1>
-					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
-					<Loading />
+					<h1 style:color={theme().text}>Search for a post</h1>
+					<p style:color={theme().textDull}>
+						Enter your search term to find relevant posts.
+					</p>
 				</div>
-			{:then posts}
-				{#if searchTerm == ""}
-					<div class="loading">
-						<h1 style:color={theme().text}>Search for a post</h1>
-						<p style:color={theme().textDull}>
-							Enter your search term to find relevant posts.
-						</p>
-					</div>
-				{:else if posts.length === 0}
-					<div class="loading">
-						<h1 style:color={theme().text}>No posts found</h1>
-						<p style:color={theme().textDull}>
-							No posts were found relating to your search term. Make sure you spelled everything right!
-						</p>
-					</div>
-				{/if}
-				{#each posts as post}
-					<AnyPost {post} />
-				{/each}
-			{/await}
-		{:else if view === "books"}
-			{#await books}
+			{:else if posts.length === 0}
 				<div class="loading">
-					<h1 style:color={theme().text}>Loading books...</h1>
-					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
-					<Loading />
+					<h1 style:color={theme().text}>No posts found</h1>
+					<p style:color={theme().textDull}>
+						No posts were found relating to your search term. Make sure you spelled everything right!
+					</p>
 				</div>
-			{:then books}
-				{#if searchTerm == ""}
-					<div class="loading">
-						<h1 style:color={theme().text}>Search for a book</h1>
-						<p style:color={theme().textDull}>
-							Enter your search term to find relevant books.
-						</p>
-					</div>
-				{:else if books.length === 0}
-					<div class="loading">
-						<h1 style:color={theme().text}>No books found</h1>
-						<p style:color={theme().textDull}>
-							No books were found relating to your search term. Make sure you spelled everything right!
-						</p>
-					</div>
-				{/if}
-				<div class="books">
-					{#each books as book}
-						<a href={`/book/${book.isbn}`} class="book" style:border-color={theme().textDark}>
-							<div class="book-info">
-								<h1 style:color={theme().textBright}>
-									{book.title}
-								</h1>
-								<h2 style:color={theme().textDim}>
-									{book.authors.join(", ")}
-								</h2>
+			{/if}
+			{#each posts as post}
+				<AnyPost {post} />
+			{/each}
+		{/await}
+	{:else if view === "books"}
+		{#await books}
+			<div class="loading">
+				<h1 style:color={theme().text}>Loading books...</h1>
+				<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+				<Loading />
+			</div>
+		{:then books}
+			{#if searchTerm == ""}
+				<div class="loading">
+					<h1 style:color={theme().text}>Search for a book</h1>
+					<p style:color={theme().textDull}>
+						Enter your search term to find relevant books.
+					</p>
+				</div>
+			{:else if books.length === 0}
+				<div class="loading">
+					<h1 style:color={theme().text}>No books found</h1>
+					<p style:color={theme().textDull}>
+						No books were found relating to your search term. Make sure you spelled everything right!
+					</p>
+				</div>
+			{/if}
+			<div class="books">
+				{#each books as book}
+					<a href={`/book/${book.isbn}`} class="book" style:border-color={theme().textDark}>
+						<div class="book-info">
+							<h1 style:color={theme().textBright}>
+								{book.title}
+							</h1>
+							<h2 style:color={theme().textDim}>
+								{book.authors.join(", ")}
+							</h2>
+						</div>
+						{#if book.cover}
+							<img alt={`Cover for ${book.title}`} class="cover" src={book.cover} />
+						{:else}
+							<div
+								class="nocover"
+								style:background-image={`linear-gradient(${theme().accent}, ${theme().accent2})`}
+								style:color={theme().backgroundDark}
+							>
+								?
 							</div>
-							{#if book.cover}
-								<img alt={`Cover for ${book.title}`} class="cover" src={book.cover} />
-							{:else}
-								<div
-									class="nocover"
-									style:background-image={`linear-gradient(${theme().accent}, ${theme().accent2})`}
-									style:color={theme().backgroundDark}
-								>
-									?
-								</div>
-							{/if}
-						</a>
-					{/each}
-				</div>
-			{/await}
-		{:else if view === "people"}
-			{#await users}
+						{/if}
+					</a>
+				{/each}
+			</div>
+		{/await}
+	{:else if view === "people"}
+		{#await users}
+			<div class="loading">
+				<h1 style:color={theme().text}>Loading accounts...</h1>
+				<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+			</div>
+		{:then users}
+			{#if searchTerm == ""}
 				<div class="loading">
-					<h1 style:color={theme().text}>Loading accounts...</h1>
-					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+					<h1 style:color={theme().text}>Search for a user</h1>
+					<p style:color={theme().textDull}>
+						Enter your search term to find relevant users.
+					</p>
 				</div>
-			{:then users}
-				{#if searchTerm == ""}
-					<div class="loading">
-						<h1 style:color={theme().text}>Search for a user</h1>
-						<p style:color={theme().textDull}>
-							Enter your search term to find relevant users.
-						</p>
-					</div>
-				{:else if users.length === 0}
-					<div class="loading">
-						<h1 style:color={theme().text}>No users found</h1>
-						<p style:color={theme().textDull}>
-							No users were found relating to your search term. Make sure you spelled everything right!
-						</p>
-					</div>
-				{/if}
-				<div class="people">
-					{#each users as user}
-						<UserListing {user} />
-					{/each}
+			{:else if users.length === 0}
+				<div class="loading">
+					<h1 style:color={theme().text}>No users found</h1>
+					<p style:color={theme().textDull}>
+						No users were found relating to your search term. Make sure you spelled everything right!
+					</p>
 				</div>
-			{/await}
-		{/if}
-	<Footer selected="search" />
+			{/if}
+			<div class="people">
+				{#each users as user}
+					<UserListing {user} />
+				{/each}
+			</div>
+		{/await}
+	{/if}
 </Page>
 
 <style>

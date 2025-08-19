@@ -92,7 +92,6 @@
 		You are free to contact <a href="/profile/vi">@vi</a>
 		to ask for permission to use Wallflower's code for some specific circumstance. I don't bite, I promise.
 	</p>
-	<Footer selected="profile" />
 </Page>
 
 <style>

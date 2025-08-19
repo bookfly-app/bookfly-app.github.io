@@ -26,4 +26,38 @@ body {
 button,
 label {
 	cursor: pointer;
+
+	* {
+		cursor: pointer;
+	}
+}
+
+/* 
+ * dear lord, this is hilarious to me.
+ *
+ * on firefox, when you autofill a form value, it sets the background
+ * to this horrendous yellow. 
+ *
+ * come to find out, you cant just override that background color; firefox
+ * just doesnt let you.
+ *
+ * so i do some digging n stumble across THIS ANSWER:
+ *
+ * https://stackoverflow.com/a/79433914 
+ *
+ * which makes this css rule that says "i know we cant stop you from
+ * changing the background, but we can change the *time* it takes to
+ * change the background, so im just going to set that to infinity."
+ *
+ * so, yeah, it *is* trying to change the background, just that... it
+ * takes an infinite amount of time. god, what a stupid problem and a
+ * stupid workaround.
+ *
+ * one must imagine firefox sisyphus happy
+ */
+input:autofill {
+	transition:
+		background-color calc(infinity * 1s) step-end,
+		background-image calc(infinity * 1s) step-end allow-discrete,
+		color calc(infinity * 1s) step-end;
 }

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { getBookDiscussions } from "../../../api/bookapi";
-	import SearchIcon from "../../../assets/images/icons/SearchIcon.svelte";
+	import { getBookDiscussions, getBookRating } from "../../../api/bookapi";
 	import { updateUser, user } from "../../../backend/auth.svelte";
-	import Background from "../../../components/Background.svelte";
-	import Footer from "../../../components/Footer.svelte";
+	import BackButton from "../../../components/BackButton.svelte";
+	import BookCover from "../../../components/BookCover.svelte";
 	import Page from "../../../components/Page.svelte";
 	import AnyPost from "../../../components/posts/AnyPost.svelte";
 	import Sidebar from "../../../components/Sidebar.svelte";
+	import StarRating from "../../../components/StarRating.svelte";
 	import theme, { accentGradient } from "../../../themes/theme.svelte.js";
 
 	let { data } = $props();
@@ -14,8 +14,15 @@
 
 	let view: "info" | "discussion" = $state("info");
 
+	function setView(viewName: "info" | "discussion") {
+		return function() {
+			view = viewName;
+			content.scrollTop = 0;
+		}
+	}
+
 	let discussions = getBookDiscussions(book.isbn);
-	let sidebar: Sidebar;
+	let sidebar: Sidebar = $state(null!);
 	let isInReadingList = $derived(user()?.readingList.includes(book.isbn) ?? false)
 
 	async function addToReadingList() {
@@ -36,62 +43,90 @@
 
 		let sentences = description.split(/([.!?])\s*/);
 
-		let sentenceArray = [];
-		for (let i = 0; i < sentences.length; i += 2) {
-			sentenceArray.push(sentences[i] + sentences[i + 1]);
+		const sentenceArray = [];
+		for (let sentenceNumber = 0; sentenceNumber < sentences.length; sentenceNumber += 2) {
+			const punctuation = sentenceNumber < sentences.length - 1 ? sentences[sentenceNumber + 1] : "";
+			sentenceArray.push(sentences[sentenceNumber] + punctuation);
 		}
 
-		let formattedText = sentenceArray
-			.map((sentence, index) => {
+		const mapped = sentenceArray.map((sentence, index) => {
 				if ((index + 1) % interval === 0 && index !== sentenceArray.length - 1) {
 					return sentence + "\n\n";
 				}
 				return sentence;
-			})
-			.join("");
+			});
 
+		let formattedText = mapped.join("");
 		formattedText = formattedText.replaceAll(/\.(\S)/g, (_match, letter) => `. ${letter}`);
 
 		return formattedText;
 	}
+
+	let content: HTMLElement;
 </script>
 
-<Background />
-<Page style="overflow-y: hidden;">
+<Page type="search" bind:sidebar>
+	<BackButton style="position: fixed; top: 1rem; left: 1rem;" />
+
 	<nav style:background={theme().backgroundDark}>
-		<div class="banner">
-			<button style:background-image={`url("${user()?.picture ?? ""}")`} onclick={() => sidebar.show()} aria-label="Open sidebar"></button>
-			<div class="book-name">
-				<h1 style:color={theme().textBright}>{book.title}</h1>
-				<h2 style:color={theme().textDim}>{book.authors.join(", ")}</h2>
-			</div>
-			<SearchIcon style="width: 2rem; height: 2rem;" stroke={theme().textBright} />
+		<div class="book-name">
+			<h1 style:color={theme().textBright}>{book.title}</h1>
+			<h2 style:color={theme().textDim}>{book.authors.join(", ")}</h2>
 		</div>
-	</nav>
-	<section>
-		<div style:background-color={theme().backgroundDark} class="views">
+		<div class="views">
 			<button
 				style:color={view === "info" ? theme().textBright : theme().textDull}
 				style:border-bottom-color={view === "info" ? theme().accent : "transparent"}
-				onclick={() => (view = "info")}
+				onclick={setView("info")}
 			>
 				Info
 			</button>
 			<button
 				style:color={view === "discussion" ? theme().textBright : theme().textDull}
 				style:border-bottom-color={view === "discussion" ? theme().accent : "transparent"}
-				onclick={() => (view = "discussion")}
+				onclick={setView("discussion")}
 			>
 				Discussion
 			</button>
 		</div>
-
+	</nav>
+	<section bind:this={content}>
 		{#if view === "info"}
 			<div class="book-info">
-				<img alt={`${book.title} cover`} class="cover" src={book.cover} />
+				<div class="title">
+					<h1>{book.title}</h1>
+					{#if book.authors.length > 0}
+						<h2>{book.authors[0]}</h2>
+					{/if}
+				</div>
+				<BookCover {book} style="width: 10rem" />
+				{#await getBookRating(book.isbn) then { rating, count } }
+					<span class="rating">
+						<StarRating {rating} /> {rating.toFixed(1)}
+						<span class="count">({count})</span>
+					</span>
+				{/await}
 				<p class="description" style:color={theme().textDull}>
 					{makeReadable(book.description)}
 				</p>
+			</div>
+			<div class="product-info">
+				<h2>Product Information</h2>
+				<span><span>Title: </span>{book.title}</span>
+				<span>
+					<span>Author{book.authors.length === 1 ? "" : "s"}: </span>
+					<span>
+						{#each book.authors as author, index (author)}
+							<a href="/author">{author}</a>{#if index !== book.authors.length - 1},{/if}
+						{/each}
+					</span>
+				</span>
+				<span><span>ISBN-13: </span>{book.isbn}</span>
+				<span><span>Page Count: </span>{book.pageCount}</span>
+				<span><span>Publish Date: </span>{book.publishDate}</span>
+				<span><span>Publisher{book.publishers.length === 1 ? "" : "s"}: </span>{book.publishers.join(", ")}</span>
+				<span><span>Characters: </span>{book.characters.join(", ")}</span>
+				<span><span>Tags: </span>{book.genres.join(", ")}</span>
 			</div>
 		{:else if view === "discussion"}
 			{#await discussions then discussions}
@@ -113,10 +148,6 @@
 			{/if}
 		{/if}
 	</section>
-
-
-	<Footer selected="search" />
-	<Sidebar bind:this={sidebar} />
 </Page>
 
 <style>
@@ -125,7 +156,50 @@
 		flex-direction: column;
 		align-items: center;
 		height: 100%;
-		overflow-y: scroll;
+	}
+
+	.rating {
+		display: flex;
+		align-items: center;
+		color: var(--subtext-1);
+		gap: 0.5rem;
+		font-size: 0.85rem;
+
+		.count {
+			color: var(--surface-2);
+		}
+	}
+
+	.product-info {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		padding: 1.5rem;
+		gap: 0.25rem;
+		margin-top: 0.5rem;
+
+		h2 {
+			color: var(--subtext-1);
+			margin-bottom: 0.5rem;
+		}
+
+		span {
+			font-size: 0.85rem;
+		}
+
+		> span {
+			color: var(--overlay-1);
+
+			a {
+				color: var(--blue);
+				text-decoration: none;
+			}
+
+			> span {
+				color: var(--subtext-1);
+				padding-right: 0.25rem;
+			}
+		}
 	}
 
 	#add-to-reading-list {
@@ -146,19 +220,40 @@
 	}
 
 	.book-info {
-		margin-top: 2rem;
+		margin-top: 1rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1.5rem;
+		gap: 1rem;
+
+		.title {
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			gap: 0.25rem;
+			padding-bottom: 0.5rem;
+
+			h1 {
+				color: var(--text);
+				font-weight: normal;
+				text-align: center;
+				font-size: 1.5rem;
+			}
+
+			h2 {
+				color: var(--overlay-1);
+				font-size: 1rem;
+			}
+		}
 	}
 
 	.views {
 		width: 100%;
-		display: flex;
-		justify-content: space-between;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
 		padding-right: 2rem;
 		padding-left: 2rem;
+		background-color: var(--crust);
 
 		button {
 			border-bottom-width: 2px;
@@ -182,33 +277,19 @@
 	nav {
 		display: flex;
 		flex-direction: column;
+		position: sticky;
+		top: 0px;
+		gap: 1rem;
+		padding-top: 1rem;
 
 		h1 {
 			font-size: 1rem;
+			font-weight: normal;
 		}
 
 		h2 {
-			font-size: 1rem;
+			font-size: 0.85rem;
 		}
-	}
-
-	.banner {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 1rem;
-
-		button {
-			height: 3rem;
-			width: 3rem;
-			border-radius: 50%;
-			background-size: cover;
-			background-position: center;
-		}
-	}
-
-	.cover {
-		width: 10rem;
 	}
 
 	h2 {

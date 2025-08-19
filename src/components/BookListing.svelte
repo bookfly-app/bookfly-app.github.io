@@ -27,24 +27,18 @@
 </svelte:element>
 
 <style>
-
 	#outer {
 		position: relative;
 		cursor: pointer;
 		text-decoration: none;
 		display: flex;
-		height: 8rem;
+		height: 6rem;
 		padding: 1rem;
 		padding-left: 2rem;
 		align-items: center;
 		border-bottom-width: 1px;
 		border-bottom-style: solid;
 		justify-content: space-between;
-
-		img {
-			height: 100%;
-			aspect-ratio: 8/11;
-		}
 	}
 
 	.rating {
@@ -61,7 +55,7 @@
 	.book-info {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5em;
+		gap: 0.25rem;
 		width: 50%;
 
 		h1,
@@ -70,11 +64,11 @@
 		}
 
 		h1 {
-			font-size: 1rem;
+			font-size: 0.85rem;
 		}
 
 		h2 {
-			font-size: 0.85rem;
+			font-size: 0.75rem;
 		}
 	}
 </style>

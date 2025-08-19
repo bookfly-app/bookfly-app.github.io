@@ -3,12 +3,9 @@
 	import theme from "../themes/theme.svelte";
 	import Sidebar from "./Sidebar.svelte";
 	import { setTheme } from "../api/themes.svelte";
+	import Footer from "./Footer.svelte";
 
-	let { sidebar = $bindable(), ...props } = $props();
-	let children = props.children;
-
-	props = { ...props };
-	props.children = undefined;
+	let { sidebar = $bindable(), type = undefined, children, ...rest } = $props();
 
 	onMount(() => {
 		if (window.innerWidth > window.innerHeight) {
@@ -20,24 +17,19 @@
 </script>
 
 <div class="outer">
-	{#if window.innerWidth > window.innerHeight}
-		<Sidebar bind:this={sidebar} />
-	{/if}
-	<main style:border-color={theme().textDark} {...props}>
+	<Sidebar bind:this={sidebar} />
+	<main style:border-color={theme().textDark} {...rest}>
 		{@render children?.()}
 	</main>
-	{#if window.innerWidth > window.innerHeight}
-		<div class="inner"></div>
-	{/if}
 </div>
+<Footer selected={type} />
 
 <style>
 	.outer {
-		display: flex;
 		position: relative;
 		width: 100%;
-		height: 100%;
-		padding-bottom: 4rem;
+		height: calc(100% - 4rem);
+		overflow: hidden;
 
 		.inner {
 			width: 40%;

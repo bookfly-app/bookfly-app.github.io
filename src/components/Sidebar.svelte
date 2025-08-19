@@ -15,15 +15,16 @@
 	import theme from "../themes/theme.svelte";
 
 	let sidebar: HTMLElement;
+	let left = $state(window.innerHeight > window.innerWidth ? "-17rem" : "-23rem");
 
 	export function show() {
-		sidebar.style.left = "0px";
+		left = "0px";
 		overlayDisplay = "block";
 		overlayOpacity = 0.5;
 	}
 
 	export function hide() {
-		sidebar.style.left = window.innerHeight > window.innerWidth ? "-17rem" : "-23rem";
+		left = window.innerHeight > window.innerWidth ? "-17rem" : "-23rem";
 		overlayOpacity = 0;
 		setTimeout(() => {
 			overlayDisplay = "none";
@@ -73,12 +74,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div onclick={hide} class="overlay" style:opacity={overlayOpacity} style:display={overlayDisplay}></div>
-<section
-	style:background-image={`linear-gradient(${theme().background}, ${theme().backgroundDim})`}
-	style:border-color={theme().textDark}
-	bind:this={sidebar}
-	style:--hover={theme().textDark}
->
+<section style:left bind:this={sidebar}>
 	<div class="profile" style:background={theme().backgroundDark}>
 		<a class="profile-picture" href="/profile" aria-label="Go to profile">
 			{#if user()}
@@ -91,13 +87,13 @@
 		</a>
 		<div>
 			<a href="/profile">
-				<h1 style:color={theme().textBright}>
+				<h1>
 					{user()?.displayName ?? "Guest"}
 				</h1>
 			</a>
 			{#if user()}
 				<a href="/profile">
-					<h2 style:color={theme().textDim}>
+					<h2>
 						@{user()!.username}
 					</h2>
 				</a>
@@ -153,10 +149,10 @@
 		top: 0px;
 		display: flex;
 		flex-direction: column;
-		border-right-width: 1px;
-		border-right-style: solid;
+		border-right: 1px solid var(--surface-2);
 		transition: left 0.25s;
 		z-index: 999999;
+		background-image: linear-gradient(to bottom, var(--base), var(--mantle));
 
 		.listing {
 			text-decoration: none;
@@ -206,11 +202,14 @@
 
 		h1 {
 			font-size: 1rem;
+			color: var(--text);
+			font-weight: normal;
 		}
 
 		h2 {
 			font-weight: normal;
 			font-size: 0.85rem;
+			color: var(--overlay-1);
 		}
 
 		a {
@@ -222,14 +221,12 @@
 		section {
 			box-shadow: 0px 0px 10px black;
 			width: 15rem;
-			left: -17rem;
 		}
 	}
 
 	@media (orientation: landscape) {
 		section {
 			width: 20rem;
-			left: -23rem;
 		}
 	}
 
@@ -237,6 +234,7 @@
 		position: fixed;
 		top: 0px;
 		left: 0px;
+		z-index: 99;
 		width: 100dvw;
 		height: 100dvh;
 		background-color: black;

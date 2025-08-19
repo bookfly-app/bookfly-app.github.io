@@ -3,90 +3,64 @@
 	import { usernameErrors } from "../../api/userapi";
 	import { emailIsTaken, passwordErrors, signUp, user, usernameIsTaken } from "../../backend/auth.svelte";
 	import Footer from "../../components/Footer.svelte";
-	import theme from "../../themes/theme.svelte";
 	import Page from "../../components/Page.svelte";
+	import BackButton from "../../components/BackButton.svelte";
 
 	let email = $state("");
 	let password = $state("");
 	let password2 = $state("");
 	let username = $state("");
 
-	let usernameInput: HTMLInputElement;
-	let emailInput: HTMLInputElement;
-	let passwordInput: HTMLInputElement;
-	let passwordInput2: HTMLInputElement;
-
-	let passwordErrorList: string[] = $state([]);
-	let usernameErrorList: string[] = $state([]);
+	let passwordErrorList: string[] = $derived(passwordErrors(password));
+	let usernameErrorList: string[] = $derived(usernameErrors(username));
 	let emailErrorList: string[] = $state([]);
-	let passwordMatchError = $state(false);
+	let passwordMatchError = $derived(
+		password.length > 0 && 
+		password2.length > 0 && 
+		password !== password2
+	);
 
-	let usernameValid = $state(true);
-	let passwordValid = $state(true);
-	let password2Valid = $state(true);
+	let usernameIsAvailable = $state(true);
+	let emailIsAvailable = $state(true);
 
+	let usernameValid = $derived(usernameErrorList.length === 0 && usernameIsAvailable);
+	let emailValid = $derived(emailErrorList.length === 0 && emailIsAvailable);
+	let passwordValid = $derived(passwordErrorList.length === 0);
+	let password2Valid = $derived(!passwordMatchError);
+
+	let unknownError = $state(false);
 	let waiver = $state(false);
 
-	let valid = $derived(usernameValid && passwordValid && password2Valid && waiver);
+	let valid = $derived(
+		username.length > 0 &&
+		email.length > 0 &&
+		password.length > 0 &&
+		password2.length > 0 &&
+		usernameValid && 
+		passwordValid && 
+		password2Valid && 
+		waiver
+	);
 
-	function checkUsername() {
-		usernameErrorList = usernameErrors(username);
-		if (usernameErrorList.length > 0) {
-			usernameValid = false;
-			usernameInput.style.outline = "2px solid indianred";
-		} else {
-			usernameValid = true;
-			usernameInput.style.outline = "none";
-		}
+	async function checkEmailAvailability(): Promise<boolean> {
+		emailIsAvailable = email ? !await emailIsTaken(email) : true;
+		return emailIsAvailable;
 	}
 
-	async function checkEmail() {
-		emailErrorList = [];
-		emailInput.style.outline = "none";
-	}
-
-	function checkPassword() {
-		passwordErrorList = passwordErrors(password);
-		if (passwordErrorList.length > 0) {
-			passwordInput.style.outline = "2px solid indianred";
-			passwordValid = false;
-		} else {
-			passwordValid = true;
-			passwordInput.style.outline = "none";
-		}
-	}
-
-	function checkPasswordRetype() {
-		if (password !== password2) {
-			passwordValid = false;
-			passwordInput2.style.outline = "2px solid indianred";
-			passwordMatchError = true;
-		} else {
-			passwordValid = true;
-			passwordInput2.style.outline = "none";
-			passwordMatchError = false;
-		}
+	async function checkUsernameAvailability(): Promise<boolean> {
+		usernameIsAvailable = username ? !await usernameIsTaken(username) : true;
+		return usernameIsAvailable;
 	}
 
 	async function createAccount() {
-		if (!valid) {
-			return;
-		}
-
-		if (await usernameIsTaken(username)) {
-			usernameInput.style.outline = "2px solid indianred";
-			usernameErrorList.push("Username already taken");
-			return;
-		}
-
-		if (await emailIsTaken(email)) {
-			emailInput.style.outline = "2px solid indianred";
-			emailErrorList.push("Email already in use");
-			return;
-		}
+		if (!valid) return;
+		if (!await checkUsernameAvailability()) return;
+		if (!await checkEmailAvailability()) return;
 
 		let error = await signUp(email, password, username);
 		if (error) {
+			console.error(error);
+			unknownError = true;
 		} else {
 			goto("/profile");
 		}
@@ -101,70 +75,81 @@
 
 <Page>
 	<main>
-		<h1 style:color={theme().textBright}>Create Account</h1>
+		<BackButton style="position: absolute; top: 1rem; left: 1rem;"/>
+		<div class="header">
+			<h1>Create Account</h1>
+			<a href="/about">Wait, what <i>is</i> wallflower.land?</a>
+		</div>
 		<p class="warning">
 			<strong>Hold up!</strong> wallflower.land is still in alpha, and probably
 			has lots of bugs cuz vi is a really shitty programmer. if you want to
 			continue, just be aware that things will break :p
+			<br />
+			<br />
+			(wallflower.land is secure, and despite any bugs, your information is
+			guaranteed to be kept safe)
 		</p>
 
 		<div>
 			<div class="section">
-				<p style:color={theme().textDull}>Username</p>
+				{#if unknownError}
+					<span class="unknown error">
+						An unknown error occurred. Please refresh the
+						page and try again.
+					</span>
+				{/if}
+				<p>Username</p>
 				<input
-					bind:this={usernameInput}
-					oninput={checkUsername}
-					style:color={theme().text}
-					style:background={theme().backgroundDark}
 					type="text"
 					placeholder="Username"
 					bind:value={username}
+					style:outline={usernameValid ? "none" : "2px solid var(--red)"}
+					onblur={checkUsernameAvailability}
 				/>
 				{#each usernameErrorList as error}
 					<span class="error">{error}</span>
 				{/each}
+				{#if !usernameIsAvailable}
+					<span class="error">Username is taken.</span>
+				{/if}
+				<p>You can change this at any time.</p>
 			</div>
 
 			<div class="section">
-				<p style:color={theme().textDull}>Email</p>
+				<p>Email</p>
 				<input
 					type="text"
-					bind:this={emailInput}
-					oninput={checkEmail}
-					style:color={theme().text}
-					style:background={theme().backgroundDark}
 					placeholder="example@website.com"
 					bind:value={email}
+					style:outline={emailValid ? "none" : "2px solid var(--red)"}
+					onblur={checkEmailAvailability}
 				/>
 				{#each emailErrorList as error}
 					<span class="error">{error}</span>
 				{/each}
+				{#if !emailIsAvailable}
+					<span class="error">Email is already in use.</span>
+				{/if}
 			</div>
 			<div class="section">
-				<p style:color={theme().textDull}>Password</p>
+				<p>Password</p>
 				<input
-					style:color={theme().text}
-					style:background={theme().backgroundDark}
 					type="password"
 					placeholder="sUp3rS3cr37!"
-					oninput={checkPassword}
 					bind:value={password}
-					bind:this={passwordInput}
+					style:outline={passwordValid ? "none" : "2px solid var(--red)"}
 				/>
 				{#each passwordErrorList as error}
 					<span class="error">{error}</span>
 				{/each}
 			</div>
 			<div class="section">
-				<p style:color={theme().textDull}>Retype Password</p>
+				<p>Retype Password</p>
 				<input
-					style:color={theme().text}
-					style:background={theme().backgroundDark}
 					type="password"
-					oninput={checkPasswordRetype}
 					placeholder="sUp3rS3cr37!"
 					bind:value={password2}
-					bind:this={passwordInput2}
+					style:outline={password2Valid ? "none" : "2px solid var(--red)"}
 				/>
 				{#if passwordMatchError}
 					<span class="error">Passwords much match</span>
@@ -178,11 +163,7 @@
 			</div>
 		</div>
 
-		<button
-			style:color={theme().background}
-			style:background={valid ? `linear-gradient(${theme().accent}, ${theme().accent2})` : theme().backgroundDark}
-			onclick={createAccount}
-		>
+		<button disabled={!valid} onclick={createAccount}>
 			Create Account
 		</button>
 	</main>
@@ -191,12 +172,17 @@
 
 <style>
 	h1 {
-		margin-top: 2rem;
+		font-weight: normal;
+		color: var(--text);
 	}
 
 	.error {
 		font-size: 0.8rem;
 		color: var(--red);
+
+		&.unknown {
+			margin-bottom: 1rem;
+		}
 	}
 
 	.warning {
@@ -218,6 +204,7 @@
 
 		p {
 			font-size: 0.85rem;
+			color: var(--overlay-1);
 		}
 	}
 
@@ -236,18 +223,35 @@
 			width: 50%;
 
 			input {
-				padding: 1rem;
+				padding: 0.5rem;
 				border-radius: 0.5rem;
 				width: 15rem;
 				font-size: 0.85rem;
+				color: var(--subtext-1);
+				background-color: var(--crust);
 			}
 		}
 
 		button {
-			padding: 1rem;
+			padding: 0.5rem;
 			width: 15rem;
-			border-radius: 1rem;
-			font-weight: bold;
+			border-radius: 100vmax;
+
+			&[disabled] {
+				color: var(--surface-0);
+				background-color: var(--crust);
+				cursor: default;
+			}
+
+			&:not([disabled]) {
+				box-shadow: 0px 0px 0.5rem black;
+				background-image: linear-gradient(var(--lavender), var(--blue));
+				transition: scale 0.2s;
+
+				&:hover {
+					scale: 105%;
+				}
+			}
 		}
 	}
 
@@ -261,5 +265,19 @@
 			width: fit-content;
 			display: inline;
 		}
+	}
+
+	.header {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		margin-top: 2rem;
+		gap: 0.5rem;
+	}
+
+	a {
+		color: var(--blue);
+		text-decoration: none;
+		font-size: 0.85rem;
 	}
 </style>

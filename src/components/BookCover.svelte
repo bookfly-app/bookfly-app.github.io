@@ -11,3 +11,9 @@
 </script>
 
 <img bind:this={image} {...rest} src={book.cover} {onload} />
+
+<style>
+	img {
+		aspect-ratio: 1 / 1.5;
+	}
+</style>

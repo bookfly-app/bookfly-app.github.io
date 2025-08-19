@@ -2,10 +2,8 @@
 	import ProfilePage from '../../components/ProfilePage.svelte';
 
 	let { data } = $props();
-
-	let { route } = data;
-
-	let username = route.match(/^@(.+)$/)?.[1];
+	let route = $derived(data.route);
+	let username = $derived(route.match(/^@(\w+)/)?.[1] ?? null);
 </script>
 
 {#if username}

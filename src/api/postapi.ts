@@ -6,6 +6,7 @@ import {
 	getDoc,
 	getDocs,
 	or,
+	orderBy,
 	query,
 	updateDoc,
 	where,
@@ -238,6 +239,15 @@ export async function getFollowedPosts(user: User, includeSelf: boolean): Promis
 	let internalPosts = (await getDocs(query(collection(db, "posts"), postQuery))).docs.map(doc =>
 		doc.data(),
 	) as InternalPost[];
+	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
+
+	return posts;
+}
+
+export async function getForYouPosts(user: User): Promise<Post[]> {
+	let internalPosts = (
+		await getDocs(query(collection(db, "posts"), orderBy("timestamp", "desc")))
+	).docs.map(doc => doc.data()) as InternalPost[];
 	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
 
 	return posts;

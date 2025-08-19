@@ -7,7 +7,7 @@
 	import { user } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
 
-	let { selected }: { selected: "home" | "profile" | "search" | "messages" } = $props();
+	let { selected = undefined }: { selected?: "home" | "profile" | "search" | "messages" } = $props();
 </script>
 
 <div class="padding">&nbsp;</div>

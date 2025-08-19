@@ -25,7 +25,17 @@
 
 	<h2>About</h2>
 	<p>
-		Wallflower is a non-profit organization originally created by
+		Like that other site, but for books.
+	</p>
+
+	<p>
+		wallflower.land is a social media website (and app soon!) for readers and
+		writers. It's a space where us bookworms can make posts discussing, rating, 
+		reviewing, and updating our followers on books.
+	</p>
+
+	<p>
+		Wallflower Land LLC&trade;, the legal owner of wallflower.land, is a non-profit organization originally created by
 		<a href="/profile/vi">@vi</a>
 		as a passion project in college. The name <i>Wallflower</i> comes from 
 		<a href="/profile/vi">@vi</a>'s favorite book 
@@ -33,8 +43,8 @@
 		by Stephen Chbosky.
 	</p>
 	<p>
-		Powered by volunteers, no one on the Wallflower team makes a cent off of the project. Wallflower is completely ad-free with zero in-app purchases,
-		providing all features to all users.
+		Powered by volunteers, no one at Wallflower LLC makes a cent off of the project. 
+		wallflower.land is completely ad-free with zero in-app purchases.
 	</p>
 
 	<!-- Team & Values -->
@@ -45,12 +55,15 @@
 		a nonbinary reader and writer. Wallflower will always support kindness, acceptance, diversity, equity, and inclusion.
 	</p>
 	<p>Currently, Wallflower has no other team members.</p>
+	<p>
+		Wallflower does not support the use of AI, and will not be integrating AI features into the website.
+	</p>
 
 	<!-- Moderation -->
 	<h2>Moderation</h2>
 	<p>
 		The Wallflower team moderates content posted to Wallflower. Harmful and hateful content will be removed. Wallflower also may remove content that's
-		off-topic&mdash;Posting repeatedly with no relation to books or writing may get your account flagged. Wallflower was designed to be a safe and cozy
+		off-topic&mdash;Posting repeatedly with no relation to books or writing may get your account flagged. wallflower.land was designed to be a safe and cozy
 		space for people to talk about and discover books. Nothing more, nothing less.
 	</p>
 	<p>

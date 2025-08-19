@@ -25,10 +25,9 @@ export function user(): User | null {
  * Returns a list of strings, each of which representing an error in the validity of the
  * given password, such as "Must contain at least 1 number". If the password is a valid
  * password, an empty list is returned.
- *
- *
  */
 export function passwordErrors(password: string): string[] {
+	if (password === "") return [];
 	let errors = [];
 	if (!/\d/.test(password)) errors.push("Must contain at least 1 number");
 	if (!/[a-z]/.test(password)) errors.push("Must contain at least 1 lowercase letter");

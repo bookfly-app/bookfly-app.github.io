@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { getFollowedPosts } from "../api/postapi";
+	import { getFollowedPosts, getForYouPosts } from "../api/postapi";
 	import CatIcon from "../assets/images/icons/CatIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
 	import { user } from "../backend/auth.svelte";
 	import initializeFirebase from "../backend/backend";
-	import Background from "../components/Background.svelte";
 	import Footer from "../components/Footer.svelte";
 	import New from "../components/New.svelte";
 	import Page from "../components/Page.svelte";
@@ -17,11 +16,12 @@
 
 	initializeFirebase();
 
-	let view: "following" | "for you" = $state("following");
+	let view: "following" | "for you" = $state(user() ? "following" : "for you");
 
 	let followedPosts = $derived(user() ? getFollowedPosts(user()!, true).then(posts => posts.toSorted((a, b) => b.timestamp - a.timestamp)) : Promise.resolve([]));
+	let forYouPosts = getForYouPosts(user()!);
 
-	let sidebar: Sidebar;
+	let sidebar: Sidebar = $state(null!);
 	let spinLogo = $state(false);
 
 	function spin() {
@@ -32,9 +32,7 @@
 	}
 </script>
 
-<Background />
-
-<Page>
+<Page bind:sidebar>
 	<nav>
 		<div class="banner">
 			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
@@ -59,19 +57,21 @@
 
 	<section class="content">
 		<div style:background-color={theme().backgroundDark} class="views">
-			<button
-				style:color={view === "following" ? theme().textBright : theme().textDull}
-				style:border-bottom-color={view === "following" ? theme().accent : "transparent"}
-				onclick={() => (view = "following")}
-			>
-				Following
-			</button>
+			{#if user()}
+				<button
+					style:color={view === "following" ? theme().textBright : theme().textDull}
+					style:border-bottom-color={view === "following" ? theme().accent : "transparent"}
+					onclick={() => (view = "following")}
+				>
+					Following
+				</button>
+			{/if}
 			<button
 				style:color={view === "for you" ? theme().textBright : theme().textDull}
 				style:border-bottom-color={view === "for you" ? theme().accent : "transparent"}
 				onclick={() => (view = "for you")}
 			>
-				For You
+				Discover
 			</button>
 		</div>
 
@@ -91,21 +91,17 @@
 				{/each}
 			{/await}
 		{:else if view === "for you"}
-			<div class="nofollowing">
-				<h1 style:color={theme().textBright}>We haven't figured you out yet.</h1>
-				<p style:color={theme().textDull}>
-					After enough interactions, we'll start suggesting things we think you'll like
-					here.
-				</p>
-				<CatIcon style="width: 10rem;" stroke={theme().backgroundDim} />
-			</div>
+			{#await forYouPosts then forYouPosts}
+				{#each forYouPosts as post}
+					<AnyPost {post} />
+				{/each}
+			{/await}
 		{/if}
 		<div class="footer-padding"></div>
 	</section>
 
 	<New />
 	<Footer selected="home" />
-	<Sidebar bind:this={sidebar}/>
 </Page>
 
 <style>
@@ -153,9 +149,16 @@
 
 	.views {
 		display: flex;
-		justify-content: space-between;
-		padding-right: 2rem;
+		padding-right: 1rem;
 		padding-left: 1rem;
+
+		&:not(:has(> *:nth-child(2))) {
+			justify-content: center;
+		}
+
+		&:has(> *:nth-child(2)) {
+			justify-content: space-between;
+		}
 
 		button {
 			border-bottom-width: 2px;

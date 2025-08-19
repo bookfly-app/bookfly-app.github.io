@@ -17,14 +17,20 @@
 	import PersonIcon from "../../assets/images/icons/PersonIcon.svelte";
 	import Sidebar from "../../components/Sidebar.svelte";
 
-	let search;
+	type View = "posts" | "books" | "people" | "authors";
+
 	let sidebar: Sidebar;
 
-	let view: "posts" | "books" | "people" = $state(new URLSearchParams(window.location.search).get("view") as any ?? "posts");
+	let view: View = $state(new URLSearchParams(window.location.search).get("view") as View ?? "posts");
 
 	let searchTerm: string = $state("");
 
-	async function doSearch() {
+	async function search() {
+		if (searchTimeout) clearTimeout(searchTimeout)
+		searchTimeout = null;
+
+		searchTerm = searchTerm.trim();
+
 		const params = new URLSearchParams({ term: searchTerm, view });
 		goto(`/search?${params}`);
 
@@ -34,18 +40,17 @@
 	}
 
 	onMount(() => {
-		if (searchTerm) doSearch();
+		if (searchTerm) search();
 	});
 
 	let searchTimeout: number | null = $state(null);
 
 	function handleSearch(event: KeyboardEvent) {
 		if (event.key === "Enter") {
-			if (searchTimeout) clearTimeout(searchTimeout)
-			doSearch();
+			search();
 		} else {
 			if (searchTimeout) clearTimeout(searchTimeout)
-			searchTimeout = setTimeout(doSearch, 3000) as unknown as number;
+			searchTimeout = setTimeout(search, 3000) as unknown as number;
 		}
 	}
 
@@ -53,7 +58,7 @@
 	let books: Promise<Book[]> = $state(Promise.resolve([]));
 	let users: Promise<User[]> = $state(Promise.resolve([]));
 
-	function setView(viewName: "posts" | "books" | "people") {
+	function setView(viewName: View) {
 		return function() {
 			const params = new URLSearchParams({ view: viewName });
 			if (searchTerm) params.set("term", searchTerm);
@@ -63,7 +68,7 @@
 	}
 </script>
 
-<Page>
+<Page bind:sidebar>
 	<nav>
 		<div class="banner">
 			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
@@ -90,13 +95,20 @@
 			type="text"
 			bind:value={searchTerm}
 			onkeyup={handleSearch}
-			bind:this={search}
+			onblur={search}
+			placeholder={{
+				books: "Enter a title or ISBN",
+				posts: "Enter some keywords",
+				authors: "Enter an author's name",
+				people: "Enter a username"
+			}[view]}
 		/>
 
 		<div class="views" style:border-color={theme().textDark}>
 			<button class={view === "posts" ? "selected" : ""} onclick={setView("posts")}>Posts</button>
 			<button class={view === "books" ? "selected" : ""} onclick={setView("books")}>Books</button>
-			<button class={view === "people" ? "selected" : ""} onclick={setView("people")}>People</button>
+			<button class={view === "authors" ? "selected" : ""} onclick={setView("authors")}>Authors</button>
+			<button class={view === "people" ? "selected" : ""} onclick={setView("people")}>Users</button>
 		</div>
 	</section>
 		{#if view === "posts"}
@@ -107,7 +119,14 @@
 					<Loading />
 				</div>
 			{:then posts}
-				{#if posts.length === 0}
+				{#if searchTerm == ""}
+					<div class="loading">
+						<h1 style:color={theme().text}>Search for a post</h1>
+						<p style:color={theme().textDull}>
+							Enter your search term to find relevant posts.
+						</p>
+					</div>
+				{:else if posts.length === 0}
 					<div class="loading">
 						<h1 style:color={theme().text}>No posts found</h1>
 						<p style:color={theme().textDull}>
@@ -127,7 +146,14 @@
 					<Loading />
 				</div>
 			{:then books}
-				{#if books.length === 0}
+				{#if searchTerm == ""}
+					<div class="loading">
+						<h1 style:color={theme().text}>Search for a book</h1>
+						<p style:color={theme().textDull}>
+							Enter your search term to find relevant books.
+						</p>
+					</div>
+				{:else if books.length === 0}
 					<div class="loading">
 						<h1 style:color={theme().text}>No books found</h1>
 						<p style:color={theme().textDull}>
@@ -168,7 +194,14 @@
 					<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
 				</div>
 			{:then users}
-				{#if users.length === 0}
+				{#if searchTerm == ""}
+					<div class="loading">
+						<h1 style:color={theme().text}>Search for a user</h1>
+						<p style:color={theme().textDull}>
+							Enter your search term to find relevant users.
+						</p>
+					</div>
+				{:else if users.length === 0}
 					<div class="loading">
 						<h1 style:color={theme().text}>No users found</h1>
 						<p style:color={theme().textDull}>
@@ -184,14 +217,13 @@
 			{/await}
 		{/if}
 	<Footer selected="search" />
-	<Sidebar bind:this={sidebar} />
 </Page>
 
 <style>
 	section {
 		padding-top: 1rem;
 		background-color: var(--crust);
-		margin-top: 4rem;
+		margin-top: 4.5rem;
 	}
 
 	.loading {
@@ -199,7 +231,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.5rem;
 		padding-left: 3rem;
 		padding-right: 3rem;
 		text-align: center;
@@ -265,8 +297,8 @@
 		padding-top: 2rem;
 		border-bottom-width: 1px;
 		border-bottom-style: solid;
-		padding-left: 2rem;
-		padding-right: 2rem;
+		padding-left: 1rem;
+		padding-right: 1rem;
 
 		> * {
 			padding-bottom: 0.75rem;

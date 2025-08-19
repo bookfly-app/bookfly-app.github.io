@@ -51,6 +51,8 @@ export type User = {
 	links: {}[];
 	currentBook: string | null;
 	pronouns: string;
+
+	/** The timestamp, in epoch milliseconds, that this user's account was created. */
 	birthmoment: number;
 
 	views: PostId[];
@@ -74,10 +76,10 @@ let { db } = initializeFirebase();
 
 export function usernameErrors(username: string): string[] {
 	let errors = [];
-	if (username.length < 1) errors.push("Username can't be empty");
 	if (username.length > 30) errors.push("Username can't be more than 30 characters");
 	if (!/^[\w\-]*$/.test(username))
 		errors.push("Username can only contain letters, numbers, underscores, and hyphens");
+	if (/^\d+$/.test(username)) errors.push("Username cannot be only numbers");
 	return errors;
 }
 

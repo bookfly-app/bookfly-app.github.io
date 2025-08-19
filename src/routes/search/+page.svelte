@@ -2,9 +2,8 @@
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 	import { searchBooks, type Book } from "../../api/bookapi";
-	import { searchPosts, type Post } from "../../api/postapi";
+	import { searchPosts, type InternalPost} from "../../api/postapi";
 	import { searchUsers, type User } from "../../api/userapi";
-	import Footer from "../../components/Footer.svelte";
 	import Loading from "../../components/Loading.svelte";
 	import Page from "../../components/Page.svelte";
 	import AnyPost from "../../components/posts/AnyPost.svelte";
@@ -16,10 +15,11 @@
 	import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 	import PersonIcon from "../../assets/images/icons/PersonIcon.svelte";
 	import Sidebar from "../../components/Sidebar.svelte";
+	import BookCover from "../../components/BookCover.svelte";
 
 	type View = "posts" | "books" | "people" | "authors";
 
-	let sidebar: Sidebar;
+	let sidebar: Sidebar = $state(null!);
 
 	let view: View = $state(new URLSearchParams(window.location.search).get("view") as View ?? "posts");
 
@@ -54,8 +54,8 @@
 		}
 	}
 
-	let posts: Promise<Post[]> = $state(Promise.resolve([]));
-	let books: Promise<Book[]> = $state(Promise.resolve([]));
+	let posts: Promise<InternalPost[]> = $state(Promise.resolve([]));
+	let books: Promise<Promise<Book>[]> = $state(Promise.resolve([]));
 	let users: Promise<User[]> = $state(Promise.resolve([]));
 
 	function setView(viewName: View) {
@@ -64,6 +64,7 @@
 			if (searchTerm) params.set("term", searchTerm);
 			goto(`/search?${params}`);
 			view = viewName;
+			search();
 		}
 	}
 </script>
@@ -163,27 +164,37 @@
 			{/if}
 			<div class="books">
 				{#each books as book}
-					<a href={`/book/${book.isbn}`} class="book" style:border-color={theme().textDark}>
-						<div class="book-info">
-							<h1 style:color={theme().textBright}>
-								{book.title}
-							</h1>
-							<h2 style:color={theme().textDim}>
-								{book.authors.join(", ")}
-							</h2>
-						</div>
-						{#if book.cover}
-							<img alt={`Cover for ${book.title}`} class="cover" src={book.cover} />
-						{:else}
-							<div
-								class="nocover"
-								style:background-image={`linear-gradient(${theme().accent}, ${theme().accent2})`}
-								style:color={theme().backgroundDark}
-							>
-								?
+					{#await book}
+						<div class="book" style:border-color={theme().textDark}>
+							<div class="book-info">
+								<div class="loading-title"></div>
+								<div class="loading-authors"></div>
 							</div>
-						{/if}
-					</a>
+							<div class="loading-cover"></div>
+						</div>
+					{:then book}
+						<a href={`/book/${book.isbn}`} class="book" style:border-color={theme().textDark}>
+							<div class="book-info">
+								<h1 style:color={theme().textBright}>
+									{book.title}
+								</h1>
+								<h2 style:color={theme().textDim}>
+									{book.authors.join(", ")}
+								</h2>
+							</div>
+							{#if book.cover}
+								<BookCover {book} style="width: 3.5rem; margin-left: auto;" />
+							{:else}
+								<div
+									class="nocover"
+									style:background-image={`linear-gradient(${theme().accent}, ${theme().accent2})`}
+									style:color={theme().backgroundDark}
+								>
+									?
+								</div>
+							{/if}
+						</a>
+					{/await}
 				{/each}
 			</div>
 		{/await}
@@ -266,13 +277,49 @@
 			font-weight: bold;
 		}
 
+		.loading-cover {
+			width: 3.25rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 2rem;
+			font-weight: bold;
+			background: var(--surface-0);
+			margin-left: auto;
+			aspect-ratio: 1 / 1.5;
+			border-radius: 0.25rem;
+		}
+
 		.book-info {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
+			gap: 0.25rem;
+
+			.loading-title {
+				background-color: var(--surface-2);
+				width: 10rem;
+				height: 1rem;
+				border-radius: 100vmax;
+			}
+
+			.loading-authors {
+				background-color: var(--surface-0);
+				width: 5rem;
+				height: 1rem;
+				border-radius: 100vmax;
+			}
+
+			h1 {
+				color: var(--text);
+			}
+
+			h2 {
+				color: var(--overlay-1);
+				font-size: 0.85rem;
+			}
 		}
 
-		.cover,
 		.nocover {
 			margin-left: auto;
 			height: 5rem;

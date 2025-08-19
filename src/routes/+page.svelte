@@ -4,7 +4,6 @@
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
 	import { user } from "../backend/auth.svelte";
-	import initializeFirebase from "../backend/backend";
 	import New from "../components/New.svelte";
 	import Page from "../components/Page.svelte";
 	import AnyPost from "../components/posts/AnyPost.svelte";

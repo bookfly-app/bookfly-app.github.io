@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { getUserFromId, getUserFromUsername, getFollowers } from "../../../../api/userapi";
-	import Background from "../../../../components/Background.svelte";
-	import Footer from "../../../../components/Footer.svelte";
 	import Page from "../../../../components/Page.svelte";
 	import UserListing from "../../../../components/UserListing.svelte";
 	import theme from "../../../../themes/theme.svelte";

@@ -1,11 +1,9 @@
 <script lang="ts">
-	import { getPostFromId, getReplies, post, type Post, type PostId } from "../../../api/postapi";
+	import { getPostFromId, getReplies, post, type InternalPost, type PostId } from "../../../api/postapi";
 	import { getFile } from "../../../api/storageapi";
 	import AddImageIcon from "../../../assets/images/icons/AddImageIcon.svelte";
 	import SendIcon from "../../../assets/images/icons/SendIcon.svelte";
 	import { user } from "../../../backend/auth.svelte";
-	import Background from "../../../components/Background.svelte";
-	import Footer from "../../../components/Footer.svelte";
 	import ImageCarousel from "../../../components/ImageCarousel.svelte";
 	import ImagePicker from "../../../components/ImagePicker.svelte";
 	import Page from "../../../components/Page.svelte";
@@ -14,14 +12,14 @@
 
 	let { data }: { data: { postid: PostId } } = $props();
 	let postid = $derived(data.postid);
-	let thePost = getPostFromId(postid)!;
+	let thePost = $derived(getPostFromId(postid)!);
 
 	let reply: HTMLTextAreaElement;
 
 	let replyState: "contracted" | "expanded" = "contracted";
 
-	let replies = $state(thePost.then(post => getReplies(post!)));
-	let newReplies: Post[] = $state([]);
+	let replies = $derived(thePost.then(post => getReplies(post!)));
+	let newReplies: InternalPost[] = $state([]);
 
 	function expand() {
 		replyState = "expanded";

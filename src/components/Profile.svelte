@@ -2,7 +2,7 @@
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 	import { getBook } from "../api/bookapi";
-	import { format, type Post } from "../api/postapi";
+	import { format, type InternalPost, type Post } from "../api/postapi";
 	import { getFavoriteBook, getFollowers, getUserPosts, type User } from "../api/userapi";
 	import AddIcon from "../assets/images/icons/AddIcon.svelte";
 	import BookIcon from "../assets/images/icons/BookIcon.svelte";
@@ -59,8 +59,8 @@
 			return posts
 				.filter(post => post.type === "rating")
 				.toSorted({
-					best: (a: Post, b: Post) => b.rating - a.rating,
-					recent: (a: Post, b: Post) => b.timestamp - a.timestamp,
+					best: (a: InternalPost, b: InternalPost) => b.rating - a.rating,
+					recent: (a: InternalPost, b: InternalPost) => b.timestamp - a.timestamp,
 				}[ratingSort]);
 		});
 	});
@@ -321,7 +321,9 @@
 						{#if showFullReviews}
 							<AnyPost {post} />
 						{:else}
-							<BookListing book={post.books[0]} rating={post.rating} user={profileUser} onclick={() => goto(`/post/${post.id}`)} />
+							{#await getBook(post.books[0]) then book}
+								<BookListing {book} rating={post.rating} user={profileUser} onclick={() => goto(`/post/${post.id}`)} />
+							{/await}
 						{/if}
 					{/each}
 				{/await}

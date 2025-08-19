@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { getUserFromId, getUserFromUsername } from "../api/userapi";
 	import { user } from "../backend/auth.svelte";
-	import Footer from "./Footer.svelte";
 	import New from "./New.svelte";
 	import Page from "./Page.svelte";
 	import Profile from "./Profile.svelte";

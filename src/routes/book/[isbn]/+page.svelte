@@ -125,7 +125,9 @@
 				<span><span>Page Count: </span>{book.pageCount}</span>
 				<span><span>Publish Date: </span>{book.publishDate}</span>
 				<span><span>Publisher{book.publishers.length === 1 ? "" : "s"}: </span>{book.publishers.join(", ")}</span>
-				<span><span>Characters: </span>{book.characters.join(", ")}</span>
+				{#if book.characters.length > 0}
+					<span><span>Characters: </span>{book.characters.join(", ")}</span>
+				{/if}
 				<span><span>Tags: </span>{book.genres.join(", ")}</span>
 			</div>
 		{:else if view === "discussion"}
@@ -208,7 +210,6 @@
 		box-shadow: 0px 0px 0.5rem black;
 		transition: scale 0.1s;
 		margin-top: 1rem;
-		margin-bottom: 8rem;
 
 		&:hover {
 			scale: 105%;

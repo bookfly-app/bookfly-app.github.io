@@ -20,7 +20,7 @@ export type Book = {
 
 let { db } = initializeFirebase();
 
-export async function getBookDiscussions(isbn: ISBN): Promise<Post[]> {
+export async function getBookDiscussions(isbn: ISBN): Promise<InternalPost[]> {
 	let posts = (
 		await getDocs(
 			query(
@@ -31,7 +31,7 @@ export async function getBookDiscussions(isbn: ISBN): Promise<Post[]> {
 		)
 	).docs.map(doc => doc.data()) as InternalPost[];
 
-	return await Promise.all(posts.map(post => internalPostToPost(post)));
+	return posts;
 }
 
 export async function getBookRating(isbn: ISBN): Promise<{ rating: number; count: number }> {
@@ -46,7 +46,8 @@ export async function getBookRating(isbn: ISBN): Promise<{ rating: number; count
 	).docs.map(doc => doc.data().rating);
 
 	return {
-		rating: posts.reduce((accumulator, current) => accumulator + current, 0) / posts.length,
+		rating:
+			posts.reduce((accumulator, current) => accumulator + current, 0) / (posts.length || 1),
 		count: posts.length,
 	};
 }
@@ -92,14 +93,12 @@ export async function getBook(isbn: ISBN): Promise<Book> {
 	return book;
 }
 
-export async function searchBooks(searchTerm: string, max = 10): Promise<Book[]> {
+export async function searchBooks(searchTerm: string, max = 10): Promise<Promise<Book>[]> {
 	if (/^\d{3}\-?\d{10}$/.test(searchTerm)) getBook(searchTerm).then(book => [book]);
 
 	const query = new URLSearchParams({ q: searchTerm });
 	let response = await fetch(`https://openlibrary.org/search.json?${query}&fields=isbn,editions`);
 	const data = await response.json();
-	let books = data.docs.filter((book: Book) => book.isbn).slice(0, max);
-	return await Promise.all(
-		books.map((book: any) => getBook(book.isbn.find((isbn: string) => /^\d{13}$/.test(isbn)))),
-	);
+	let books: { isbn: string[] }[] = data.docs.filter((book: Book) => book.isbn).slice(0, max);
+	return books.map(book => getBook(book.isbn.find(isbn => /^\d{13}$/.test(isbn))!));
 }

@@ -15,5 +15,6 @@
 <style>
 	img {
 		aspect-ratio: 1 / 1.5;
+		background-color: var(--surface-0);
 	}
 </style>

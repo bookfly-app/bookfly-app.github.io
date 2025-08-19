@@ -24,7 +24,7 @@
 	let updateType = $state("start");
 	let chosenBooks: Book[] = $state([]);
 
-	let searchResults: Book[] = $state([]);
+	let searchResults: Promise<Book>[] = $state([]);
 	let searchText: string = $state("");
 
 	async function search() {
@@ -128,13 +128,23 @@
 		{#each searchResults as book}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
-			<div class="book search-book" onclick={chooseBook(book)}>
-				<img alt="{book.title} cover" src={book.cover} />
-				<div class="info">
-					<span class="title" style:color={theme().text}>{book.title}</span>
-					<span class="authors" style:color={theme().textDull}>{book.authors.join(",")}</span>
+			{#await book}
+				<div class="book search-book">
+					<img alt="Book cover" src="" />
+					<div class="info">
+						<span class="title" style:color={theme().text}>Loading Title...</span>
+						<span class="authors" style:color={theme().textDull}>Loading authors...</span>
+					</div>
 				</div>
-			</div>
+			{:then book}
+				<div class="book search-book" onclick={chooseBook(book)}>
+					<img alt="{book.title} cover" src={book.cover} />
+					<div class="info">
+						<span class="title" style:color={theme().text}>{book.title}</span>
+						<span class="authors" style:color={theme().textDull}>{book.authors.join(",")}</span>
+					</div>
+				</div>
+			{/await}
 		{/each}
 	</div>
 {/snippet}

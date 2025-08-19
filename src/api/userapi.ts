@@ -174,7 +174,7 @@ export async function getNumberOfBooksRead(user: User): Promise<number> {
 	).docs.length;
 }
 
-export async function getUserPosts(user: User): Promise<Post[]> {
+export async function getUserPosts(user: User): Promise<InternalPost[]> {
 	let internalPosts = (
 		await getDocs(
 			query(
@@ -184,9 +184,7 @@ export async function getUserPosts(user: User): Promise<Post[]> {
 			),
 		)
 	).docs.map(doc => doc.data()) as InternalPost[];
-
-	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
-	return posts;
+	return internalPosts;
 }
 
 export async function searchUsers(searchTerm: string): Promise<User[]> {

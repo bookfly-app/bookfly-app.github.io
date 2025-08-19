@@ -2,7 +2,7 @@
 	import { format } from "../../api/postapi";
 	import theme from "../../themes/theme.svelte";
 
-	let { body, images, parent } = $props();
+	let { body, images } = $props();
 </script>
 
 <section>

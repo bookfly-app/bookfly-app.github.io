@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
+	import { getBook } from "../../api/bookapi";
 	import {
 		deletePost,
 		didComment,
@@ -13,9 +14,10 @@
 		likePost,
 		sharePost,
 		unlikePost,
-		type Post,
+		type InternalPost,
 	} from "../../api/postapi";
 	import { getFile } from "../../api/storageapi";
+	import { getUserFromId } from "../../api/userapi";
 	import CommentIcon from "../../assets/images/icons/CommentIcon.svelte";
 	import DotMenuIcon from "../../assets/images/icons/DotMenuIcon.svelte";
 	import EyeIcon from "../../assets/images/icons/EyeIcon.svelte";
@@ -31,7 +33,7 @@
 	import Rating from "./Rating.svelte";
 	import Reply from "./Reply.svelte";
 
-	let { post, postpage }: { post: Post; postpage?: boolean; } = $props();
+	let { post, postpage }: { post: InternalPost; postpage?: boolean; } = $props();
 
 	/**
 	 * The context menu that appears when clicking the post actions button, which
@@ -104,7 +106,7 @@
 	toggleTimeFormat();
 
 	/** Whether this post was posted by the current user. */
-	let isCurrentUser = $derived(user()?.id === post.poster.id);
+	let isCurrentUser = $derived(user()?.id === post.poster);
 
 	/**
 	 * The "parent" of this post. If this post is a reply, this is the post being replied to.
@@ -230,6 +232,9 @@
 
 		await sharePost(post);
 	}
+
+	const poster = getUserFromId(post.poster);
+	const books = post.books.map(isbn => getBook(isbn));
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -243,42 +248,67 @@
 >
 	<!-- Poster's profile picture -->
 	<div class="profile">
-		{#await getFile(post.poster.picture) then pfp}
-			<a aria-label="Go to poster's profile" style:background-image={`url("${pfp}")`} href={`/profile/${post.poster.username}`}></a>
+		{#await poster}
+			<div class="no-picture"></div>
+		{:then poster}
+			{#await getFile(poster.picture)}
+				<div class="no-picture"></div>
+			{:then pfp}
+				<a aria-label="Go to poster's profile" style:background-image={`url("${pfp}")`} href={`/profile/${poster.username}`}></a>
+			{/await}
 		{/await}
 	</div>
 
 	<div class="content-outer">
 		<!-- User info: Display Name & Username -->
-		<span class="user">
-			<a href="/profile/{post.poster.username}" class="display-name" style:color={theme().textBright}>{post.poster.displayName}</a>
-			<a href="/profile/{post.poster.username}" class="username" style:color={theme().textDim}>{`@${post.poster.username}`}</a>
+		{#await poster}
+			<span class="user">
+				<span class="missing-username" style:color={theme().textBright}></span>
 
-			<Badges forUser={post.poster} size={0.7} />
+				<button class="timestamp" onclick={toggleTimeFormat} style:color={theme().textDim}>
+					{elapsedTime}
+				</button>
+			</span>
+		{:then poster}
+			<span class="user">
+				<a href="/profile/{poster.username}" class="display-name" style:color={theme().textBright}>{poster.displayName}</a>
+				<a href="/profile/{poster.username}" class="username" style:color={theme().textDim}>{`@${poster.username}`}</a>
 
-			<button class="timestamp" onclick={toggleTimeFormat} style:color={theme().textDim}>
-				{elapsedTime}
-			</button>
-		</span>
+				<Badges forUser={poster} size={0.7} />
+
+				<button class="timestamp" onclick={toggleTimeFormat} style:color={theme().textDim}>
+					{elapsedTime}
+				</button>
+			</span>
+		{/await}
 
 		<!-- Reply: Show "replying to @user" text -->
 		{#if post.type === "reply"}
-			{#await parent then parent}
-				<span style:color={theme().textDim} class="replying-to">
-					Replying to <a href="/profile/{parent!.poster.username}">@{parent!.poster.username}</a>
-				</span>
-			{/await}
+			<span style:color={theme().textDim} class="replying-to">
+				Replying to
+				{#await parent then parent}
+					{#await getUserFromId(parent!.poster)}
+						<div class="loading-replying"></div>
+					{:then parentPoster}
+						<a href="/profile/{parentPoster.username}">@{parentPoster.username}</a>
+					{/await}
+				{/await}
+			</span>
 		{/if}
 
 		<!-- The post content itself -->
 		{#if post.type === "rating"}
-			<Rating isbn={post.books[0].isbn} rating={post.rating} review={post.body} user={post.poster} />
+			{#await books[0] then book}
+				<Rating isbn={book.isbn} rating={post.rating} review={post.body} user={post.poster} />
+			{/await}
 		{:else if post.type === "general"}
 			<Discussion body={post.body} images={post.pictures} />
 		{:else if post.type === "reply"}
-			<Reply body={post.body} images={post.pictures} parent={post.parent} />
+			<Reply body={post.body} images={post.pictures} />
 		{:else if post.type === "update"}
-			<BookUpdate updateType={post.updateType} body={post.body} isbn={post.books[0].isbn} user={post.poster} />
+			{#await books[0] then book}
+				<BookUpdate updateType={post.updateType} body={post.body} isbn={book.isbn} user={post.poster} />
+			{/await}
 		{/if}
 
 		<!-- Post stats (views, likes, replies, etc.) -->
@@ -286,41 +316,50 @@
 			<!-- Views Button -->
 			<span style:color="#88FFDD">
 				<EyeIcon stroke="#88FFDD" style="width: 1rem;" />
-				{#await views then views}
+				{#await views}
+					0
+				{:then views}
 					{views}
 				{/await}
 			</span>
 
 			<!-- Like Button -->
-			{#await likes then likes}
-				{#await liked then liked}
-					<button onclick={toggleLike} style:color={liked ? "#FFAACC" : theme().textDim}>
-						<HeartIcon fill={liked ? "#FFAACC" : "none"} stroke={liked ? "#FFAACC" : theme().textDim} style="width: 1rem;" />
-						{likes}
-					</button>
+			<button onclick={toggleLike} style:color={liked ? "#FFAACC" : theme().textDim}>
+				<HeartIcon fill={liked ? "#FFAACC" : "none"} stroke={liked ? "#FFAACC" : theme().textDim} style="width: 1rem;" />
+				{#await likes}
+					0
+				{:then likes}
+					{likes}
 				{/await}
-			{/await}
+			</button>
 
 			<!-- Reply Button -->
-			{#await commented then commented}
-				{#await comments then comments}
-					<button onclick={goToPost} style:color={commented ? "#99BBFF" : theme().textDim}>
-						<CommentIcon stroke={commented ? "#99BBFF" : theme().textDim} style="width: 1rem;" />
+			{#await commented}
+				<button onclick={goToPost} style:color="var(--overlay-1)">
+					<CommentIcon stroke="var(--overlay-1)" style="width: 1rem;" />
+					0
+				</button>
+			{:then commented}
+				<button onclick={goToPost} style:color={commented ? "#99BBFF" : theme().textDim}>
+					<CommentIcon stroke={commented ? "#99BBFF" : theme().textDim} style="width: 1rem;" />
+					{#await comments}
+						0
+					{:then comments}
 						{comments}
-					</button>
-				{/await}
+					{/await}
+				</button>
 			{/await}
 
 			<!-- Share Button -->
-			{#await shares then shares}
-				{#await shared then shared}
-					<button style:color={shared ? "#BB99FF" : theme().textDim} onclick={share}>
-						<ShareIcon stroke={shared ? "#BB99FF" : theme().textDim} style="width: 0.85rem;" />
+				<button style:color={shared ? "#BB99FF" : theme().textDim} onclick={share}>
+					<ShareIcon stroke={shared ? "#BB99FF" : theme().textDim} style="width: 0.85rem;" />
+					{#await shares}
+						0
+					{:then shares}
 						{shares}
-						<Notification message="Link copied!" bind:this={shareNotification} />
-					</button>
-				{/await}
-			{/await}
+					{/await}
+					<Notification message="Link copied!" bind:this={shareNotification} />
+				</button>
 
 			<!-- Post Actions Button -->
 			<button onclick={event => actionsMenu.open(event)}>
@@ -358,6 +397,16 @@
 
 	.replying-to {
 		font-size: 0.85rem;
+		display: flex;
+		gap: 0.25rem;
+		align-items: center;
+
+		.loading-replying {
+			height: 0.70rem;
+			width: 4rem;
+			border-radius: 100vmax;
+			background-color: var(--surface-0);
+		}
 
 		a {
 			text-decoration: none;
@@ -386,7 +435,11 @@
 		flex-direction: column;
 		align-items: center;
 
-		a {
+		.no-picture {
+			background-color: var(--surface-2);
+		}
+
+		a, .no-picture {
 			width: 3rem;
 			height: 3rem;
 			border-radius: 50%;
@@ -415,6 +468,13 @@
 		button {
 			font-weight: normal;
 			font-size: 1rem;
+		}
+
+		.missing-username {
+			height: 1.35rem;
+			border-radius: 100vmax;
+			width: 8rem;
+			background-color: var(--surface-0);
 		}
 
 		.timestamp {

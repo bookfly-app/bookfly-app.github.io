@@ -144,7 +144,7 @@ let { db } = initializeFirebase();
  */
 export async function post(
 	post: Partial<Omit<InternalPost, "id">> & { body: string; type: PostType },
-): Promise<Post> {
+): Promise<InternalPost> {
 	let toPost: InternalPost = {
 		timestamp: Date.now(),
 		poster: user()!.id,
@@ -157,13 +157,10 @@ export async function post(
 		id: "",
 		...post,
 	} as InternalPost;
-	let { pictures, ...postData } = toPost;
-	console.log(toPost);
-
 	let doc = await addDoc(collection(db, "posts"), toPost);
 	updateDoc(doc, { id: doc.id });
 
-	return internalPostToPost({ ...toPost, id: doc.id });
+	return { ...toPost, id: doc.id };
 }
 
 /**
@@ -177,7 +174,7 @@ export async function post(
  *
  * @returns A promise that resolves when the database has deleted the post.
  */
-export async function deletePost(post: Post): Promise<void> {
+export async function deletePost(post: InternalPost): Promise<void> {
 	await deleteDoc(doc(db, "posts", post.id));
 }
 
@@ -213,24 +210,23 @@ export async function internalPostToPost(internalPost: InternalPost): Promise<Po
  * @returns a promise that, when resolved, returns the `Post` object associated with the given `id`,
  * or `null` if no such post exists.
  */
-export async function getPostFromId(postid: PostId): Promise<Post | null> {
+export async function getPostFromId(postid: PostId): Promise<InternalPost | null> {
 	try {
-		return internalPostToPost((await getDoc(doc(db, "posts", postid))).data() as InternalPost);
+		return (await getDoc(doc(db, "posts", postid))).data() as InternalPost;
 	} catch (e) {
 		return null;
 	}
 }
 
-export async function searchPosts(searchTerm: string): Promise<Post[]> {
+export async function searchPosts(searchTerm: string): Promise<InternalPost[]> {
 	let internalPosts = (await getDocs(query(collection(db, "posts")))).docs.map(doc =>
 		doc.data(),
 	) as InternalPost[];
 
-	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
-	return posts.filter(post => post.body.toLowerCase().includes(searchTerm.toLowerCase()));
+	return internalPosts;
 }
 
-export async function getFollowedPosts(user: User, includeSelf: boolean): Promise<Post[]> {
+export async function getFollowedPosts(user: User, includeSelf: boolean): Promise<InternalPost[]> {
 	if (user.following.length === 0) return [];
 
 	let postQuery: any = where("poster", "in", user.following);
@@ -239,35 +235,29 @@ export async function getFollowedPosts(user: User, includeSelf: boolean): Promis
 	let internalPosts = (await getDocs(query(collection(db, "posts"), postQuery))).docs.map(doc =>
 		doc.data(),
 	) as InternalPost[];
-	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
-
-	return posts;
+	return internalPosts;
 }
 
-export async function getForYouPosts(user: User): Promise<Post[]> {
+export async function getForYouPosts(user: User): Promise<InternalPost[]> {
 	let internalPosts = (
 		await getDocs(query(collection(db, "posts"), orderBy("timestamp", "desc")))
 	).docs.map(doc => doc.data()) as InternalPost[];
-	let posts = await Promise.all(internalPosts.map(async post => internalPostToPost(post)));
-
-	return posts;
+	return internalPosts;
 }
 
-export async function getReplies(post: Post): Promise<Post[]> {
-	return Promise.all(
-		(await getDocs(query(collection(db, "posts"), where("parent", "==", post.id)))).docs.map(
-			doc => internalPostToPost(doc.data() as InternalPost),
-		),
+export async function getReplies(post: InternalPost): Promise<InternalPost[]> {
+	return (await getDocs(query(collection(db, "posts"), where("parent", "==", post.id)))).docs.map(
+		doc => doc.data() as InternalPost,
 	);
 }
 
-export async function getLikes(post: Post): Promise<InternalUser[]> {
+export async function getLikes(post: InternalPost): Promise<InternalUser[]> {
 	return (
 		await getDocs(query(collection(db, "users"), where("likes", "array-contains", post.id)))
 	).docs.map(doc => doc.data() as InternalUser);
 }
 
-export async function getShares(post: Post): Promise<InternalUser[]> {
+export async function getShares(post: InternalPost): Promise<InternalUser[]> {
 	return (
 		await getDocs(query(collection(db, "users"), where("shares", "array-contains", post.id)))
 	).docs.map(doc => doc.data() as InternalUser);
@@ -349,7 +339,7 @@ export async function format(text: string): Promise<string> {
  * @returns A promise that resolves when the view count is finished being fetched from
  * the database and calculated, returning the total number of views.
  */
-export async function getPostViews(post: Post): Promise<number> {
+export async function getPostViews(post: InternalPost): Promise<number> {
 	let storedViews = (
 		await getDocs(query(collection(db, "users"), where("views", "array-contains", post.id)))
 	).docs;
@@ -374,13 +364,13 @@ export async function getPostViews(post: Post): Promise<number> {
  *
  * @returns A promise that resolves when the database is updated with the post like.
  */
-export async function likePost(post: Post): Promise<void> {
+export async function likePost(post: InternalPost): Promise<void> {
 	await updateDoc(doc(collection(db, "users"), user()!.id), {
 		likes: [...new Set([...user()!.likes, post.id])],
 	});
 }
 
-export async function sharePost(post: Post): Promise<void> {
+export async function sharePost(post: InternalPost): Promise<void> {
 	await updateDoc(doc(collection(db, "users"), user()!.id), {
 		shares: [...new Set([...user()!.shares, post.id])],
 	});
@@ -400,7 +390,7 @@ export async function sharePost(post: Post): Promise<void> {
  *
  * @returns A promise that resolves when the database is updated with the post like.
  */
-export async function unlikePost(post: Post): Promise<void> {
+export async function unlikePost(post: InternalPost): Promise<void> {
 	await updateDoc(doc(collection(db, "users"), user()!.id), {
 		likes: user()!.likes.filter(id => id !== post.id),
 	});
@@ -418,7 +408,7 @@ export async function unlikePost(post: Post): Promise<void> {
  * @returns A promise that, when resolved, returns whether or not the current user liked
  * the given post.
  */
-export function didLike(post: Post): boolean {
+export function didLike(post: InternalPost): boolean {
 	return user()?.likes.includes(post.id) ?? false;
 }
 
@@ -434,7 +424,7 @@ export function didLike(post: Post): boolean {
  * @returns A promise that, when resolved, returns whether or not the current user shared
  * the given post.
  */
-export function didShare(post: Post): boolean {
+export function didShare(post: InternalPost): boolean {
 	if (!user()) {
 		let shared = localStorage.getItem("shared-posts");
 		if (!shared) return false;
@@ -455,7 +445,7 @@ export function didShare(post: Post): boolean {
  * @returns A promise that, when resolved, returns whether or not the current user replied
  * to the given post.
  */
-export async function didComment(post: Post): Promise<boolean> {
+export async function didComment(post: InternalPost): Promise<boolean> {
 	return user()
 		? (
 				await getDocs(

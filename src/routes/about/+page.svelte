@@ -1,7 +1,6 @@
 <script>
 	import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 	import BackButton from "../../components/BackButton.svelte";
-	import Footer from "../../components/Footer.svelte";
 	import Page from "../../components/Page.svelte";
 </script>
 

@@ -158,7 +158,7 @@
 <style>
 	section {
 		position: fixed;
-		height: 100vh;
+		height: 100dvh;
 		top: 0px;
 		display: flex;
 		flex-direction: column;

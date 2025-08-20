@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { format } from "../../api/postapi";
-	import theme from "../../themes/theme.svelte";
 	import ImageCarousel from "../ImageCarousel.svelte";
 
-	let { body, images } = $props();
+	let { body, images, main } = $props();
 </script>
 
 <section>
 	{#await format(body) then body}
-		<p class="body" style:color={theme().text}>{@html body}</p>
+		<p class="body" style:font-size={main ? "1rem" : "0.85rem"}>{@html body}</p>
 	{/await}
 	{#if images.length > 0}
 		<ImageCarousel {images} />
@@ -17,7 +16,7 @@
 
 <style>
 	.body {
-		font-size: 0.85rem;
+		color: var(--subtext-1);
 
 		:global(a) {
 			color: cornflowerblue;

@@ -33,7 +33,7 @@
 	import Rating from "./Rating.svelte";
 	import Reply from "./Reply.svelte";
 
-	let { post, postpage }: { post: InternalPost; postpage?: boolean; } = $props();
+	let { post, postpage, element = $bindable() }: { post: InternalPost; postpage?: boolean; element?: HTMLElement } = $props();
 
 	/**
 	 * The context menu that appears when clicking the post actions button, which
@@ -137,11 +137,7 @@
 	 * open the parent post.
 	 */
 	async function goToPost() {
-		if (post.type === "reply") {
-			await goto(`/post/${(await parent)!.id}`);
-		} else {
-			await goto(`/post/${post.id}`);
-		}
+		await goto(`/post/${post.id}`);
 	}
 
 	/** The number of views on the post */
@@ -244,7 +240,9 @@
 	tabindex="0"
 	role="link"
 	onclick={clickPost}
-	style:border={`1px solid ${theme().textDark}`}
+	style:border-top={postpage ? "none" : `1px solid var(--surface-0)`}
+	style:border-bottom={postpage ? "none" : `1px solid var(--surface-0)`}
+	bind:this={element}
 >
 	<!-- Poster's profile picture -->
 	<div class="profile">
@@ -302,9 +300,9 @@
 				<Rating isbn={book.isbn} rating={post.rating} review={post.body} user={post.poster} />
 			{/await}
 		{:else if post.type === "general"}
-			<Discussion body={post.body} images={post.pictures} />
+			<Discussion main={postpage} body={post.body} images={post.pictures} />
 		{:else if post.type === "reply"}
-			<Reply body={post.body} images={post.pictures} />
+			<Reply main={postpage} body={post.body} images={post.pictures} />
 		{:else if post.type === "update"}
 			{#await books[0] then book}
 				<BookUpdate updateType={post.updateType} body={post.body} isbn={book.isbn} user={post.poster} />

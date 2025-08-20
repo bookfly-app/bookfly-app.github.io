@@ -54,61 +54,107 @@
 		newReplies = [replyPost, ...newReplies];
 		imageAttachment = null;
 	}
+
+	let parentChain = $derived.by(async () => {
+		let current = (await thePost)!;
+		let chain: InternalPost[] = [];
+		while (true) {
+			if (current.type !== "reply") return chain.toReversed();	
+			current = (await getPostFromId(current.parent))!;
+			chain.push(current);
+		}
+	});
+
+	let mainPost: HTMLElement = $state(null!);
+	let container: HTMLElement;
+	
+	let scrolled = $derived(parentChain.then(chain => {
+		setTimeout(() => {
+			console.log(mainPost.getBoundingClientRect().top);
+			container.scrollTop = mainPost.getBoundingClientRect().top;
+		}, 100);
+		return chain.length;
+	}));
+
+	// svelte-ignore state_referenced_locally
+	// Without this, scrolled is considered dead code and removed
+	scrolled;
+
+	let parents: HTMLElement[] = $state([]);
+	let parentContainer: HTMLElement | null = $state(null);
+	let height = $derived.by(() => `calc(100dvh + ${parentContainer?.getBoundingClientRect().height ?? 0}px)`);
 </script>
 
 <Page type="search" class="post">
-	{#await thePost then post}
-		<AnyPost post={post!} postpage />
+	<section bind:this={container} style:min-height={height}>
+		{#await thePost then post}
+			{#await parentChain then parentChain}
+				<div bind:this={parentContainer}>
+					{#each parentChain as parent, index}
+						<AnyPost bind:element={parents[index]} post={parent} />
+					{/each}
+				</div>
+			{/await}
+			<AnyPost bind:element={mainPost} post={post!} postpage />
 
-		{#if user()}
-			<div style:padding-bottom={imageAttachment === null ? "0.5rem" : "2.5rem"} style:border-color={theme().textDark} class="reply">
-				<a aria-label="Go to profile" href="/profile">
-					{#await getFile(user()!.picture) then pfp}
-						<img alt="Your profile" src={pfp} />
-					{/await}
-				</a>
+			{#if user()}
+				<div style:padding-bottom={imageAttachment === null ? "0.5rem" : "2.5rem"} style:border-color={theme().textDark} class="reply">
+					<a aria-label="Go to profile" href="/profile">
+						{#await getFile(user()!.picture) then pfp}
+							<img alt="Your profile" src={pfp} />
+						{/await}
+					</a>
 
-				<div class="reply-body">
-					<textarea
-						bind:this={reply}
-						bind:value={replyBody}
-						onfocus={expand}
-						onblur={contract}
-						style:color={theme().text}
-						style:background={theme().backgroundDim}
-						placeholder="Leave a reply"
-					></textarea>
+					<div class="reply-body">
+						<textarea
+							bind:this={reply}
+							bind:value={replyBody}
+							onfocus={expand}
+							onblur={contract}
+							style:color={theme().text}
+							style:background={theme().backgroundDim}
+							placeholder="Leave a reply"
+						></textarea>
 
-					<ImageCarousel {images} />
+						<ImageCarousel {images} />
 
-					<div style:bottom={imageAttachment === null ? "1.4rem" : "-2rem"} title="Post" class="send">
-						<label for="attach-image-reply">
-							<AddImageIcon stroke={theme().textDull} style="width: 1.5rem;" />
-						</label>
-						<ImagePicker id="attach-image-reply" onupload={imageId => images.push(imageId)} />
+						<div style:bottom={imageAttachment === null ? "1.4rem" : "-2rem"} title="Post" class="send">
+							<label for="attach-image-reply">
+								<AddImageIcon stroke={theme().textDull} style="width: 1.5rem;" />
+							</label>
+							<ImagePicker id="attach-image-reply" onupload={imageId => images.push(imageId)} />
 
-						<button onmousedown={sendReply}>
-							<SendIcon stroke={theme().textDull} style="width: 1.5rem;" />
-						</button>
+							<button onmousedown={sendReply}>
+								<SendIcon stroke={theme().textDull} style="width: 1.5rem;" />
+							</button>
+						</div>
 					</div>
 				</div>
-			</div>
-		{/if}
+			{/if}
 
-		{#await replies then replies}
-			{#each newReplies as newReply}
-				<AnyPost post={newReply} />
-			{/each}
-			<div class="replies">
-				{#each replies as reply}
-					<AnyPost post={reply} />
+			{#await replies then replies}
+				{#each newReplies as newReply}
+					<AnyPost post={newReply} />
 				{/each}
-			</div>
+				<div class="replies">
+					{#each replies as reply}
+						<AnyPost post={reply} />
+					{/each}
+				</div>
+			{/await}
+
+			<div class="padder"></div>
 		{/await}
-	{/await}
+	</section>
 </Page>
 
 <style>
+	section {
+		overflow-y: auto;
+		height: 100%;
+		width: 100%;
+	}
+
 	label {
 		cursor: pointer;
 	}
@@ -136,8 +182,6 @@
 
 	.replies {
 		width: 100%;
-		height: 100%;
-		overflow-y: auto;
 	}
 
 	.reply-body {

@@ -243,15 +243,15 @@ export async function getForYouPosts(user: User): Promise<InternalPost[]> {
 }
 
 export async function getReplies(post: InternalPost): Promise<InternalPost[]> {
-	return (
-		await getDocs(
-			query(
-				collection(db, "posts"),
-				where("parent", "==", post.id),
-				orderBy("timestamp", "asc"),
-			),
-		)
+	const replies = (
+		await getDocs(query(collection(db, "posts"), where("parent", "==", post.id)))
 	).docs.map(doc => doc.data() as InternalPost);
+
+	const childRepliesArrays = await Promise.all(replies.map(reply => getReplies(reply)));
+	const childReplies = childRepliesArrays.flat();
+	return [...replies, ...childReplies].toSorted(
+		(post1, post2) => post1.timestamp - post2.timestamp,
+	);
 }
 
 export async function getLikes(post: InternalPost): Promise<InternalUser[]> {
@@ -291,6 +291,25 @@ async function replaceAllAsync(
 	return str.replaceAll(regex, () => data.shift()!);
 }
 
+function escapeHTML(text: string): string {
+	return text
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("'", "&#x27;")
+		.replaceAll("`", "&#x60;");
+}
+
+function isSafeUrl(url: string): boolean {
+	const lower = url.trim().toLowerCase();
+	return !(
+		lower.startsWith("javascript:") ||
+		lower.startsWith("data:") ||
+		lower.startsWith("vbscript:")
+	);
+}
+
 /**
  * Formats the given text into an HTML string that's styled for things like **bold**, *italic*,
  * [links](https://www.google.com), and other common markdown formatting. The text is automatically sanitized, meaning it's
@@ -302,16 +321,11 @@ async function replaceAllAsync(
  * Svelte's `@html` tag.
  */
 export async function format(text: string): Promise<string> {
-	text = text
-		.replaceAll("&", "&amp;")
-		.replaceAll("<", "&lt;")
-		.replaceAll(">", "&gt;")
-		.replaceAll('"', "&quot;")
-		.replaceAll("'", "&#x27;");
+	text = escapeHTML(text);
 
 	text = await replaceAllAsync(text, /@(\d{13})/g, async (_match, isbn) => {
 		const book = await getBook(isbn);
-		return `<a style="text-decoration: none;" href="/book/${isbn}"><i>${book.title}</i></a>`;
+		return `<a style="text-decoration: none;" href="/book/${isbn}"><i>${escapeHTML(book.title)}</i></a>`;
 	});
 
 	return text
@@ -324,10 +338,10 @@ export async function format(text: string): Promise<string> {
 		.replaceAll(/\*([^\*]+)\*/g, (_match, content) => `<i>${content}</i>`)
 		.replaceAll(/`([^\`]+)`/g, (_match, code) => `<code>${code}</code>`)
 		.replaceAll(/~~([^~]+)~~/g, (_match, code) => `<s>${code}</s>`)
-		.replaceAll(
-			linkRegex,
-			match => `<a target="_blank" rel="noopener noreferrer" href="${match}">${match}</a>`,
-		)
+		.replaceAll(linkRegex, url => {
+			if (!isSafeUrl(url)) return url;
+			return `<a target="_blank" rel="noopener noreferrer" href="${url}">${url}</a>`;
+		})
 		.replaceAll(/\\\*/g, "*")
 		.replaceAll(/\\`/g, "`")
 		.replaceAll("`", "&#x60;");

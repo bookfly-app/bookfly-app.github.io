@@ -530,8 +530,7 @@
 	}
 
 	.profile-books {
-		display: grid;
-		grid-template-columns: 50% 50%;
+		display: flex;
 		overflow: hidden;
 		gap: 1rem;
 
@@ -541,6 +540,7 @@
 			gap: 0.5rem;
 			color: var(--overlay-1);
 			text-decoration: none;
+			max-width: 50%;
 		}
 	}
 

@@ -1,35 +1,63 @@
 {
-	"$schema": "https://schema.tauri.app/config/2",
-	"productName": "booksite",
-	"version": "0.1.0",
-	"identifier": "com.booksite.app",
 	"build": {
-		"beforeDevCommand": "bun run dev",
-		"devUrl": "http://localhost:1420",
 		"beforeBuildCommand": "bun run build",
-		"frontendDist": "../build"
+		"beforeDevCommand": "bun run dev",
+		"devPath": "http://localhost:1420",
+		"distDir": "../src/assets"
 	},
-	"app": {
-		"windows": [
-			{
-				"title": "booksite",
-				"width": 800,
-				"height": 600
+	"package": {
+		"productName": "wallflower",
+		"version": "0.1.0"
+	},
+	"tauri": {
+		"allowlist": {
+			"all": false
+		},
+		"bundle": {
+			"active": true,
+			"category": "DeveloperTool",
+			"copyright": "",
+			"deb": {
+				"depends": []
+			},
+			"externalBin": [],
+			"icon": [
+				"icons/32x32.png",
+				"icons/128x128.png",
+				"icons/128x128@2x.png",
+				"icons/icon.icns",
+				"icons/icon.ico"
+			],
+			"identifier": "land.wallflower",
+			"longDescription": "",
+			"macOS": {
+				"entitlements": null,
+				"exceptionDomain": "",
+				"frameworks": [],
+				"providerShortName": null,
+				"signingIdentity": null
+			},
+			"resources": [],
+			"shortDescription": "",
+			"targets": "all",
+			"windows": {
+				"certificateThumbprint": null,
+				"digestAlgorithm": "sha256",
+				"timestampUrl": ""
 			}
-		],
+		},
 		"security": {
 			"csp": null
-		}
-	},
-	"bundle": {
-		"active": true,
-		"targets": "all",
-		"icon": [
-			"icons/32x32.png",
-			"icons/128x128.png",
-			"icons/128x128@2x.png",
-			"icons/icon.icns",
-			"icons/icon.ico"
+		},
+		"updater": {
+			"active": false
+		},
+		"windows": [
+			{
+				"resizable": true,
+				"title": "Wallflower",
+				"maximized": true
+			}
 		]
 	}
 }

@@ -14,18 +14,29 @@
 	import { logOut, user } from "../backend/auth.svelte";
 	import theme from "../themes/theme.svelte";
 
-	let sidebar: HTMLElement;
-	let left = $state(window.innerHeight > window.innerWidth ? "-17rem" : "-23rem");
+	let innerWidth = $state(window.innerWidth);
+	let innerHeight = $state(window.innerHeight);
+	let aspectRatio = $derived(innerWidth / innerHeight);let sidebar: HTMLElement;
+
+	// svelte-ignore state_referenced_locally
+	let visible = $state(aspectRatio > 1);
+
+	// svelte-ignore state_referenced_locally
+	let left = $derived(visible ? "0px" : aspectRatio > 1 ? "-17rem" : "-23rem");
+	let overlayOpacity = $derived(visible ? 0.5 : 0);
+
+	$effect(() => {
+		if (aspectRatio > 1) show();
+		else hide();
+	});
 
 	export function show() {
-		left = "0px";
+		visible = true;
 		overlayDisplay = "block";
-		overlayOpacity = 0.5;
 	}
 
 	export function hide() {
-		left = window.innerHeight > window.innerWidth ? "-17rem" : "-23rem";
-		overlayOpacity = 0;
+		visible = false;
 		setTimeout(() => {
 			overlayDisplay = "none";
 		}, 200);
@@ -44,7 +55,6 @@
 		window.location.reload();
 	}
 
-	let overlayOpacity = $state(0);
 	let overlayDisplay = $state("none");
 
 	onMount(() => {
@@ -69,11 +79,16 @@
 			}
 		});
 	});
+
 </script>
+
+<svelte:window bind:innerWidth bind:innerHeight />
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div onclick={hide} class="overlay" style:opacity={overlayOpacity} style:display={overlayDisplay}></div>
+{#if aspectRatio < 1}
+	<div onclick={hide} class="overlay" style:opacity={overlayOpacity} style:display={overlayDisplay}></div>
+{/if}
 <section style:left bind:this={sidebar}>
 	<div class="profile" style:background={theme().backgroundDark}>
 		<a class="profile-picture" href="/profile" aria-label="Go to profile">
@@ -93,14 +108,12 @@
 			</a>
 			{#if user()}
 				<a href="/profile">
-					<h2>
-						@{user()!.username}
-					</h2>
+					<h2>@{user()!.username}</h2>
 				</a>
 			{/if}
 		</div>
 
-		{#if window.innerWidth < window.innerHeight}
+		{#if aspectRatio < 1}
 			<button onclick={hide}>
 				<CloseIcon stroke={theme().textBright} style="width: 1.5rem; height: 1.5rem; position: absolute; top: 1.5rem; right: 1.5rem;" />
 			</button>
@@ -149,7 +162,7 @@
 		top: 0px;
 		display: flex;
 		flex-direction: column;
-		border-right: 1px solid var(--surface-2);
+		border-right: 1px solid var(--surface-0);
 		transition: left 0.25s;
 		z-index: 999999;
 		background-image: linear-gradient(to bottom, var(--base), var(--mantle));

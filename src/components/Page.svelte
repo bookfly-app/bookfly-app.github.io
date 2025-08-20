@@ -18,7 +18,7 @@
 
 <div class="outer">
 	<Sidebar bind:this={sidebar} />
-	<main style:border-color={theme().textDark} {...rest}>
+	<main {...rest}>
 		{@render children?.()}
 	</main>
 </div>
@@ -39,18 +39,21 @@
 	@media (orientation: landscape) {
 		main {
 			margin-left: 20rem;
+			width: max(calc(100% - 40rem), 25rem);
+			border-right: 1px solid var(--surface-0);
+		}
+	}
+
+	@media (orientation: portrait) {
+		main {
+			width: 100%;
 		}
 	}
 
 	main {
-		width: 100%;
 		height: 100%;
 		overflow-y: auto;
 		overflow-x: hidden;
-		border-left-style: solid;
-		border-right-style: solid;
-		border-left-width: 1px;
-		border-right-width: 1px;
 		position: relative;
 		background-color: var(--base);
 	}

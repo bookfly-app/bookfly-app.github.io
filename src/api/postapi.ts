@@ -8,6 +8,7 @@ import {
 	or,
 	orderBy,
 	query,
+	setDoc,
 	updateDoc,
 	where,
 } from "firebase/firestore";
@@ -150,17 +151,13 @@ export async function post(
 		poster: user()!.id,
 		authors: [],
 		books: [],
-		views: [],
-		likes: [],
-		shares: [],
 		pictures: [],
 		id: "",
 		...post,
 	} as InternalPost;
-	let doc = await addDoc(collection(db, "posts"), toPost);
-	updateDoc(doc, { id: doc.id });
-
-	return { ...toPost, id: doc.id };
+	const postDoc = doc(collection(db, "posts"));
+	await setDoc(postDoc, { ...toPost, id: postDoc.id });
+	return { ...toPost, id: postDoc.id };
 }
 
 /**
@@ -246,9 +243,15 @@ export async function getForYouPosts(user: User): Promise<InternalPost[]> {
 }
 
 export async function getReplies(post: InternalPost): Promise<InternalPost[]> {
-	return (await getDocs(query(collection(db, "posts"), where("parent", "==", post.id)))).docs.map(
-		doc => doc.data() as InternalPost,
-	);
+	return (
+		await getDocs(
+			query(
+				collection(db, "posts"),
+				where("parent", "==", post.id),
+				orderBy("timestamp", "asc"),
+			),
+		)
+	).docs.map(doc => doc.data() as InternalPost);
 }
 
 export async function getLikes(post: InternalPost): Promise<InternalUser[]> {

@@ -14,13 +14,6 @@
 			{@html body}
 		</p>
 	{/await}
-	{#if images.length > 0}
-		<div class="image" style:background-image={`url("${images[0]}")`}>
-			{#each images}
-				<div class="dot"></div>
-			{/each}
-		</div>
-	{/if}
 </section>
 
 <style>

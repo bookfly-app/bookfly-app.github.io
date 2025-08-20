@@ -15,6 +15,8 @@ const themes = [
 			yellow: "#f9e2af",
 			green: "#a6e3a1",
 			red: "#f38ba8",
+			peach: "#fab387",
+			teal: "#94e2d5",
 		},
 	},
 ] as const satisfies {
@@ -33,6 +35,8 @@ const themes = [
 		yellow: string;
 		green: string;
 		red: string;
+		peach: string;
+		teal: string;
 	};
 }[];
 

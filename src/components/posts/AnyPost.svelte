@@ -27,6 +27,7 @@
 	import theme from "../../themes/theme.svelte";
 	import Badges from "../Badges.svelte";
 	import ContextMenu from "../ContextMenu.svelte";
+	import ImageCarousel from "../ImageCarousel.svelte";
 	import Notification from "../Notification.svelte";
 	import BookUpdate from "./BookUpdate.svelte";
 	import Discussion from "./Discussion.svelte";
@@ -307,6 +308,10 @@
 			{#await books[0] then book}
 				<BookUpdate updateType={post.updateType} body={post.body} isbn={book.isbn} user={post.poster} />
 			{/await}
+		{/if}
+
+		{#if post.pictures.length > 0}
+			<ImageCarousel images={post.pictures} />
 		{/if}
 
 		<!-- Post stats (views, likes, replies, etc.) -->

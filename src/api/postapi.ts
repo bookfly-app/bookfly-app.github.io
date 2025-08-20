@@ -1,5 +1,4 @@
 import {
-	addDoc,
 	collection,
 	deleteDoc,
 	doc,
@@ -77,7 +76,7 @@ export type InternalPost<T extends PostType = PostType> = {
 
 	authors: string[];
 
-	pictures: Image[];
+	pictures: string[];
 
 	rating: T extends "rating" ? number : never;
 	updateType: T extends "update" ? "start" : never;
@@ -216,11 +215,12 @@ export async function getPostFromId(postid: PostId): Promise<InternalPost | null
 }
 
 export async function searchPosts(searchTerm: string): Promise<InternalPost[]> {
+	if (searchTerm === "") return Promise.resolve([]);
 	let internalPosts = (await getDocs(query(collection(db, "posts")))).docs.map(doc =>
 		doc.data(),
 	) as InternalPost[];
 
-	return internalPosts;
+	return internalPosts.filter(post => post.body.toLowerCase().includes(searchTerm.toLowerCase()));
 }
 
 export async function getFollowedPosts(user: User, includeSelf: boolean): Promise<InternalPost[]> {

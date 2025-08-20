@@ -78,11 +78,8 @@ export async function logOut(): Promise<unknown | null> {
 }
 
 export async function updateUser(userInfo: Partial<User>) {
+	Object.entries(userInfo).forEach(([key, value]) => ((currentUser as any)[key] = value));
 	await updateDoc(doc(db, "users", user()!.id), userInfo);
-}
-
-export async function updateOtherUser(user: User, userInfo: Partial<User>) {
-	await setDoc(doc(db, "users", user.id), userInfo);
 }
 
 export async function signUp(

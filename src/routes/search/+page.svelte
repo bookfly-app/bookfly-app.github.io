@@ -35,8 +35,8 @@
 		goto(`/search?${params}`);
 
 		if (view === "posts") posts = searchPosts(searchTerm);
-		if (view === "books") books = searchBooks(searchTerm);
-		if (view === "people") users = searchUsers(searchTerm);
+		else if (view === "books") books = searchBooks(searchTerm);
+		else if (view === "people") users = searchUsers(searchTerm);
 	}
 
 	onMount(() => {

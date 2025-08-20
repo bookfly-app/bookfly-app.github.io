@@ -1,7 +1,8 @@
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { collection, getDoc, getDocs, orderBy, query, where } from "firebase/firestore";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
-import { internalPostToPost, type InternalPost, type Post, type PostId } from "./postapi";
+import { type InternalPost, type Post, type PostId } from "./postapi";
+import { fuzzyQuery } from "./util";
 
 export type UserId = string;
 
@@ -188,12 +189,14 @@ export async function getUserPosts(user: User): Promise<InternalPost[]> {
 }
 
 export async function searchUsers(searchTerm: string): Promise<User[]> {
-	let users = (await getDocs(query(collection(db, "users")))).docs
-		.map(doc => doc.data())
-		.filter(
-			user =>
-				user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				user.displayName.includes(searchTerm.toLowerCase()),
-		);
-	return users as User[];
+	if (searchTerm === "") return Promise.resolve([]);
+	if (searchTerm.startsWith("@")) {
+		const docs = (
+			await getDocs(
+				query(collection(db, "users"), where("username", "==", searchTerm.substring(1))),
+			)
+		).docs;
+		return docs.length > 0 ? [docs[0].data() as User] : [];
+	}
+	return fuzzyQuery(searchTerm, "displayName", "users");
 }

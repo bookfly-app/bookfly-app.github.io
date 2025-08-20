@@ -2,17 +2,14 @@
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 	import { getBook } from "../api/bookapi";
-	import { format, type InternalPost, type Post } from "../api/postapi";
+	import { format, type InternalPost } from "../api/postapi";
 	import { getFavoriteBook, getFollowers, getUserPosts, type User } from "../api/userapi";
-	import AddIcon from "../assets/images/icons/AddIcon.svelte";
 	import BookIcon from "../assets/images/icons/BookIcon.svelte";
-	import CheckIcon from "../assets/images/icons/CheckIcon.svelte";
 	import ClockIcon from "../assets/images/icons/ClockIcon.svelte";
 	import LeftArrowIcon from "../assets/images/icons/LeftArrowIcon.svelte";
-	import MessageIcon from "../assets/images/icons/MessageIcon.svelte";
 	import SortIcon from "../assets/images/icons/SortIcon.svelte";
 	import StarIcon from "../assets/images/icons/StarIcon.svelte";
-	import { updateOtherUser, updateUser, user } from "../backend/auth.svelte";
+	import { updateUser, user } from "../backend/auth.svelte";
 	import Badges from "./Badges.svelte";
 	import BookListing from "./BookListing.svelte";
 	import ContextMenu from "./ContextMenu.svelte";
@@ -72,32 +69,17 @@
 		};
 	}
 
-	let followingOverride: boolean | null = $state(null);
-
-	/** Whether the current user is following this profile's user */
-	let following = $derived(
-		followingOverride || ((user()?.following.some(following => following === profileUser.id) ?? false) && followingOverride === null),
-	);
-
 	/** Follows this user. */
 	function follow() {
-		followingOverride = true;
 		updateUser({
 			following: [...new Set([...user()!.following, profileUser.id])],
-		});
-		updateOtherUser(profileUser, {
-			followers: [...new Set([...profileUser.followers, user()!.id])],
 		});
 	}
 
 	/** Unfollows this user. */
 	function unfollow() {
-		followingOverride = false;
 		updateUser({
 			following: user()!.following.filter(id => id !== profileUser.id),
-		});
-		updateOtherUser(profileUser, {
-			followers: profileUser.followers.filter(id => id !== user()!.id),
 		});
 	}
 
@@ -177,23 +159,33 @@
 
 			<!-- Edit profile button -->
 			{#if isCurrentUser}
-				<button class="edit-profile" onclick={() => goto("/profile/edit")}>
+				<button class="edit button" onclick={() => goto("/profile/edit")}>
 					Edit Profile
 				</button>
 			{:else if user()}
-				<!-- Profile actions -->
-				<div class="profile-actions">
-					<button class="profile-action-follow">
-						{#if following}
-							<CheckIcon stroke="var(--overlay-1)" style="width: 2rem;" onclick={unfollow} />
-						{:else}
-							<AddIcon stroke="var(--overlay-1)" style="width: 2rem;" onclick={follow} />
-						{/if}
+				{#if user()!.following.includes(profileUser.id)}
+					<button class="unfollow button" onclick={unfollow}>
+						Unfollow
 					</button>
+				{:else}
+					<button class="follow button" onclick={follow}>
+						Follow
+					</button>
+				{/if}
+
+				<!-- Profile actions -->
+				<!-- <div class="profile-actions"> -->
+				<!-- 	<button class="profile-action-follow"> -->
+				<!-- 		{#if following} -->
+				<!-- 			<CheckIcon stroke="var(--overlay-1)" style="width: 2rem;" onclick={unfollow} /> -->
+				<!-- 		{:else} -->
+				<!-- 			<AddIcon stroke="var(--overlay-1)" style="width: 2rem;" onclick={follow} /> -->
+				<!-- 		{/if} -->
+				<!-- 	</button> -->
 					<!-- <button class="profile-action"> -->
 					<!-- 	<MessageIcon stroke="var(--overlay-1)" style="width: 1rem;" /> -->
 					<!-- </button> -->
-				</div>
+				<!-- </div> -->
 			{/if}
 		</div>
 
@@ -559,7 +551,7 @@
 			color: var(--surface-2);
 		}
 
-		.edit-profile {
+		.button {
 			position: absolute;
 			right: 0px;
 			top: 8.5rem;
@@ -570,8 +562,25 @@
 			padding-right: 1rem;
 			border-radius: 100vmax;
 			font-weight: 500;
-			background-image: linear-gradient(to bottom right, var(--lavender), var(--blue));
 			color: var(--crust);
+			transition: scale 0.2s;
+			box-shadow: 0px 0px 1rem black;
+
+			&:hover {
+				scale: 105%;
+			}
+
+			&.follow {
+				background-image: linear-gradient(to bottom right, var(--lavender), var(--blue));
+			}
+
+			&.unfollow {
+				background-image: linear-gradient(to bottom right, var(--peach), var(--red));
+			}
+
+			&.edit {
+				background-image: linear-gradient(to bottom right, var(--teal), var(--green));
+			}
 		}
 	}
 

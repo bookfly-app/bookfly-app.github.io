@@ -1,37 +1,71 @@
 <script lang="ts">
+	import { getFile } from "../api/storageapi";
+	import TrashIcon from "../assets/images/icons/TrashIcon.svelte";
 	import TriangleLeftIcon from "../assets/images/icons/TriangleLeftIcon.svelte";
 	import TriangleRight from "../assets/images/icons/TriangleRight.svelte";
+	import ClickableImage from "./ClickableImage.svelte";
 
-	let { images }: { images: string[] } = $props();
+	let { images = $bindable(), editable = false }: { images: string[], editable?: boolean } = $props();
 
 	let imageIndex = $state(0);
 	function cycleImage(amount: number) {
 		return async () => (imageIndex = Math.max(Math.min(imageIndex + amount, images.length - 1), 0));
 	}
+
+	function deleteCurrentImage() {
+		images = images.filter((_image, index) => imageIndex !== index);
+	}
 </script>
 
-<div class="media">
-	<div class="images" style:margin-left="{imageIndex * -23}rem">
-		{#each images as image}
-			<div class="media-wrapper">
-				<img alt="user content" src={image} />
-			</div>
-		{/each}
+{#if images.length > 0}
+	<div class="media">
+		{#if editable}
+			<button class="delete" onclick={deleteCurrentImage}>
+				<TrashIcon stroke="var(--red)" style="width: 1rem; height: 1rem;" />
+			</button>
+		{/if}
+		<div class="images" style:margin-left="{-imageIndex * 100}%">
+			{#each images as image}
+				{#await getFile(image)}
+				{:then image}
+					<ClickableImage src={image}>
+						<div class="media-wrapper" style:background-image="url('{image}')"></div>
+					</ClickableImage>
+				{/await}
+			{/each}
+		</div>
+		{#if images.length > 1}
+			<button onclick={cycleImage(-1)} class="rotate-image left">
+				<TriangleLeftIcon stroke="#FFFFFF" style="width: 1.5rem;" />
+			</button>
+			<button onclick={cycleImage(1)} class="rotate-image right">
+				<TriangleRight stroke="#FFFFFF" style="width: 1.5rem;" />
+			</button>
+		{/if}
 	</div>
-	<button onclick={cycleImage(-1)} class="rotate-image left">
-		<TriangleLeftIcon stroke="#FFFFFF" style="width: 1.5rem;" />
-	</button>
-	<button onclick={cycleImage(1)} class="rotate-image right">
-		<TriangleRight stroke="#FFFFFF" style="width: 1.5rem;" />
-	</button>
-</div>
+{/if}
 
 <style>
+	.delete {
+		background-color: var(--crust);
+		padding: 0.5rem;
+		position: absolute;
+		top: 0.5rem;
+		right: 0.5rem;
+		border-radius: 0.5rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--overlay-1);
+	}
+
 	.media {
 		margin-top: 1rem;
-		width: 100%;
+		aspect-ratio: 1.5;
 		overflow: hidden;
 		position: relative;
+		margin-bottom: 1rem;
+		max-width: 20rem;
 
 		&:hover :global(.rotate-image) {
 			opacity: 100%;
@@ -71,24 +105,23 @@
 			}
 		}
 	}
+
 	.images {
 		display: flex;
 		width: fit-content;
+		height: 100%;
+		width: 100%;
 		transition: margin-left 0.3s;
 
 		.media-wrapper {
-			width: 23rem;
-			height: 15rem;
+			height: 100%;
+			aspect-ratio: 1.5;
 			border-radius: 1rem;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			overflow: hidden;
-
-			img {
-				min-width: 100%;
-				min-height: 100%;
-			}
+			background-size: cover;
+			background-position: center;
 		}
 	}
 </style>

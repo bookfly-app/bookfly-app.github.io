@@ -12,12 +12,14 @@
 		onupload = (_imageId: string) => {}, 
 		imageId = $bindable(null),
 		circular = false,
+		allowEdit = true,
 		...rest 
 	}: {
 		aspectRatio?: number;
 		onupload?: (imageId: string) => void;
 		imageId?: string | null;
 		circular?: boolean;
+		allowEdit?: boolean;
 		[key: string]: unknown
 	} = $props();
 
@@ -47,7 +49,15 @@
 
 	let file: File | null = $state(null);
 	
-	function openImage() {
+	async function openImage() {
+		if (!allowEdit) {
+			const chosen = files?.[0] ?? null;
+			if (!chosen) return;
+			imageId = (await uploadFile(chosen))!;
+			onupload(imageId);
+			reset();
+		}
+
 		file = files?.[0] ?? null;
 		if (!file) return;
 

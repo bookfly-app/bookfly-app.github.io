@@ -39,7 +39,6 @@
 
 	let replyBody = $state("");
 
-	let imageAttachment: FileList | null = $state(null);
 	let images: string[] = $state([]);
 
 	async function sendReply() {
@@ -49,10 +48,9 @@
 			body,
 			type: "reply",
 			parent: (await thePost)!.id,
-			...(imageAttachment && { pictures: images }),
+			pictures: images,
 		});
 		newReplies = [replyPost, ...newReplies];
-		imageAttachment = null;
 	}
 
 	let parentChain = $derived.by(async () => {
@@ -70,7 +68,6 @@
 	
 	let scrolled = $derived(parentChain.then(chain => {
 		setTimeout(() => {
-			console.log(mainPost.getBoundingClientRect().top);
 			container.scrollTop = mainPost.getBoundingClientRect().top;
 		}, 100);
 		return chain.length;
@@ -98,7 +95,7 @@
 			<AnyPost bind:element={mainPost} post={post!} postpage />
 
 			{#if user()}
-				<div style:padding-bottom={imageAttachment === null ? "0.5rem" : "2.5rem"} style:border-color={theme().textDark} class="reply">
+				<div style:border-color={theme().textDark} class="reply">
 					<a aria-label="Go to profile" href="/profile">
 						{#await getFile(user()!.picture) then pfp}
 							<img alt="Your profile" src={pfp} />
@@ -112,20 +109,19 @@
 							onfocus={expand}
 							onblur={contract}
 							style:color={theme().text}
-							style:background={theme().backgroundDim}
 							placeholder="Leave a reply"
 						></textarea>
 
-						<ImageCarousel {images} />
+						<ImageCarousel bind:images editable />
 
-						<div style:bottom={imageAttachment === null ? "1.4rem" : "-2rem"} title="Post" class="send">
+						<div title="Post" class="send">
 							<label for="attach-image-reply">
-								<AddImageIcon stroke={theme().textDull} style="width: 1.5rem;" />
+								<AddImageIcon stroke="var(--overlay-1)" style="width: 1.5rem;" />
 							</label>
-							<ImagePicker id="attach-image-reply" onupload={imageId => images.push(imageId)} />
+							<ImagePicker allowEdit={false} id="attach-image-reply" onupload={async imageId => images.push(imageId)} />
 
 							<button onmousedown={sendReply}>
-								<SendIcon stroke={theme().textDull} style="width: 1.5rem;" />
+								<SendIcon stroke="var(--overlay-1)" style="width: 1.5rem;" />
 							</button>
 						</div>
 					</div>
@@ -178,6 +174,7 @@
 		align-items: center;
 		margin-top: 0.4rem;
 		filter: brightness(90%);
+		background: var(--mantle);
 	}
 
 	.replies {
@@ -217,7 +214,11 @@
 		gap: 0.5rem;
 		height: fit-content;
 		position: absolute;
-		right: 0.5rem;
+		right: 0.25rem;
+		top: 0.5rem;
+		background: var(--mantle);
+		padding: 0.25rem;
+		border-radius: 0.5rem;
 
 		> * {
 			display: flex;

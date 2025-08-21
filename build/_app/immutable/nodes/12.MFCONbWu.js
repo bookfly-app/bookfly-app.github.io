@@ -1,1 +1,0 @@
-import"../chunks/Bg9kRutz.js";import"../chunks/69_IOA4Y.js";import{a as t,t as m}from"../chunks/D66Go1WX.js";var p=m("<main><h2>Discord</h2></main>");function e(a){var o=p();t(a,o)}export{e as component};

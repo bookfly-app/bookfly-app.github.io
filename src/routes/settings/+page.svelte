@@ -13,7 +13,7 @@
 		<h1>Settings</h1>
 	</span>
 
-	<!-- Request author verification -->
+f<!-- Request author verification -->
 	<a href="/settings/appearance">
 		<div>
 			<PaintRollerIcon style="width: 1.25rem; height: 1.25rem;" stroke="var(--text)" />

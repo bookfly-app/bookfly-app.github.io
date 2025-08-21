@@ -10,6 +10,8 @@ export default {
 	kit: {
 		adapter: adapter({
 			fallback: "404.html",
+			pages: "build/web",
+			assets: "build/web",
 		}),
 		prerender: {
 			entries: [], // important for SPA routing

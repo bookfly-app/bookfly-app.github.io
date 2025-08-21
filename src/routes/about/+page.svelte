@@ -7,14 +7,15 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 
 <Page class="about">
 	<span class="heading">
-		<BackButton style="position: absolute; left: 0px;" />
-		<Wallflower stroke="var(--overlay-1)" style="width: 2rem; height: 2rem;" />
+		<BackButton style="position: absolute; left: 1rem;" />
+		<h1>About</h1>
 	</span>
 
 	<div class="definition">
 		<span>
 			<h2 class="wallflower"><i>Wall&middot;flow&middot;er</i></h2>
 			<span class="ipa" aria-label="US IPA">&#x2F;&#x2C8;w&#x0251;l;&#x02D0;fla&#x028A;.&#x0259;r&#x2F;</span>
+			<Wallflower stroke="var(--overlay-1)" style="width: 1rem; height: 1rem; margin-left: auto; margin-right: 0.25rem;" />
 		</span>
 		<p class="body">
 			<i>(noun)</i>
@@ -118,10 +119,23 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 		align-items: center;
 		position: relative;
 		justify-content: center;
+		position: fixed;
+		top: 0px;
+		background-color: var(--crust);
+		width: 100%;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+		left: 0px;
+
+		h1 {
+			color: var(--text);
+			font-weight: normal;
+			font-size: 1.5rem;
+		}
 	}
 
 	.definition {
-		margin-top: 0.5rem;
+		margin-top: 4rem;
 		padding-top: 1rem;
 		color: var(--overlay-1);
 		display: flex;

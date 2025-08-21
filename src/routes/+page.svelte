@@ -2,7 +2,6 @@
 	import { getFollowedPosts, getForYouPosts } from "../api/postapi";
 	import CatIcon from "../assets/images/icons/CatIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
-	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
 	import { user } from "../backend/auth.svelte";
 	import New from "../components/New.svelte";
 	import Page from "../components/Page.svelte";
@@ -10,6 +9,7 @@
 	import Sidebar from "../components/Sidebar.svelte";
 	import Wallflower from "../assets/images/icons/Wallflower.svelte";
 	import { getFile } from "../api/storageapi";
+	import BellIcon from "../assets/images/icons/BellIcon.svelte";
 
 	let view: "following" | "for you" = $state(user() ? "following" : "for you");
 
@@ -44,8 +44,8 @@
 				<Wallflower class={spinLogo ? "spin" : ""} style="width: 2rem; height: 2rem;" stroke="var(--overlay-1)" />
 			</button>
 
-			<a class="search" href="/search">
-				<SearchIcon style="width: 2rem; height: 2rem;" stroke="var(--subtext-1)" />
+			<a href="/inbox">
+				<BellIcon style="width: 2rem; height: 2rem;" stroke="var(--overlay-1)" />
 			</a>
 		</div>
 	</nav>
@@ -119,10 +119,6 @@
 
 	.footer-padding {
 		height: 4rem;
-	}
-
-	.search {
-		padding-bottom: 1rem;
 	}
 
 	@keyframes spin {

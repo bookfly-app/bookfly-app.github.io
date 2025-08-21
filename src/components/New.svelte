@@ -5,7 +5,6 @@
 </script>
 
 {#if user()}
-	<div></div>
 	<a href="/new" style:background={accentGradient()} style:color={theme().backgroundDark}>
 		<PlusIcon stroke={theme().backgroundDark} style="width: 2rem;" />
 	</a>
@@ -24,21 +23,11 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-	}
+		box-shadow: 0px 0px 0.5rem black;
+		transition: scale 0.1s;
 
-	div {
-		position: fixed;
-		right: 1rem;
-		bottom: 5rem;
-		bottom: 5rem;
-		font-size: 3rem;
-		width: 4rem;
-		height: 4rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: black;
-		filter: blur(10px);
-		border-radius: 50%;
+		&:hover {
+			scale: 105%;
+		}
 	}
 </style>

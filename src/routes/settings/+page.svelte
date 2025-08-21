@@ -8,12 +8,12 @@
 </script>
 
 <Page class="settings">
-	<span class="settings-header">
-		<BackButton />
+	<span class="heading">
+		<BackButton style="position: absolute; left: 1rem;" />
 		<h1>Settings</h1>
 	</span>
 
-f<!-- Request author verification -->
+	<!-- Request author verification -->
 	<a href="/settings/appearance">
 		<div>
 			<PaintRollerIcon style="width: 1.25rem; height: 1.25rem;" stroke="var(--text)" />
@@ -35,7 +35,7 @@ f<!-- Request author verification -->
 			<BellIcon style="width: 1.25rem; height: 1.25rem;" stroke="var(--text)" />
 			<span>Notifications</span>
 		</div>
-		<p>Configure what kind of notifications you'd like to get.</p>
+		<p>Configure what kind of notifications you'd like to see in your inbox.</p>
 	</a>
 
 	<a href="/about">
@@ -87,8 +87,33 @@ f<!-- Request author verification -->
 			color: var(--overlay-1);
 		}
 
+		&:first-of-type {
+			margin-top: 4.5rem;
+		}
+
 		&:hover {
 			background: rgba(150, 150, 255, 10%);
+		}
+	}
+
+	.heading {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+		position: relative;
+		justify-content: center;
+		position: fixed;
+		top: 0px;
+		background-color: var(--crust);
+		width: 100%;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+		left: 0px;
+
+		h1 {
+			color: var(--text);
+			font-weight: normal;
+			font-size: 1.25rem;
 		}
 	}
 </style>

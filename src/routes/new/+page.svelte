@@ -4,10 +4,12 @@
 	import BackButton from "../../components/BackButton.svelte";
 </script>
 
-<Page class="new-page">
-	<BackButton style="position: absolute; left: 1rem; top: 1rem;" href="/profile" />
+<Page type="new" class="new-page">
+	<span class="heading">
+		<BackButton style="position: absolute; left: 1rem;" />
+		<h1>New Post</h1>
+	</span>
 
-	<h1 style:color={theme().textBright}>New Post</h1>
 	<p class="kind" style:color={theme().textDull}>What kind of post do you want to make?</p>
 
 	<!-- General post -->
@@ -88,6 +90,31 @@
 
 		&:hover {
 			scale: 105%;
+		}
+	}
+
+	.kind {
+		margin-top: 4rem;
+	}
+
+	.heading {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+		position: relative;
+		justify-content: center;
+		position: fixed;
+		top: 0px;
+		background-color: var(--crust);
+		width: 100%;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+		left: 0px;
+
+		h1 {
+			color: var(--text);
+			font-weight: normal;
+			font-size: 1.5rem;
 		}
 	}
 </style>

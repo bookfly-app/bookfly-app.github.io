@@ -6,11 +6,18 @@
 	function clampPercent(value: number) {
 		return Math.max(Math.min(value, 1), 0);
 	}
+
+	function editRating(value: number) {
+		return function() {
+			if (!interactive) return;
+			rating = rating === value ? value + 1 : value;
+		}
+	}
 </script>
 
 <span class="rating">
 	<StarIcon
-		onclick={() => rating = rating === 0 ? 1 : 0}
+		onclick={editRating(0)}
 		stroke="var(--yellow)"
 		fill="var(--yellow)"
 		fillEnd="var(--base)"
@@ -18,7 +25,7 @@
 		style="cursor: {interactive ? 'pointer' : 'default'}; width: {size * 1.5}rem; height: {size * 1.5}rem;"
 	/>
 	<StarIcon
-		onclick={() => rating = rating === 2 ? 3 : 2}
+		onclick={editRating(2)}
 		stroke="var(--yellow)"
 		fill="var(--yellow)"
 		fillEnd="var(--base)"
@@ -26,7 +33,7 @@
 		style="cursor: {interactive ? 'pointer' : 'default'}; width: {size * 1.5}rem; height: {size * 1.5}rem;"
 	/>
 	<StarIcon
-		onclick={() => rating = rating === 4 ? 5 : 4}
+		onclick={editRating(4)}
 		stroke="var(--yellow)"
 		fill="var(--yellow)"
 		fillEnd="var(--base)"
@@ -34,7 +41,7 @@
 		style="cursor: {interactive ? 'pointer' : 'default'}; width: {size * 1.5}rem; height: {size * 1.5}rem;"
 	/>
 	<StarIcon
-		onclick={() => rating = rating === 6 ? 7 : 6}
+		onclick={editRating(6)}
 		stroke="var(--yellow)"
 		fill="var(--yellow)"
 		fillEnd="var(--base)"
@@ -42,7 +49,7 @@
 		style="cursor: {interactive ? 'pointer' : 'default'}; width: {size * 1.5}rem; height: {size * 1.5}rem;"
 	/>
 	<StarIcon
-		onclick={() => rating = rating === 8 ? 9 : 8}
+		onclick={editRating(8)}
 		stroke="var(--yellow)"
 		fill="var(--yellow)"
 		fillEnd="var(--base)"

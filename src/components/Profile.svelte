@@ -18,6 +18,7 @@
 	import { cssVar } from "../api/themes.svelte";
 	import { getFile } from "../api/storageapi";
 	import Sidebar from "./Sidebar.svelte";
+	import ClickableImage from "./ClickableImage.svelte";
 
 	let props = $props();
 	let profileUser: User = props.user;
@@ -131,16 +132,18 @@
 
 <section>
 	{#await getFile(profileUser.banner) then bnr}
-		<div class="banner" style:background-image={`url("${bnr}")`}></div>
+		<ClickableImage src={bnr!}>
+			<div class="banner" style:background-image={`url("${bnr}")`}></div>
+		</ClickableImage>
 	{/await}
 	<button class="back-arrow" onclick={() => sidebar.show()}>
 		<LeftArrowIcon stroke="#FFFFFF" style="width: 1.5rem; height: 1.5rem;" />
 	</button>
 	<div class="profile">
 		{#await getFile(profileUser.picture) then pfp}
-			<img
+			<ClickableImage
 				class="profile-picture"
-				src={pfp}
+				src={pfp!}
 				alt={`${profileUser.displayName} profile picture`}
 			/>
 		{/await}
@@ -467,6 +470,17 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+
+		:global(.profile-picture) {
+			margin-left: 1rem;
+			border-radius: 50%;
+			width: 6rem;
+			height: 6rem;
+			margin-top: 4.7rem;
+			z-index: 2;
+			border: 0.5rem solid var(--crust);
+		}
+
 	}
 
 	.profile-line-2 {
@@ -546,16 +560,6 @@
 				background-image: linear-gradient(to bottom right, var(--teal), var(--green));
 			}
 		}
-	}
-
-	.profile-picture {
-		margin-left: 1rem;
-		border-radius: 50%;
-		width: 6rem;
-		height: 6rem;
-		margin-top: 4.7rem;
-		z-index: 2;
-		border: 0.5rem solid var(--crust);
 	}
 
 	.name {

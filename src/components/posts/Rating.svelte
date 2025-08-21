@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getBook } from "../../api/bookapi";
 	import { format } from "../../api/postapi";
+	import BookCover from "../BookCover.svelte";
 	import StarRating from "../StarRating.svelte";
 
 	let { isbn, rating, review, user } = $props();
@@ -29,7 +30,7 @@
 				</h1>
 			</div>
 			<a href={`/book/${book?.isbn}`} aria-label={`Go to details for book "${book?.title}"`}>
-				<img alt={`Cover for book "${book?.title}"`} src={book?.cover} />
+				<BookCover {book} style="width: 6rem; margin-left: 1rem;" />
 			</a>
 		</div>
 		{#await format(review) then body}
@@ -93,12 +94,6 @@
 			font-size: inherit;
 			color: var(--yellow);
 		}
-	}
-
-	img {
-		width: 6rem;
-		height: 9rem;
-		margin-left: 1rem;
 	}
 
 	.review {

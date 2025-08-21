@@ -7,8 +7,8 @@
 </script>
 
 <Page class="settings">
-	<span class="settings-header">
-		<BackButton href="/settings" />
+	<span class="heading">
+		<BackButton style="position: absolute; left: 1rem;" />
 		<h1>Appearance</h1>
 	</span>
 
@@ -36,13 +36,6 @@
 		font-size: 1.5rem;
 	}
 
-	.settings-header {
-		display: flex;
-		align-items: center;
-		padding: 1.5rem;
-		gap: 2rem;
-	}
-
 	label {
 		display: flex;
 		justify-content: space-between;
@@ -51,6 +44,31 @@
 
 		span {
 			color: var(--subtext-1);
+		}
+
+		&:first-of-type {
+			margin-top: 5rem;
+		}
+	}
+
+	.heading {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+		position: relative;
+		justify-content: center;
+		position: fixed;
+		top: 0px;
+		background-color: var(--crust);
+		width: 100%;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+		left: 0px;
+
+		h1 {
+			color: var(--text);
+			font-weight: normal;
+			font-size: 1.25rem;
 		}
 	}
 </style>

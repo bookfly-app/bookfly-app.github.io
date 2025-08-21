@@ -8,8 +8,8 @@
 </script>
 
 <Page class="settings">
-	<span class="settings-header">
-		<BackButton />
+	<span class="heading">
+		<BackButton style="position: absolute; left: 1rem;" />
 		<h1>Account</h1>
 	</span>
 
@@ -62,13 +62,6 @@
 		font-size: 1.5rem;
 	}
 
-	.settings-header {
-		display: flex;
-		align-items: center;
-		padding: 1.5rem;
-		gap: 2rem;
-	}
-
 	a {
 		text-decoration: none;
 		font-size: 1.25rem;
@@ -77,6 +70,10 @@
 		gap: 0.5rem;
 		padding: 1rem;
 		padding-left: 2rem;
+
+		&:first-of-type {
+			margin-top: 4.5rem;
+		}
 
 		> div {
 			display: flex;
@@ -97,6 +94,27 @@
 
 		&:hover {
 			background: rgba(150, 150, 255, 10%);
+		}
+	}
+
+	.heading {
+		display: flex;
+		gap: 1rem;
+		align-items: center;
+		position: relative;
+		justify-content: center;
+		position: fixed;
+		top: 0px;
+		background-color: var(--crust);
+		width: 100%;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
+		left: 0px;
+
+		h1 {
+			color: var(--text);
+			font-weight: normal;
+			font-size: 1.25rem;
 		}
 	}
 </style>

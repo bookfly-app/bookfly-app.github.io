@@ -10,7 +10,7 @@
 <section>
 	{#await book then book}
 		<!-- Update information -->
-		<p class="rating-line" style:color={theme().textDull}>
+		<p class="rating-line">
 			{user.displayName}
 			{#if updateType === "start"}
 				started reading
@@ -19,7 +19,7 @@
 			{:else if updateType === "abandon"}
 				abandoned
 			{/if}
-			<i style:color={theme().text}>{book?.title}</i>
+			<i>{book?.title}</i>
 			:
 		</p>
 
@@ -27,13 +27,13 @@
 		<div class="info">
 			<div class="content">
 				<!-- Book title & authors -->
-				<a href="/book/{book?.isbn}" class="title" style:color={theme().text}>{book?.title}</a>
-				<a href="/book/{book?.isbn}" class="author" style:color={theme().textDim}>
+				<a href="/book/{book?.isbn}" class="title">{book?.title}</a>
+				<a href="/book/{book?.isbn}" class="author">
 					{book?.authors.join(", ")}
 				</a>
 
 				<!-- Book genres -->
-				<p style:color={theme().text}>
+				<p>
 					{[...(book?.genres ?? [])].splice(0, 2).join(", ")}
 				</p>
 			</div>
@@ -46,7 +46,7 @@
 	{/await}
 
 	<!-- Post body -->
-	<p class="review" style:color={theme().text}>{body}</p>
+	<p class="review">{body}</p>
 </section>
 
 <style>
@@ -75,21 +75,30 @@
 
 		.title {
 			font-size: 1.2rem;
+			color: var(--text);
 		}
 
 		.author {
 			font-size: 0.9rem;
+			color: var(--surface-2);
 		}
 
 		p {
 			font-size: 0.85rem;
 			padding-top: 1rem;
+			color: var(--subtext-1);
+			text-align: center;
 		}
 	}
 
 	.rating-line {
 		padding-bottom: 1rem;
 		font-size: 0.85rem;
+		color: var(--overlay-1);
+
+		i {
+			color: var(--text);
+		}
 	}
 
 	img {
@@ -100,5 +109,6 @@
 	.review {
 		padding-top: 1rem;
 		font-size: 0.85rem;
+		color: var(--subtext-1);
 	}
 </style>

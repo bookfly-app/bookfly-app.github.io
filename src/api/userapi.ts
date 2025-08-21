@@ -1,49 +1,18 @@
-import { collection, getDoc, getDocs, orderBy, query, where } from "firebase/firestore";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
 import { type InternalPost, type Post, type PostId } from "./postapi";
 import { fuzzyQuery } from "./util";
+import { updateUser, user } from "../backend/auth.svelte";
 
 export type UserId = string;
 
-export type InternalUser = {
-	// Internal
-
-	username: string;
-	email: string;
-	id: string;
-
-	// Profile
-
-	displayName: string;
-	banner: string;
-	picture: string;
-	bio: string;
-	tags: string[];
-	links: {}[];
-	currentBook: string | null;
-	pronouns: string;
-	birthmoment: number;
-
-	views: PostId[];
-	likes: PostId[];
-	shares: PostId[];
-
-	readingList: ISBN[];
-
-	followers: UserId[];
-	following: UserId[];
-};
-
 export type User = {
-	// Internal
-
 	username: string;
 	email: string;
 	id: string;
 
 	// Profile
-
 	displayName: string;
 	banner: string;
 	picture: string;
@@ -62,15 +31,10 @@ export type User = {
 
 	readingList: ISBN[];
 
-	followers: UserId[];
 	following: UserId[];
-};
 
-type Settings = {
-	appearance: {
-		showMyPostsInFollowingFeed: boolean;
-		theme: string;
-	};
+	// Preferences
+	darkMode: boolean;
 };
 
 let { db } = initializeFirebase();
@@ -148,18 +112,18 @@ export async function getFollowers(user: User): Promise<User[]> {
 export async function getUserFromId(id: UserId): Promise<User> {
 	let internalUser = (
 		await getDocs(query(collection(db, "users"), where("id", "==", id)))
-	).docs[0].data() as InternalUser;
+	).docs[0].data() as User;
 	return internalUser;
 }
 
-export async function internalUserToUser(user: InternalUser): Promise<User> {
+export async function internalUserToUser(user: User): Promise<User> {
 	return user;
 }
 
 export async function getUserFromUsername(username: string): Promise<User> {
 	let user = (
 		await getDocs(query(collection(db, "users"), where("username", "==", username)))
-	).docs[0].data() as InternalUser;
+	).docs[0].data() as User;
 	return user;
 }
 
@@ -199,4 +163,35 @@ export async function searchUsers(searchTerm: string): Promise<User[]> {
 		return docs.length > 0 ? [docs[0].data() as User] : [];
 	}
 	return fuzzyQuery(searchTerm, "displayName", "users");
+}
+
+export const defaultPreferences = {
+	darkMode: true,
+} as const satisfies Preferences;
+
+type Preferences = {
+	darkMode: boolean;
+};
+
+export type Preference = keyof Preferences;
+export type PreferenceValue<T extends Preference> = Preferences[T];
+
+export function getPreference<Name extends Preference>(name: Name): PreferenceValue<Name> {
+	if (user()) return user()![name];
+
+	const fromStorage = localStorage.getItem(`preference-${name}`);
+	if (fromStorage) return JSON.parse(fromStorage);
+
+	const preference = defaultPreferences[name];
+	localStorage.setItem(`preference-${name}`, JSON.stringify(preference));
+
+	return preference;
+}
+
+export async function setPreference<Name extends keyof typeof defaultPreferences>(
+	name: Name,
+	value: (typeof defaultPreferences)[Name],
+): Promise<void> {
+	localStorage.setItem(`preference-${name}`, JSON.stringify(value));
+	if (user()) await updateUser({ [name]: value });
 }

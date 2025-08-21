@@ -24,7 +24,6 @@
 	import HeartIcon from "../../assets/images/icons/HeartIcon.svelte";
 	import ShareIcon from "../../assets/images/icons/ShareIcon.svelte";
 	import { user } from "../../backend/auth.svelte";
-	import theme from "../../themes/theme.svelte";
 	import Badges from "../Badges.svelte";
 	import ContextMenu from "../ContextMenu.svelte";
 	import ImageCarousel from "../ImageCarousel.svelte";
@@ -241,7 +240,6 @@
 	tabindex="0"
 	role="link"
 	onclick={clickPost}
-	style:border-top={postpage ? "none" : `1px solid var(--surface-0)`}
 	style:border-bottom={postpage ? "none" : `1px solid var(--surface-0)`}
 	bind:this={element}
 >
@@ -262,20 +260,19 @@
 		<!-- User info: Display Name & Username -->
 		{#await poster}
 			<span class="user">
-				<span class="missing-username" style:color={theme().textBright}></span>
-
-				<button class="timestamp" onclick={toggleTimeFormat} style:color={theme().textDim}>
+				<span class="missing-username"></span>
+				<button class="timestamp" onclick={toggleTimeFormat}>
 					{elapsedTime}
 				</button>
 			</span>
 		{:then poster}
 			<span class="user">
-				<a href="/profile/{poster.username}" class="display-name" style:color={theme().textBright}>{poster.displayName}</a>
-				<a href="/profile/{poster.username}" class="username" style:color={theme().textDim}>{`@${poster.username}`}</a>
+				<a href="/profile/{poster.username}" class="display-name">{poster.displayName}</a>
+				<a href="/profile/{poster.username}" class="username">{`@${poster.username}`}</a>
 
 				<Badges forUser={poster} size={0.7} />
 
-				<button class="timestamp" onclick={toggleTimeFormat} style:color={theme().textDim}>
+				<button class="timestamp" onclick={toggleTimeFormat}>
 					{elapsedTime}
 				</button>
 			</span>
@@ -283,7 +280,7 @@
 
 		<!-- Reply: Show "replying to @user" text -->
 		{#if post.type === "reply"}
-			<span style:color={theme().textDim} class="replying-to">
+			<span class="replying-to">
 				Replying to
 				{#await parent then parent}
 					{#await getUserFromId(parent!.poster)}
@@ -317,8 +314,8 @@
 		<!-- Post stats (views, likes, replies, etc.) -->
 		<div class="stats">
 			<!-- Views Button -->
-			<span style:color="#88FFDD">
-				<EyeIcon stroke="#88FFDD" style="width: 1rem;" />
+			<span style:color="var(--teal)">
+				<EyeIcon stroke="var(--teal)" style="width: 1rem;" />
 				{#await views}
 					0
 				{:then views}
@@ -327,8 +324,8 @@
 			</span>
 
 			<!-- Like Button -->
-			<button onclick={toggleLike} style:color={liked ? "#FFAACC" : theme().textDim}>
-				<HeartIcon fill={liked ? "#FFAACC" : "none"} stroke={liked ? "#FFAACC" : theme().textDim} style="width: 1rem;" />
+			<button onclick={toggleLike} style:color={liked ? "var(--pink)" : "var(--surface-2)"}>
+				<HeartIcon fill={liked ? "var(--pink)" : "none"} stroke={liked ? "var(--pink)" : "var(--surface-2)"} style="width: 1rem;" />
 				{#await likes}
 					0
 				{:then likes}
@@ -343,8 +340,8 @@
 					0
 				</button>
 			{:then commented}
-				<button onclick={goToPost} style:color={commented ? "#99BBFF" : theme().textDim}>
-					<CommentIcon stroke={commented ? "#99BBFF" : theme().textDim} style="width: 1rem;" />
+				<button onclick={goToPost} style:color={commented ? "var(--blue)" : "var(--surface-2)"}>
+					<CommentIcon stroke={commented ? "var(--blue)" : "var(--surface-2)"} style="width: 1rem;" />
 					{#await comments}
 						0
 					{:then comments}
@@ -354,8 +351,8 @@
 			{/await}
 
 			<!-- Share Button -->
-				<button style:color={shared ? "#BB99FF" : theme().textDim} onclick={share}>
-					<ShareIcon stroke={shared ? "#BB99FF" : theme().textDim} style="width: 0.85rem;" />
+				<button style:color={shared ? "#BB99FF" : "var(--surface-2)"} onclick={share}>
+					<ShareIcon stroke={shared ? "#BB99FF" : "var(--surface-2)"} style="width: 0.85rem;" />
 					{#await shares}
 						0
 					{:then shares}
@@ -366,14 +363,14 @@
 
 			<!-- Post Actions Button -->
 			<button onclick={event => actionsMenu.open(event)}>
-				<DotMenuIcon stroke={theme().textDull} style="width: 1.25rem;" />
+				<DotMenuIcon stroke="var(--overlay-1)" style="width: 1.25rem;" />
 				<ContextMenu bind:this={actionsMenu}>
 					{#if isCurrentUser}
-						<button onclick={deleteAndUpdate} style:background={theme().backgroundDim} style:color={theme().textBright}>
+						<button onclick={deleteAndUpdate}>
 							Delete Post
 						</button>
 					{:else}
-						<button style:background={theme().backgroundDim} style:color={theme().textBright}>Report</button>
+						<button>Report</button>
 					{/if}
 				</ContextMenu>
 			</button>
@@ -403,6 +400,7 @@
 		display: flex;
 		gap: 0.25rem;
 		align-items: center;
+		color: var(--surface-2);
 
 		.loading-replying {
 			height: 0.70rem;
@@ -413,7 +411,7 @@
 
 		a {
 			text-decoration: none;
-			color: cornflowerblue;
+			color: var(--blue);
 		}
 	}
 
@@ -465,6 +463,11 @@
 
 		.display-name {
 			font-size: 1rem;
+			color: var(--text);
+		}
+
+		.username {
+			color: var(--surface-2);
 		}
 
 		.username,
@@ -484,6 +487,7 @@
 			font-size: 0.85rem;
 			margin-left: auto;
 			cursor: pointer;
+			color: var(--surface-2);
 		}
 	}
 </style>

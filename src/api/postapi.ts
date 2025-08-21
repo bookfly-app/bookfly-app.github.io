@@ -15,7 +15,7 @@ import { updateUser, user } from "../backend/auth.svelte";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
 import type { Image } from "./serializer";
-import { getUserFromId, type InternalUser, type User, type UserId } from "./userapi";
+import { getUserFromId, type User, type UserId } from "./userapi";
 
 export type PostType = "general" | "rating" | "update" | "reply";
 
@@ -254,16 +254,16 @@ export async function getReplies(post: InternalPost): Promise<InternalPost[]> {
 	);
 }
 
-export async function getLikes(post: InternalPost): Promise<InternalUser[]> {
+export async function getLikes(post: InternalPost): Promise<User[]> {
 	return (
 		await getDocs(query(collection(db, "users"), where("likes", "array-contains", post.id)))
-	).docs.map(doc => doc.data() as InternalUser);
+	).docs.map(doc => doc.data() as User);
 }
 
-export async function getShares(post: InternalPost): Promise<InternalUser[]> {
+export async function getShares(post: InternalPost): Promise<User[]> {
 	return (
 		await getDocs(query(collection(db, "users"), where("shares", "array-contains", post.id)))
-	).docs.map(doc => doc.data() as InternalUser);
+	).docs.map(doc => doc.data() as User);
 }
 
 /**

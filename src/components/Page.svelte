@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import theme from "../themes/theme.svelte";
 	import Sidebar from "./Sidebar.svelte";
-	import { setTheme } from "../api/themes.svelte";
 	import Footer from "./Footer.svelte";
+	import { setTheme } from "../api/themes.svelte";
+	import { getPreference } from "../api/userapi";
 
 	let { sidebar = $bindable(), type = undefined, children, ...rest } = $props();
 
@@ -12,7 +12,7 @@
 			sidebar.show();
 		}
 
-		setTheme("Catppuccin Mocha");
+		setTheme(getPreference("darkMode") ? "Catppuccin Mocha" : "Catppuccin Latte");
 	});
 </script>
 

@@ -12,7 +12,6 @@
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import ProfileIcon from "../assets/images/icons/ProfileIcon.svelte";
 	import { logOut, user } from "../backend/auth.svelte";
-	import theme from "../themes/theme.svelte";
 
 	let innerWidth = $state(window.innerWidth);
 	let innerHeight = $state(window.innerHeight);
@@ -90,14 +89,14 @@
 	<div onclick={hide} class="overlay" style:opacity={overlayOpacity} style:display={overlayDisplay}></div>
 {/if}
 <section style:left bind:this={sidebar}>
-	<div class="profile" style:background={theme().backgroundDark}>
+	<div class="profile">
 		<a class="profile-picture" href="/profile" aria-label="Go to profile">
 			{#if user()}
 				{#await getFile(user()!.picture) then pfp}
 					<img alt="Your profile" src={pfp} class="profile-link" />
 				{/await}
 			{:else}
-				<PersonIcon stroke={theme().textDull} style="width: 4rem; height: 4rem;" />
+				<PersonIcon stroke="var(--overlay-1)" style="width: 4rem; height: 4rem;" />
 			{/if}
 		</a>
 		<div>
@@ -115,41 +114,41 @@
 
 		{#if aspectRatio < 1}
 			<button onclick={hide}>
-				<CloseIcon stroke={theme().textBright} style="width: 1.5rem; height: 1.5rem; position: absolute; top: 1.5rem; right: 1.5rem;" />
+				<CloseIcon stroke="var(--text)" style="width: 1.5rem; height: 1.5rem; position: absolute; top: 1.5rem; right: 1.5rem;" />
 			</button>
 		{/if}
 	</div>
 
 	<!-- Navigation buttons -->
-	<button class="listing" style:color={theme().text} onclick={nav("/")}>
-		<EmptyHomeIcon stroke={theme().text} style="width: 1.5rem;" />
+	<button class="listing" style:color="var(--subtext-1)" onclick={nav("/")}>
+		<EmptyHomeIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
 		Home
 	</button>
-	<button class="listing" style:color={theme().text} onclick={nav("/profile")}>
-		<ProfileIcon stroke={theme().text} style="width: 1.5rem;" />
+	<button class="listing" style:color="var(--subtext-1)" onclick={nav("/profile")}>
+		<ProfileIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
 		Profile
 	</button>
-	<button class="listing" style:color={theme().text} onclick={nav("/settings")}>
-		<BookmarkIcon stroke={theme().text} style="width: 1.5rem;" />
+	<button class="listing" style:color="var(--subtext-1)" onclick={nav("/settings")}>
+		<BookmarkIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
 		Saved
 	</button>
-	<button class="listing" style:color={theme().text} onclick={nav("/settings")}>
-		<GearIcon stroke={theme().text} style="width: 1.5rem;" />
+	<button class="listing" style:color="var(--subtext-1)" onclick={nav("/settings")}>
+		<GearIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
 		Settings
 	</button>
-	<button class="listing" style:color={theme().text} onclick={nav("/about")}>
-		<InfoIcon2 stroke={theme().text} style="width: 1.5rem;" />
+	<button class="listing" style:color="var(--subtext-1)" onclick={nav("/about")}>
+		<InfoIcon2 stroke="var(--subtext-1)" style="width: 1.5rem;" />
 		About
 	</button>
 
 	{#if user()}
-		<button style:background={theme().backgroundDark} class="listing" style:color={theme().text} onclick={signOut}>
-			<ExitIcon stroke={theme().text} style="width: 1.5rem;" />
+		<button class="listing" style:color="var(--subtext-1)" onclick={signOut}>
+			<ExitIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
 			Log Out
 		</button>
 	{:else}
-		<a style:background={theme().backgroundDark} class="listing" style:color={theme().text} href="/login">
-			<EnterIcon stroke={theme().text} style="width: 1.5rem;" />
+		<a class="listing" style:color="var(--subtext-1)" href="/login">
+			<EnterIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
 			Log In
 		</a>
 	{/if}
@@ -180,11 +179,12 @@
 			width: 100%;
 
 			&:hover {
-				background: var(--hover);
+				background: rgba(150, 150, 255, 10%);
 			}
 
 			&:last-child {
 				margin-top: auto;
+				background: var(--crust);
 			}
 		}
 	}
@@ -207,11 +207,11 @@
 
 	.profile {
 		padding-top: 2rem;
-		border-bottom-style: solid;
-		border-bottom-width: 1px;
+		border-bottom: 1px solid var(--surface-0);
 		padding-bottom: 2rem;
 		display: flex;
 		align-items: center;
+		background: var(--crust);
 
 		h1 {
 			font-size: 1rem;

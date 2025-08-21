@@ -1,17 +1,17 @@
 <script>
 	import { goto } from "$app/navigation";
-	import LeftArrowIcon from "../assets/images/icons/LeftArrowIcon.svelte";
-	import theme, { accentGradient } from "../themes/theme.svelte";
+	import LeftCaretIcon from "../assets/images/icons/LeftCaretIcon.svelte";
 
 	let { href = undefined, ...props } = $props();
 </script>
 
-<button {...props} onclick={() => href ? goto(href) : window.history.back()} style:background={accentGradient()}>
-	<LeftArrowIcon style="width: 1.25rem; height: 1.25rem;" stroke={theme().backgroundDark}/>
+<button {...props} onclick={() => href ? goto(href) : window.history.back()}>
+	<LeftCaretIcon style="width: 1.25rem; height: 1.25rem;" stroke="var(--crust)" />
 </button>
 
 <style>
 	button {
+		background: linear-gradient(to bottom right, var(--lavender), var(--blue));
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -21,6 +21,11 @@
 		z-index: 9999;
 		width: fit-content;
 		height: fit-content;
+		transition: scale 0.2s;
+
+		&:hover {
+			scale: 110%;
+		}
 
 		&, :global(*) {
 			cursor: pointer;

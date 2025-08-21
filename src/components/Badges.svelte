@@ -4,7 +4,6 @@
 	import EditIcon from "../assets/images/icons/EditIcon.svelte";
 	import SproutIcon from "../assets/images/icons/SproutIcon.svelte";
 	import WrenchIcon from "../assets/images/icons/WrenchIcon.svelte";
-	import theme from "../themes/theme.svelte";
 
 	let { forUser, size }: { forUser: User; size: number } = $props();
 </script>
@@ -20,7 +19,7 @@
 				title="{forUser.displayName} is a Wallflower developer"
 				class="badge dev"
 			>
-				<DeveloperIcon stroke={theme().backgroundDark} style="width: {size}rem;" />
+				<DeveloperIcon stroke="var(--crust)" style="width: {size}rem;" />
 			</a>
 		{/if}
 		{#if forUser.tags.includes("author")}
@@ -32,7 +31,7 @@
 				title="{forUser.displayName} is a verified published author"
 				class="badge author"
 			>
-				<EditIcon stroke={theme().backgroundDark} style="width: {size}rem;" />
+				<EditIcon stroke="var(--crust)" style="width: {size}rem;" />
 			</a>
 		{/if}
 		{#if forUser.tags.includes("mod")}
@@ -44,7 +43,7 @@
 				title="{forUser.displayName} is a Wallflower moderator"
 				class="badge mod"
 			>
-				<WrenchIcon stroke={theme().backgroundDark} style="width: {size * 0.8}rem;" />
+				<WrenchIcon stroke="var(--crust)" style="width: {size * 0.8}rem;" />
 			</a>
 		{/if}
 		{#if Date.now() - forUser.birthmoment < 1000 * 60 * 60 * 24 * 7}
@@ -56,7 +55,7 @@
 				title="{forUser.displayName} is a Wallflower moderator"
 				class="badge new"
 			>
-				<SproutIcon stroke={theme().backgroundDark} style="width: {size * 0.8}rem;" />
+				<SproutIcon stroke="var(--crust)" style="width: {size * 0.8}rem;" />
 			</a>
 		{/if}
 	</span>
@@ -74,15 +73,15 @@
 	}
 
 	.dev {
-		background-image: linear-gradient(to bottom right, #a6e3a1, #89dceb);
+		background-image: linear-gradient(to bottom right, var(--green), var(--teal));
 	}
 
 	.author {
-		background-image: linear-gradient(to bottom right, #fab387, #f38ba8);
+		background-image: linear-gradient(to bottom right, var(--peach), var(--red));
 	}
 
 	.mod {
-		background-image: linear-gradient(to bottom right, #f5c2e7, #b4befe);
+		background-image: linear-gradient(to bottom right, var(--pink), var(--lavender));
 	}
 
 	.new {

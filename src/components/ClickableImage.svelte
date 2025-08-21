@@ -35,11 +35,12 @@
 		align-items: center;
 		justify-content: center;
 		padding: 2rem;
+		z-index: 9999999;
 	}
 
 	.preview {
 		width: 100%;
-		z-index: 9999999;
 		border-radius: 0.5rem;
+		max-width: 50rem;
 	}
 </style>

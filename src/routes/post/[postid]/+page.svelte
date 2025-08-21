@@ -8,7 +8,6 @@
 	import ImagePicker from "../../../components/ImagePicker.svelte";
 	import Page from "../../../components/Page.svelte";
 	import AnyPost from "../../../components/posts/AnyPost.svelte";
-	import theme from "../../../themes/theme.svelte";
 
 	let { data }: { data: { postid: PostId } } = $props();
 	let postid = $derived(data.postid);
@@ -95,7 +94,7 @@
 			<AnyPost bind:element={mainPost} post={post!} postpage />
 
 			{#if user()}
-				<div style:border-color={theme().textDark} class="reply">
+				<div class="reply">
 					<a aria-label="Go to profile" href="/profile">
 						{#await getFile(user()!.picture) then pfp}
 							<img alt="Your profile" src={pfp} />
@@ -108,7 +107,6 @@
 							bind:value={replyBody}
 							onfocus={expand}
 							onblur={contract}
-							style:color={theme().text}
 							placeholder="Leave a reply"
 						></textarea>
 
@@ -175,6 +173,7 @@
 		margin-top: 0.4rem;
 		filter: brightness(90%);
 		background: var(--mantle);
+		color: var(--subtext-1);
 	}
 
 	.replies {
@@ -193,8 +192,7 @@
 		width: 100%;
 		padding: 1rem;
 		gap: 1rem;
-		border-bottom-style: solid;
-		border-bottom-width: 1px;
+		border-bottom: 1px solid var(--surface-0);
 
 		a {
 			border-radius: 50%;
@@ -216,7 +214,6 @@
 		position: absolute;
 		right: 0.25rem;
 		top: 0.5rem;
-		background: var(--mantle);
 		padding: 0.25rem;
 		border-radius: 0.5rem;
 

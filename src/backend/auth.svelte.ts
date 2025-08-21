@@ -8,7 +8,7 @@ import {
 	signOut,
 } from "firebase/auth";
 import { collection, doc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
-import { internalUserToUser, resolveUser, type InternalUser, type User } from "../api/userapi";
+import { getPreference, internalUserToUser, resolveUser, type User } from "../api/userapi";
 import initializeFirebase from "./backend";
 
 let { db } = initializeFirebase();
@@ -57,7 +57,7 @@ onAuthStateChanged(auth, async user => {
 		currentUser = await internalUserToUser(
 			(
 				await getDocs(query(collection(db, "users"), where("id", "==", user.uid)))
-			).docs[0].data() as InternalUser,
+			).docs[0].data() as User,
 		);
 		resolveUser(currentUser);
 	}
@@ -88,6 +88,7 @@ export async function signUp(
 	username: string,
 ): Promise<unknown | null> {
 	try {
+		const darkMode = getPreference("darkMode");
 		let userInfo = await createUserWithEmailAndPassword(auth, email, password);
 		let user: User = {
 			displayName: username,
@@ -105,7 +106,7 @@ export async function signUp(
 			currentBook: null,
 			readingList: [],
 			following: [],
-			followers: [],
+			darkMode,
 			views: [],
 			shares: [],
 			birthmoment: Date.now(),

@@ -6,32 +6,34 @@ import cottonCandy from "./cotton-candy.json";
 
 type Theme = typeof catppuccinMocha;
 
-export const themes = [
-	catppuccinLatte,
-	catppuccinMocha,
-	cottonCandy,
-	midnight,
-	voidTheme
-];
+export const themes = [catppuccinLatte, catppuccinMocha, cottonCandy, midnight, voidTheme];
 
-let currentTheme = $state((() => {
-	let theme = localStorage.getItem("theme");
-	if (theme) {
-		return themes.find(other => other.id === theme) ?? catppuccinMocha;
-	}
-	return catppuccinMocha;
-})());
+let currentTheme = $state(
+	(() => {
+		let theme = localStorage.getItem("theme");
+		if (theme) {
+			return themes.find(other => other.id === theme) ?? catppuccinMocha;
+		}
+		return catppuccinMocha;
+	})(),
+);
 
+/** @deprecated */
 export default function theme(): Theme {
 	return currentTheme;
 }
 
+/** @deprecated */
 export function setTheme(theme: Theme) {
 	currentTheme = theme;
 	localStorage.setItem("theme", theme.id);
 }
 
-let accentGradient_ = $derived(`linear-gradient(to bottom right, ${theme().accent}, ${theme().accent2})`);
+let accentGradient_ = $derived(
+	`linear-gradient(to bottom right, ${theme().accent}, ${theme().accent2})`,
+);
+
+/** @deprecated */
 export function accentGradient() {
 	return accentGradient_;
 }

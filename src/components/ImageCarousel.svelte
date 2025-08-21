@@ -28,7 +28,7 @@
 			{#each images as image}
 				{#await getFile(image)}
 				{:then image}
-					<ClickableImage src={image}>
+					<ClickableImage src={image!}>
 						<div class="media-wrapper" style:background-image="url('{image}')"></div>
 					</ClickableImage>
 				{/await}

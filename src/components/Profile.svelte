@@ -153,8 +153,10 @@
 				<!-- Badges -->
 				<Badges forUser={profileUser} size={1} />
 
-				<div class="dot"></div>
-				<h2 class="pronouns">{profileUser.pronouns}</h2>
+				{#if profileUser.pronouns}
+					<div class="dot"></div>
+					<h2 class="pronouns">{profileUser.pronouns}</h2>
+				{/if}
 			</span>
 
 			<!-- Edit profile button -->
@@ -172,20 +174,6 @@
 						Follow
 					</button>
 				{/if}
-
-				<!-- Profile actions -->
-				<!-- <div class="profile-actions"> -->
-				<!-- 	<button class="profile-action-follow"> -->
-				<!-- 		{#if following} -->
-				<!-- 			<CheckIcon stroke="var(--overlay-1)" style="width: 2rem;" onclick={unfollow} /> -->
-				<!-- 		{:else} -->
-				<!-- 			<AddIcon stroke="var(--overlay-1)" style="width: 2rem;" onclick={follow} /> -->
-				<!-- 		{/if} -->
-				<!-- 	</button> -->
-					<!-- <button class="profile-action"> -->
-					<!-- 	<MessageIcon stroke="var(--overlay-1)" style="width: 1rem;" /> -->
-					<!-- </button> -->
-				<!-- </div> -->
 			{/if}
 		</div>
 
@@ -291,7 +279,7 @@
 				<div bind:this={ratingOptions} class="rating-options">
 					<span style:color="var(--overlay-1)">
 						<label for="show-full-reviews">Show full reviews</label>
-						<RadioInput id="show-full-reviews" size={0.5} bind:on={showFullReviews} />
+						<RadioInput id="show-full-reviews" size={0.5} bind:value={showFullReviews} />
 					</span>
 					<span style:color="var(--overlay-1)">
 						<label for="change-rating-sort">{ratingSortName}</label>
@@ -414,29 +402,6 @@
 		color: var(--overlay-1);
 	}
 
-	.profile-action {
-		border-radius: 50%;
-		width: 2rem;
-		height: 2rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border: 2px solid var(--overlay-1);
-	}
-
-	.profile-action-follow {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.profile-actions {
-		display: flex;
-		margin-left: auto;
-		margin-right: 1rem;
-		gap: 0.5rem;
-	}
-
 	.truncate {
 		text-overflow: ellipsis;
 		text-wrap: nowrap;
@@ -476,7 +441,7 @@
 		overflow-x: auto;
 
 		button {
-			font-size: 0.8.80.80.80.80.80.80.85rem;
+			font-size: 0.85rem;
 			white-space: nowrap;
 			padding-top: 0.5rem;
 			padding-bottom: 0.5rem;
@@ -497,8 +462,6 @@
 	}
 
 	.profile {
-		border-bottom-width: 1px;
-		border-bottom-style: solid;
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
@@ -564,7 +527,6 @@
 			font-weight: 500;
 			color: var(--crust);
 			transition: scale 0.2s;
-			box-shadow: 0px 0px 1rem black;
 
 			&:hover {
 				scale: 105%;

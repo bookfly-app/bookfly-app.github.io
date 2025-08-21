@@ -8,7 +8,6 @@
 	import Page from "../../components/Page.svelte";
 	import AnyPost from "../../components/posts/AnyPost.svelte";
 	import UserListing from "../../components/UserListing.svelte";
-	import theme from "../../themes/theme.svelte";
 	import { getFile } from "../../api/storageapi";
 	import { user } from "../../backend/auth.svelte";
 	import SearchIcon from "../../assets/images/icons/SearchIcon.svelte";
@@ -105,7 +104,7 @@
 			}[view]}
 		/>
 
-		<div class="views" style:border-color={theme().textDark}>
+		<div class="views">
 			<button class={view === "posts" ? "selected" : ""} onclick={setView("posts")}>Posts</button>
 			<button class={view === "books" ? "selected" : ""} onclick={setView("books")}>Books</button>
 			<button class={view === "authors" ? "selected" : ""} onclick={setView("authors")}>Authors</button>
@@ -115,22 +114,22 @@
 	{#if view === "posts"}
 		{#await posts}
 			<div class="loading">
-				<h1 style:color={theme().text}>Loading posts...</h1>
-				<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+				<h1>Loading posts...</h1>
+				<p>We promise Wallflower will be faster soon.</p>
 				<Loading />
 			</div>
 		{:then posts}
 			{#if searchTerm == ""}
 				<div class="loading">
-					<h1 style:color={theme().text}>Search for a post</h1>
-					<p style:color={theme().textDull}>
+					<h1>Search for a post</h1>
+					<p>
 						Enter your search term to find relevant posts.
 					</p>
 				</div>
 			{:else if posts.length === 0}
 				<div class="loading">
-					<h1 style:color={theme().text}>No posts found</h1>
-					<p style:color={theme().textDull}>
+					<h1>No posts found</h1>
+					<p>
 						No posts were found relating to your search term. Make sure you spelled everything right!
 					</p>
 				</div>
@@ -142,22 +141,22 @@
 	{:else if view === "books"}
 		{#await books}
 			<div class="loading">
-				<h1 style:color={theme().text}>Loading books...</h1>
-				<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+				<h1>Loading books...</h1>
+				<p>We promise Wallflower will be faster soon.</p>
 				<Loading />
 			</div>
 		{:then books}
 			{#if searchTerm == ""}
 				<div class="loading">
-					<h1 style:color={theme().text}>Search for a book</h1>
-					<p style:color={theme().textDull}>
+					<h1>Search for a book</h1>
+					<p>
 						Enter your search term to find relevant books.
 					</p>
 				</div>
 			{:else if books.length === 0}
 				<div class="loading">
-					<h1 style:color={theme().text}>No books found</h1>
-					<p style:color={theme().textDull}>
+					<h1>No books found</h1>
+					<p>
 						No books were found relating to your search term. Make sure you spelled everything right!
 					</p>
 				</div>
@@ -165,7 +164,7 @@
 			<div class="books">
 				{#each books as book}
 					{#await book}
-						<div class="book" style:border-color={theme().textDark}>
+						<div class="book">
 							<div class="book-info">
 								<div class="loading-title"></div>
 								<div class="loading-authors"></div>
@@ -173,25 +172,19 @@
 							<div class="loading-cover"></div>
 						</div>
 					{:then book}
-						<a href={`/book/${book.isbn}`} class="book" style:border-color={theme().textDark}>
+						<a href={`/book/${book.isbn}`} class="book">
 							<div class="book-info">
-								<h1 style:color={theme().textBright}>
+								<h1>
 									{book.title}
 								</h1>
-								<h2 style:color={theme().textDim}>
+								<h2>
 									{book.authors.join(", ")}
 								</h2>
 							</div>
 							{#if book.cover}
 								<BookCover {book} style="width: 3.5rem; margin-left: auto;" />
 							{:else}
-								<div
-									class="nocover"
-									style:background-image={`linear-gradient(${theme().accent}, ${theme().accent2})`}
-									style:color={theme().backgroundDark}
-								>
-									?
-								</div>
+								<div class="loading-cover"></div>
 							{/if}
 						</a>
 					{/await}
@@ -201,21 +194,21 @@
 	{:else if view === "people"}
 		{#await users}
 			<div class="loading">
-				<h1 style:color={theme().text}>Loading accounts...</h1>
-				<p style:color={theme().textDull}>We promise Wallflower will be faster soon.</p>
+				<h1>Loading accounts...</h1>
+				<p>We promise Wallflower will be faster soon.</p>
 			</div>
 		{:then users}
 			{#if searchTerm == ""}
 				<div class="loading">
-					<h1 style:color={theme().text}>Search for a user</h1>
-					<p style:color={theme().textDull}>
+					<h1>Search for a user</h1>
+					<p>
 						Enter your search term to find relevant users.
 					</p>
 				</div>
 			{:else if users.length === 0}
 				<div class="loading">
-					<h1 style:color={theme().text}>No users found</h1>
-					<p style:color={theme().textDull}>
+					<h1>No users found</h1>
+					<p>
 						No users were found relating to your search term. Make sure you spelled everything right!
 					</p>
 				</div>
@@ -248,10 +241,12 @@
 
 		h1 {
 			font-size: 1.5rem;
+			color: var(--subtext-1);
 		}
 
 		p {
 			font-size: 0.85rem;
+			color: var(--overlay-1);
 		}
 	}
 
@@ -265,8 +260,7 @@
 		padding-top: 1rem;
 		padding-bottom: 1rem;
 		padding-right: 2rem;
-		border-bottom-width: 1px;
-		border-bottom-style: solid;
+		border-bottom-width: 1px solid var(--surface-0);
 
 		.nocover {
 			width: 3.25rem;
@@ -341,8 +335,6 @@
 		display: flex;
 		justify-content: space-between;
 		padding-top: 2rem;
-		border-bottom-width: 1px;
-		border-bottom-style: solid;
 		padding-left: 1rem;
 		padding-right: 1rem;
 

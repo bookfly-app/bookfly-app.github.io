@@ -8,7 +8,7 @@
 
 	let { userid = undefined, username = undefined }: { userid?: string; username?: string } = $props();
 
-	let userProfile = userid ? getUserFromId(userid) : getUserFromUsername(username!);
+	let userProfile = $derived(userid ? getUserFromId(userid) : getUserFromUsername(username!));
 	let sidebar: Sidebar = $state(null!);
 </script>
 

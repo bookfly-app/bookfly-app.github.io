@@ -8,7 +8,6 @@
 	import Page from "../components/Page.svelte";
 	import AnyPost from "../components/posts/AnyPost.svelte";
 	import Sidebar from "../components/Sidebar.svelte";
-	import theme from "../themes/theme.svelte";
 	import Wallflower from "../assets/images/icons/Wallflower.svelte";
 	import { getFile } from "../api/storageapi";
 
@@ -52,19 +51,19 @@
 	</nav>
 
 	<section class="content">
-		<div style:background-color={theme().backgroundDark} class="views">
+		<div class="views">
 			{#if user()}
 				<button
-					style:color={view === "following" ? theme().textBright : theme().textDull}
-					style:border-bottom-color={view === "following" ? theme().accent : "transparent"}
+					style:color={view === "following" ? "var(--lavender)" : "var(--overlay-1)"}
+					style:border-bottom-color={view === "following" ? "var(--lavender)" : "transparent"}
 					onclick={() => (view = "following")}
 				>
 					Following
 				</button>
 			{/if}
 			<button
-				style:color={view === "for you" ? theme().textBright : theme().textDull}
-				style:border-bottom-color={view === "for you" ? theme().accent : "transparent"}
+				style:color={view === "for you" ? "var(--lavender)" : "var(--overlay-1)"}
+				style:border-bottom-color={view === "for you" ? "var(--lavender)" : "transparent"}
 				onclick={() => (view = "for you")}
 			>
 				Discover
@@ -75,11 +74,9 @@
 			{#await followedPosts then followedPosts}
 				{#if followedPosts.length === 0}
 					<div class="nofollowing">
-						<h1 style:color={theme().textBright}>You're not following anyone.</h1>
-						<p style:color={theme().textDull}>
-							When you follow people, their posts will appear here.
-						</p>
-						<CatIcon style="width: 10rem;" stroke={theme().backgroundDim} />
+						<h1>You're not following anyone.</h1>
+						<p>When you follow people, their posts will appear here.</p>
+						<CatIcon style="width: 10rem;" stroke="var(--mantle)" />
 					</div>
 				{/if}
 				{#each followedPosts as post}
@@ -111,10 +108,12 @@
 
 		h1 {
 			font-size: 1.5rem;
+			color: var(--text);
 		}
 
 		p {
 			font-size: 0.85rem;
+			color: var(--overlay-1);
 		}
 	}
 
@@ -144,6 +143,7 @@
 	.views {
 		display: flex;
 		padding-right: 1rem;
+		background-color: var(--crust);
 		padding-left: 1rem;
 
 		&:not(:has(> *:nth-child(2))) {

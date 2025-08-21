@@ -17,6 +17,30 @@ const themes = [
 			red: "#f38ba8",
 			peach: "#fab387",
 			teal: "#94e2d5",
+			pink: "#f5c2e7",
+			mauve: "#cba6f7",
+		},
+	},
+	{
+		name: "Catppuccin Latte",
+		colors: {
+			crust: "#dce0e8",
+			mantle: "#e6e9ef",
+			base: "#eff1f5",
+			text: "#4c4f69",
+			"overlay-1": "#8c8fa1",
+			"surface-2": "#acb0be",
+			"surface-0": "#ccd0da",
+			"subtext-1": "#5c5f77",
+			lavender: "#7287fd",
+			blue: "#1e66f5",
+			yellow: "#df8e1d",
+			green: "#40a02b",
+			red: "#d20f39",
+			peach: "#fe640b",
+			teal: "#179299",
+			pink: "#ea76cb",
+			mauve: "#8839ef",
 		},
 	},
 ] as const satisfies {
@@ -37,6 +61,8 @@ const themes = [
 		red: string;
 		peach: string;
 		teal: string;
+		pink: string;
+		mauve: string;
 	};
 }[];
 

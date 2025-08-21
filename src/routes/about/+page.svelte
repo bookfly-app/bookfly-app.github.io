@@ -1,6 +1,7 @@
 <script>
-	import Wallflower from "../../assets/images/icons/Wallflower.svelte";
+import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 	import BackButton from "../../components/BackButton.svelte";
+	import ExternalLink from "../../components/ExternalLink.svelte";
 	import Page from "../../components/Page.svelte";
 </script>
 
@@ -79,7 +80,7 @@
 	</p>
 	<h2>Legal</h2>
 	<p>Wallflower is open source, meaning anyone can view and contribute to its code
-		(<a href="https://github.com/wallflower-app/wallflower-app.github.io">here</a>, if you're curious).
+		(<ExternalLink href="https://github.com/wallflower-app/wallflower-app.github.io">here</ExternalLink>, if you're curious).
 	</p>
 	<p>
 		Wallflower is licensed as <i>all rights reserved</i>, 
@@ -103,7 +104,7 @@
 
 		a {
 			text-decoration: none;
-			color: cornflowerblue;
+			color: var(--blue);
 		}
 
 		p {

@@ -68,22 +68,22 @@
 <Page type="search" bind:sidebar>
 	<BackButton style="position: fixed; top: 1rem; left: 1rem;" />
 
-	<nav style:background={theme().backgroundDark}>
+	<nav>
 		<div class="book-name">
-			<h1 style:color={theme().textBright}>{book.title}</h1>
-			<h2 style:color={theme().textDim}>{book.authors.join(", ")}</h2>
+			<h1>{book.title}</h1>
+			<h2>{book.authors.join(", ")}</h2>
 		</div>
 		<div class="views">
 			<button
-				style:color={view === "info" ? theme().textBright : theme().textDull}
-				style:border-bottom-color={view === "info" ? theme().accent : "transparent"}
+				style:color={view === "info" ? "var(--text)" : "var(--overlay-1)"}
+				style:border-bottom-color={view === "info" ? "var(--lavender)" : "transparent"}
 				onclick={setView("info")}
 			>
 				Info
 			</button>
 			<button
-				style:color={view === "discussion" ? theme().textBright : theme().textDull}
-				style:border-bottom-color={view === "discussion" ? theme().accent : "transparent"}
+				style:color={view === "discussion" ? "var(--text)" : "var(--overlay-1)"}
+				style:border-bottom-color={view === "discussion" ? "var(--lavender)" : "transparent"}
 				onclick={setView("discussion")}
 			>
 				Discussion
@@ -106,10 +106,23 @@
 						<span class="count">({count})</span>
 					</button>
 				{/await}
-				<p class="description" style:color={theme().textDull}>
+				<p class="description">
 					{makeReadable(book.description)}
 				</p>
 			</div>
+
+			{#if user()}
+				{#if isInReadingList}
+					<button id="add-to-reading-list" class="remove-from-reading-list" onclick={removeFromReadingList}>
+						Remove from Reading List
+					</button>
+				{:else}
+					<button id="add-to-reading-list" style:background={accentGradient()} onclick={addToReadingList}>
+						Add to Reading List
+					</button>
+				{/if}
+			{/if}
+
 			<div class="product-info">
 				<h2>Product Information</h2>
 				<span><span>Title: </span>{book.title}</span>
@@ -138,17 +151,6 @@
 			{/await}
 		{/if}
 
-		{#if user()}
-			{#if isInReadingList}
-				<button id="add-to-reading-list" class="remove-from-reading-list" onclick={removeFromReadingList}>
-					Remove from Reading List
-				</button>
-			{:else}
-				<button id="add-to-reading-list" style:background={accentGradient()} onclick={addToReadingList}>
-					Add to Reading List
-				</button>
-			{/if}
-		{/if}
 	</section>
 </Page>
 
@@ -273,6 +275,14 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+
+		h1 {
+			color: var(--text);
+		}
+
+		h2 {
+			color: var(--surface-2);
+		}
 	}
 
 	nav {
@@ -282,6 +292,13 @@
 		top: 0px;
 		gap: 1rem;
 		padding-top: 1rem;
+		background: var(--crust);
+
+		.book-name {
+			padding-left: 4rem;
+			padding-right: 4rem;
+			text-align: center;
+		}
 
 		h1 {
 			font-size: 1rem;
@@ -302,5 +319,6 @@
 		padding-right: 1.5rem;
 		font-size: 0.85rem;
 		white-space: pre-wrap;
+		color: var(--overlay-1);
 	}
 </style>

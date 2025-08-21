@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { getBook } from "../../api/bookapi";
 	import { format } from "../../api/postapi";
-	import theme from "../../themes/theme.svelte";
 	import StarRating from "../StarRating.svelte";
 
 	let { isbn, rating, review, user } = $props();
@@ -11,21 +10,21 @@
 
 <div>
 	{#await book then book}
-		<p class="rating-line" style:color={theme().textDull}>
+		<p class="rating-line">
 			{user.displayName} rated
-			<i style:color={theme().text}>{book?.title}</i>
+			<i>{book?.title}</i>
 			<span>{rating} / 10</span>:
 		</p>
 		<div class="info">
 			<div class="content">
-				<a href={`/book/${book?.isbn}`} class="title" style:color={theme().text}>{book?.title}</a>
-				<a href={`/book/${book?.isbn}`} class="author" style:color={theme().textDim}>
+				<a href={`/book/${book?.isbn}`} class="title">{book?.title}</a>
+				<a href={`/book/${book?.isbn}`} class="author">
 					{book?.authors.join(", ")}
 				</a>
 				<div class="stars">
 					<StarRating {rating} size={1.5} />
 				</div>
-				<h1 class="rating-number" style:color={theme().textBright}>
+				<h1 class="rating-number">
 					{rating} / 10
 				</h1>
 			</div>
@@ -34,7 +33,7 @@
 			</a>
 		</div>
 		{#await format(review) then body}
-			<p class="review" style:color={theme().text}>{@html body}</p>
+			<p class="review">{@html body}</p>
 		{/await}
 	{/await}
 </div>
@@ -50,6 +49,7 @@
 
 	.rating-number {
 		font-size: 2rem;
+		color: var(--text);
 	}
 
 	.stars {
@@ -70,21 +70,28 @@
 
 		.author {
 			font-size: 1rem;
+			color: var(--surface-2);
 		}
 
 		.title {
 			font-size: 1.25rem;
 			font-weight: 600;
+			color: var(--subtext-1);
 		}
 	}
 
 	.rating-line {
 		padding-bottom: 1rem;
 		font-size: 0.85rem;
+		color: var(--overlay-1);
+		
+		i {
+			color: var(--subtext-1);
+		}
 
 		span {
 			font-size: inherit;
-			color: #f9e2af;
+			color: var(--yellow);
 		}
 	}
 
@@ -97,9 +104,10 @@
 	.review {
 		padding-top: 1rem;
 		font-size: 0.85rem;
+		color: var(--subtext-1);
 
 		:global(a) {
-			color: cornflowerblue;
+			color: var(--blue);
 		}
 	}
 </style>

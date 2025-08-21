@@ -2,14 +2,14 @@ NPM := $(shell command -v bun 2>/dev/null || command -v pnpm 2>/dev/null || comm
 TAURI := $(shell command -v cargo-tauri 2>/dev/null)
 TAURI ?= $(NPM) tauri
 
-.PHONY: all build-site deploy dev-site dev-app build-linux-app clean build-exe build-all
+.PHONY: all build-site deploy dev-site dev-native-app build-linux-app clean build-exe build-all
 
 # Runs the website in develop mode
 dev-site:
 	$(NPM) run dev
 
 # Runs the app in develop mode
-dev-app:
+dev-native-app:
 	$(TAURI) dev
 
 # Builds the website for production

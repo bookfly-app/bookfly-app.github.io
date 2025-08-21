@@ -3,15 +3,12 @@
 	import InfoIcon2 from "../../assets/images/icons/InfoIcon2.svelte";
 	import PaintRollerIcon from "../../assets/images/icons/PaintRollerIcon.svelte";
 	import ProfileIcon from "../../assets/images/icons/ProfileIcon.svelte";
-	import BackButton from "../../components/BackButton.svelte";
+	import Header from "../../components/Header.svelte";
 	import Page from "../../components/Page.svelte";
 </script>
 
 <Page class="settings">
-	<span class="heading">
-		<BackButton style="position: absolute; left: 1rem;" />
-		<h1>Settings</h1>
-	</span>
+	<Header title="Settings" />
 
 	<!-- Request author verification -->
 	<a href="/settings/appearance">
@@ -48,18 +45,6 @@
 </Page>
 
 <style>
-	h1 {
-		font-weight: normal;
-		color: var(--text);
-		font-size: 1.5rem;
-	}
-
-	.settings-header {
-		display: flex;
-		align-items: center;
-		padding: 1.5rem;
-		gap: 2rem;
-	}
 
 	a {
 		text-decoration: none;
@@ -93,27 +78,6 @@
 
 		&:hover {
 			background: rgba(150, 150, 255, 10%);
-		}
-	}
-
-	.heading {
-		display: flex;
-		gap: 1rem;
-		align-items: center;
-		position: relative;
-		justify-content: center;
-		position: fixed;
-		top: 0px;
-		background-color: var(--crust);
-		width: 100%;
-		padding-top: 1rem;
-		padding-bottom: 1rem;
-		left: 0px;
-
-		h1 {
-			color: var(--text);
-			font-weight: normal;
-			font-size: 1.25rem;
 		}
 	}
 </style>

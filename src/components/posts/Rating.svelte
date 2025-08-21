@@ -40,12 +40,14 @@
 </div>
 
 <style>
-
-
 	.info {
 		display: flex;
 		align-items: center;
 		justify-content: space-evenly;
+	}
+
+	a {
+		text-decoration: none;
 	}
 
 	.rating-number {

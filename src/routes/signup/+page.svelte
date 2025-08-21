@@ -5,6 +5,7 @@
 	import Footer from "../../components/Footer.svelte";
 	import Page from "../../components/Page.svelte";
 	import BackButton from "../../components/BackButton.svelte";
+	import Header from "../../components/Header.svelte";
 
 	let email = $state("");
 	let password = $state("");
@@ -75,9 +76,8 @@
 
 <Page type="profile">
 	<main>
-		<BackButton style="position: absolute; top: 1rem; left: 1rem;"/>
+		<Header title="Create Account" />
 		<div class="header">
-			<h1>Create Account</h1>
 			<a href="/about">Wait, what <i>is</i> wallflower.land?</a>
 		</div>
 		<p class="warning">
@@ -274,7 +274,7 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-		margin-top: 2rem;
+		margin-top: 5rem;
 		gap: 0.5rem;
 	}
 

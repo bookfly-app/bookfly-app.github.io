@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Book } from "../api/bookapi";
 	import type { User } from "../api/userapi";
-	import theme from "../themes/theme.svelte";
 	import BookCover from "./BookCover.svelte";
 	import StarRating from "./StarRating.svelte";
 
@@ -9,17 +8,17 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<svelte:element data-rating="{rating}" id="outer" this={onclick ? "div" : "a"} href="/book/{book.isbn}" onclick={() => onclick?.()} style:border-color={theme().textDark} style:background={theme().background}>
+<svelte:element data-rating="{rating}" id="outer" this={onclick ? "div" : "a"} href="/book/{book.isbn}" onclick={() => onclick?.()}>
 	<div class="book-info">
-		<h1 style:color={theme().text}>{book.title}</h1>
-		<h2 style:color={theme().textDull}>{book.authors.join(", ")}</h2>
+		<h1>{book.title}</h1>
+		<h2>{book.authors.join(", ")}</h2>
 	</div>
 
 	{#if rating !== undefined}
 		<div class="rating">
-			<span style:color={theme().text}>{user.displayName}'s rating:</span>
+			<span class="name">{user.displayName}'s rating:</span>
 			<StarRating {rating} size={0.6}/>
-			<span style:color={theme().text}>{rating === 10 ? rating : rating.toFixed(1)} / 10</span>
+			<span class="rating-number">{rating === 10 ? rating : rating.toFixed(1)} / 10</span>
 		</div>
 	{/if}
 
@@ -36,9 +35,25 @@
 		padding: 1rem;
 		padding-left: 2rem;
 		align-items: center;
-		border-bottom-width: 1px;
-		border-bottom-style: solid;
 		justify-content: space-between;
+		background-color: var(--base);
+		border-bottom: 1px solid var(--surface-0);
+	}
+
+	.name {
+		color: var(--text);
+	}
+
+	.rating-number {
+		color: var(--overlay-1);
+	}
+
+	h1 {
+		color: var(--subtext-1);
+	}
+
+	h2 {
+		color: var(--overlay-1);
 	}
 
 	.rating {

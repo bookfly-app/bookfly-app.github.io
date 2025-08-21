@@ -3,7 +3,6 @@
 	import CatIcon from "../assets/images/icons/CatIcon.svelte";
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import { user } from "../backend/auth.svelte";
-	import New from "../components/New.svelte";
 	import Page from "../components/Page.svelte";
 	import AnyPost from "../components/posts/AnyPost.svelte";
 	import Sidebar from "../components/Sidebar.svelte";
@@ -90,9 +89,7 @@
 				{/each}
 			{/await}
 		{/if}
-		<div class="footer-padding"></div>
 	</section>
-	<New />
 </Page>
 
 <style>
@@ -117,10 +114,6 @@
 		}
 	}
 
-	.footer-padding {
-		height: 4rem;
-	}
-
 	@keyframes spin {
 		from {
 			rotate: 0deg;
@@ -138,9 +131,9 @@
 
 	.views {
 		display: flex;
-		padding-right: 1rem;
+		padding-right: 2rem;
+		padding-left: 2rem;
 		background-color: var(--crust);
-		padding-left: 1rem;
 
 		&:not(:has(> *:nth-child(2))) {
 			justify-content: center;
@@ -156,10 +149,10 @@
 			padding-left: 3rem;
 			padding-right: 3rem;
 			font-weight: normal;
-			font-size: 1rem;
+			font-size: 0.85rem;
 			white-space: nowrap;
 			padding-top: 0.5rem;
-			padding-bottom: 1rem;
+			padding-bottom: 0.5rem;
 		}
 	}
 

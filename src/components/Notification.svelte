@@ -1,6 +1,4 @@
 <script lang="ts">
-	import theme from "../themes/theme.svelte";
-
 	let { message } = $props();
 
 	export function show() {
@@ -13,12 +11,7 @@
 	let isHidden = $state(true);
 </script>
 
-<section
-	style:color={theme().background}
-	style:background="linear-gradient({theme().accent}, {theme().accent2})"
-	style:bottom={isHidden ? "-5rem" : "5rem"}
-	class="notification"
->
+<section style:bottom={isHidden ? "-5rem" : "5rem"} class="notification">
 	{message}
 </section>
 
@@ -40,5 +33,7 @@
 		transform: translateX(-50%);
 		transition: bottom 0.2s;
 		z-index: 9999;
+		color: var(--crust);
+		background: linear-gradient(to bottom right, var(--lavender), var(--blue));
 	}
 </style>

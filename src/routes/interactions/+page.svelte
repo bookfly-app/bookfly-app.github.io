@@ -119,7 +119,6 @@
 	.views {
 		display: grid;
 		grid-template-columns: repeat(5, 1fr);
-		padding-top: 2rem;
 		padding-left: 1rem;
 		padding-right: 1rem;
 

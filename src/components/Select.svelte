@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import theme from "../themes/theme.svelte";
 	import RightArrowIcon from "../assets/images/icons/RightArrowIcon.svelte";
 
-	let { options, value = $bindable() }: { options: string[], value?: string } = $props();
+	let { options, value = $bindable(), ...rest }: { options: string[], value?: string, [key: string]: unknown } = $props();
 
 	let expanded = $state(false);
 
@@ -18,20 +17,14 @@
 	});
 </script>
 
-<div class="select" bind:this={optionsElement}>
-	<button class="value" onclick={() => expanded = !expanded} style:color={theme().text} style:background={theme().backgroundDark}>
+<div {...rest} class="select" bind:this={optionsElement}>
+	<button class="value" onclick={() => expanded = !expanded}>
 		{value}
-		<RightArrowIcon stroke={theme().text} style="width: 1rem; height: 1rem;" />
+		<RightArrowIcon stroke="var(--subtext-1)" style="width: 1rem; height: 1rem;" />
 	</button>
-	<div class="options" style:border-color={theme().textDark} style:display={expanded ? "flex" : "none"}>
+	<div class="options" style:display={expanded ? "flex" : "none"}>
 		{#each options as option}
-			<button 
-				style:--gray={theme().textDark} 
-				class="option" 
-				onclick={() => { value = option; expanded = false; }} 
-				style:--base-color={theme().backgroundDark} 
-				style:color={theme().text}
-			>
+			<button class="option" onclick={() => { value = option; expanded = false; }}>
 				{option}
 			</button>
 		{/each}
@@ -41,6 +34,9 @@
 <style>
 	.select {
 		position: relative;
+		background-color: var(--crust);
+		color: var(--subtext-1);
+		border-radius: 0.5rem;
 	}
 
 	.value {
@@ -62,10 +58,11 @@
 		left: 0px;
 		z-index: 999;
 		width: 100%;
-		border-style: solid;
-		border-width: 1px;
+		border: 1px solid var(--surface-0);
 		border-radius: 0.5rem;
 		box-shadow: 0px 0px 0.5rem black;
+		background-color: var(--crust);
+		color: var(--subtext-1);
 	}
 
 	button {

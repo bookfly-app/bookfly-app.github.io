@@ -15,6 +15,7 @@
 	import PersonIcon from "../../assets/images/icons/PersonIcon.svelte";
 	import Sidebar from "../../components/Sidebar.svelte";
 	import BookCover from "../../components/BookCover.svelte";
+	import Header from "../../components/Header.svelte";
 
 	type View = "posts" | "books" | "people" | "authors";
 
@@ -69,33 +70,14 @@
 </script>
 
 <Page bind:sidebar type="search">
-	<nav>
-		<div class="banner">
-			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
-				{#if user()}
-					{#await getFile(user()!.picture) then pfp}
-						<img alt="Your profile" src={pfp} class="profile-link" />
-					{/await}
-				{:else}
-					<PersonIcon stroke="var(--overlay-1)" style="width: 2.5rem;" />
-				{/if}
-			</button>
-
-			<button>
-				<Wallflower style="width: 2rem; height: 2rem;" stroke="var(--overlay-1)" />
-			</button>
-
-			<a class="search" href="/search">
-				<SearchIcon style="width: 2rem; height: 2rem;" stroke="var(--subtext-1)" />
-			</a>
-		</div>
-	</nav>
+	<Header title="Search" />
 	<section>
 		<input
 			type="text"
 			bind:value={searchTerm}
 			onkeyup={handleSearch}
 			onblur={search}
+			enterkeyhint="search"
 			placeholder={{
 				books: "Enter a title or ISBN",
 				posts: "Enter some keywords",
@@ -226,7 +208,7 @@
 	section {
 		padding-top: 1rem;
 		background-color: var(--crust);
-		margin-top: 4.5rem;
+		margin-top: 2.5rem;
 	}
 
 	.loading {
@@ -261,15 +243,6 @@
 		padding-bottom: 1rem;
 		padding-right: 2rem;
 		border-bottom-width: 1px solid var(--surface-0);
-
-		.nocover {
-			width: 3.25rem;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 2rem;
-			font-weight: bold;
-		}
 
 		.loading-cover {
 			width: 3.25rem;
@@ -313,11 +286,6 @@
 				font-size: 0.85rem;
 			}
 		}
-
-		.nocover {
-			margin-left: auto;
-			height: 5rem;
-		}
 	}
 
 	.books {
@@ -334,7 +302,7 @@
 	.views {
 		display: flex;
 		justify-content: space-between;
-		padding-top: 2rem;
+		padding-top: 1.25rem;
 		padding-left: 1rem;
 		padding-right: 1rem;
 
@@ -347,7 +315,7 @@
 
 			&.selected {
 				color: var(--text);
-				border-bottom: 3px solid var(--lavender);
+				border-bottom: 2px solid var(--lavender);
 			}
 		}
 	}
@@ -356,10 +324,11 @@
 		margin-left: 2rem;
 		border-radius: 100vmax;
 		width: calc(100% - 4rem);
-		padding-left: 1.5rem;
-		padding-top: 0.75rem;
-		padding-bottom: 0.75rem;
+		padding-left: 1rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
 		background-color: var(--base);
+		font-size: 1rem;
 		color: var(--subtext-1);
 	}
 

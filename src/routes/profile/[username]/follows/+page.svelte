@@ -2,7 +2,6 @@
 	import { getUserFromId, getUserFromUsername, getFollowers } from "../../../../api/userapi";
 	import Page from "../../../../components/Page.svelte";
 	import UserListing from "../../../../components/UserListing.svelte";
-	import theme from "../../../../themes/theme.svelte";
 
 	let view: "following" | "followers" = $state("following");
 
@@ -16,11 +15,11 @@
 
 <Page type="profile">
 	{#await profileUser then}
-		<div class="view" style:background={theme().backgroundDark}>
+		<div class="view">
 			{#await following then following}
 				<button
-					style:color={view === "following" ? theme().textBright : theme().textDull}
-					style:border-color={view === "following" ? theme().accent : "transparent"}
+					style:color={view === "following" ? "var(--lavender)" : "var(--overlay-1)"}
+					style:border-color={view === "following" ? "var(--lavender)" : "transparent"}
 					onclick={() => (view = "following")}
 				>
 					Following ({following.length})
@@ -28,8 +27,8 @@
 			{/await}
 			{#await followers then followers}
 				<button
-					style:color={view === "followers" ? theme().textBright : theme().textDull}
-					style:border-color={view === "followers" ? theme().accent : "transparent"}
+					style:color={view === "followers" ? "var(--lavender)" : "var(--overlay-1)"}
+					style:border-color={view === "followers" ? "var(--lavender)" : "transparent"}
 					onclick={() => (view = "followers")}
 				>
 					Followers ({followers.length})
@@ -57,13 +56,14 @@
 	.view {
 		display: flex;
 		justify-content: space-evenly;
+		background-color: var(--crust);
 
 		button {
 			border-bottom-style: solid;
-			border-bottom-width: 3px;
+			border-bottom-width: 2px;
 			padding-top: 2rem;
-			font-size: 1rem;
-			padding-bottom: 1rem;
+			font-size: 0.85rem;
+			padding-bottom: 0.75rem;
 			padding-left: 2rem;
 			padding-right: 2rem;
 			display: flex;

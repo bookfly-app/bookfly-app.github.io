@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import theme from "../themes/theme.svelte";
 
 	let menu: HTMLElement;
 
@@ -27,7 +26,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-<section tabindex="0" style:border-color={theme().textDark} bind:this={menu} class="contextmenu">
+<section tabindex="0" bind:this={menu} class="contextmenu">
 	{@render children()}
 </section>
 
@@ -39,9 +38,8 @@
 		visibility: hidden;
 		overflow: hidden;
 		border-radius: 0.5rem;
-		border-style: solid;
-		border-width: 1px;
-		box-shadow: 0px 0px 1rem black;
+		border: 1px solid var(--surface-0);
+		box-shadow: 0px 0px 0.5rem black;
 		width: 10rem;
 
 		:global(> *) {

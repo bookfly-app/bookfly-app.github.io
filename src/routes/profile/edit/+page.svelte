@@ -8,7 +8,6 @@
 	import ImagePicker from "../../../components/ImagePicker.svelte";
 	import Page from "../../../components/Page.svelte";
 	import RadioInput from "../../../components/RadioInput.svelte";
-	import theme from "../../../themes/theme.svelte";
 
 	awaitUser.then(user => {
 		displayName = user.displayName;
@@ -71,7 +70,7 @@
 			<div>
 				<!-- Profile Picture -->
 				{#await getFile(picture) then pfp}
-					<label for="set-profile-picture" class="profile-picture" style:border-color={theme().background} style:background-image="url('{pfp}')">
+					<label for="set-profile-picture" class="profile-picture" style:background-image="url('{pfp}')">
 						<div class="overlay"></div>
 						<EditIcon
 							stroke="#CCCCFF"
@@ -81,23 +80,22 @@
 				{/await}
 				<ImagePicker id="set-profile-picture" bind:imageId={picture} aspectRatio={1 / 1} />
 
-				<button class="save" style:background="linear-gradient({theme().accent}, {theme().accent2})" onclick={update}>Save</button>
+				<button class="save" onclick={update}>Save</button>
 			</div>
 
-			<label style:color={theme().textDull} for="display-name">Display Name</label>
-			<input style:background={theme().backgroundDark} style:color={theme().text} type="text" id="display-name" bind:value={displayName} />
+			<label for="display-name">Display Name</label>
+			<input enterkeyhint="done" type="text" id="display-name" bind:value={displayName} />
 
-			<label style:color={theme().textDull} for="username">Username</label>
+			<label for="username">Username</label>
 			<div
 				style:outline={usernameTaken || usernameErrorList.length > 0 ? "2px solid indianred" : "none"}
 				class="username" 
-				style:background={theme().backgroundDark}
 			>
-				<span style:color={theme().text} class="at">@</span>
+				<span class="at">@</span>
 				<input
-					style:color={theme().text}
 					type="text"
 					id="username"
+					enterkeyhint="done"
 					oninput={onInput}
 					bind:value={username}
 					bind:this={usernameInput}
@@ -112,47 +110,47 @@
 
 			<!-- Pronouns -->
 
-			<hr style:background={theme().textDark} />
+			<hr />
 
-			<label style:color={theme().textDull} for="pronouns">Pronouns</label>
-			<input style:background={theme().backgroundDark} style:color={theme().text} type="text" id="pronouns" bind:value={pronouns} />
+			<label for="pronouns">Pronouns</label>
+			<input enterkeyhint="done" type="text" id="pronouns" bind:value={pronouns} />
 
 			<span class="radio-input">
-				<label for="display-pronouns" style:color={theme().textDull}>Display pronouns on your profile</label>
+				<label for="display-pronouns">Display pronouns on your profile</label>
 				<RadioInput id="display-pronouns" size={0.7} />
 			</span>
 
 			<span class="radio-input">
-				<label for="display-post-pronouns" style:color={theme().textDull}>Display pronouns on your posts</label>
+				<label for="display-post-pronouns">Display pronouns on your posts</label>
 				<RadioInput id="display-post-pronouns" size={0.7} />
 			</span>
 
 			<!-- Bio -->
 
-			<hr style:background={theme().textDark} />
+			<hr />
 
-			<label style:color={theme().textDull} for="bio">Bio</label>
-			<textarea style:color={theme().text} style:background={theme().backgroundDark} class="bio" id="bio" bind:value={bio}>
+			<label for="bio">Bio</label>
+			<textarea enterkeyhint="done" class="bio" id="bio" bind:value={bio}>
 				{currentUser.bio}
 			</textarea>
 
-			<hr style:background={theme().textDark} />
+			<hr />
 
-			<label style:color={theme().textDull}>Badges</label>
+			<h2>Badges</h2>
 			{#if currentUser.tags.includes("dev")}
-				<span style:color={theme().textDull} class="badge-line">
+				<span class="badge-line">
 					Show developer badge
 					<RadioInput size={0.6} />
 				</span>
 			{/if}
 			{#if currentUser.tags.includes("mod")}
-				<span style:color={theme().textDull} class="badge-line">
+				<span class="badge-line">
 					Show moderator badge
 					<RadioInput size={0.6} />
 				</span>
 			{/if}
 			{#if currentUser.tags.includes("developer")}
-				<span style:color={theme().textDull} class="badge-line">
+				<span class="badge-line">
 					Show moderator badge
 					<RadioInput size={0.6} />
 				</span>
@@ -160,7 +158,7 @@
 		</div>
 	{/await}
 
-	<button class="save-bottom" style:background="linear-gradient({theme().accent}, {theme().accent2})" onclick={update}>Save</button>
+	<button class="save-bottom" onclick={update}>Save</button>
 </Page>
 
 <style>
@@ -172,6 +170,7 @@
 		padding-left: 0.5rem;
 		border-radius: 0.5rem;
 		margin-right: 2rem;
+		background-color: var(--crust);
 	}
 
 	.badge-line {
@@ -183,15 +182,29 @@
 		font-size: 0.85rem;
 	}
 
+	span {
+		color: var(--overlay-1);
+	}
+
+	h2 {
+		color: var(--subtext-1);
+		font-weight: normal;
+		margin-left: 2rem;
+		font-size: 1rem;
+		margin-bottom: 0.5rem;
+	}
+
 	.at {
 		font-size: 0.85rem;
 		height: 100%;
+		color: var(--subtext-1);
 	}
 
 	hr {
 		height: 1px;
 		margin-top: 0.5rem;
 		margin-bottom: 0.5rem;
+		background-color: var(--surface-0);
 	}
 
 	.radio-input {
@@ -216,6 +229,11 @@
 		margin-right: 2rem;
 	}
 
+	input, textarea {
+		background: var(--crust);
+		color: var(--subtext-1);
+	}
+
 	.save {
 		padding-left: 2rem;
 		padding-right: 2rem;
@@ -231,6 +249,7 @@
 		margin-right: 2rem;
 		margin-bottom: -1rem;
 		margin-top: -1rem;
+		background: linear-gradient(to bottom right, var(--lavender), var(--blue));
 	}
 
 	.save-bottom {
@@ -240,6 +259,7 @@
 		padding-bottom: 0.5rem;
 		border-radius: 100vmax;
 		font-size: 0.85rem;
+		margin-bottom: 2rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -247,6 +267,7 @@
 		margin-right: auto;
 		margin-top: 1rem;
 		box-shadow: 0px 0px 0.5rem black;
+		background: linear-gradient(to bottom right, var(--lavender), var(--blue));
 	}
 
 	input:not(#username),
@@ -261,6 +282,10 @@
 		margin-right: 2rem;
 		padding: 0.5rem;
 		border-radius: 0.5rem;
+	}
+
+	label {
+		color: var(--overlay-1);
 	}
 
 	.bio {
@@ -287,6 +312,7 @@
 
 	.profile-picture {
 		border-radius: 50%;
+		border: 0.5rem solid var(--base);
 		width: 5rem;
 		height: 5rem;
 		z-index: 2;
@@ -295,8 +321,6 @@
 		background-position: center;
 		overflow: hidden;
 		position: relative;
-		border-width: 0.5rem;
-		border-style: solid;
 		display: block;
 	}
 </style>

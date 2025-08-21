@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { getUserFromId, getUserFromUsername } from "../api/userapi";
-	import { user } from "../backend/auth.svelte";
-	import New from "./New.svelte";
 	import Page from "./Page.svelte";
 	import Profile from "./Profile.svelte";
 	import Sidebar from "./Sidebar.svelte";
@@ -16,9 +14,6 @@
 	{#await userProfile then userProfile}
 		{#if userProfile}
 			<Profile {sidebar} user={userProfile} />
-			{#if userProfile.id === user()?.id}
-				<New />
-			{/if}
 		{/if}
 	{/await}
 	<div></div>

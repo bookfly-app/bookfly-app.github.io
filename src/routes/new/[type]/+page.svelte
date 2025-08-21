@@ -2,12 +2,11 @@
 	import { goto } from "$app/navigation";
 	import { format, post, type PostType } from "../../../api/postapi";
 	import Page from "../../../components/Page.svelte";
-	import theme from "../../../themes/theme.svelte";
 	import { searchBooks, type Book } from "../../../api/bookapi";
 	import Select from "../../../components/Select.svelte";
-	import BackButton from "../../../components/BackButton.svelte";
 	import TrashIcon from "../../../assets/images/icons/TrashIcon.svelte";
 	import EyeIcon from "../../../assets/images/icons/EyeIcon.svelte";
+	import Header from "../../../components/Header.svelte";
 
 	let { data }: { data: { type: PostType } } = $props();
 	let { type } = data;
@@ -107,17 +106,15 @@
 </script>
 
 {#snippet bookSearch(title: string = "Add a book")}
-	<h2 style:color={theme().textDull} class="body-name">{title}</h2>
+	<h2>{title}</h2>
 
 	<div class="book-search">
 		<input
 			id="search"
 			type="text"
 			bind:value={searchText}
-			style:background={theme().backgroundDark}
 			onkeyup={checkSearch}
-			style:color={theme().text}
-			style:outline={bookError ? `2px solid #f38ba8` : "none"}
+			style:outline={bookError ? `2px solid var(--red)` : "none"}
 		/>
 		{#if bookError}
 			<span class="error">{bookError}</span>
@@ -132,16 +129,16 @@
 				<div class="book search-book">
 					<img alt="Book cover" src="" />
 					<div class="info">
-						<span class="title" style:color={theme().text}>Loading Title...</span>
-						<span class="authors" style:color={theme().textDull}>Loading authors...</span>
+						<span class="title">Loading Title...</span>
+						<span class="authors">Loading authors...</span>
 					</div>
 				</div>
 			{:then book}
 				<div class="book search-book" onclick={chooseBook(book)}>
 					<img alt="{book.title} cover" src={book.cover} />
 					<div class="info">
-						<span class="title" style:color={theme().text}>{book.title}</span>
-						<span class="authors" style:color={theme().textDull}>{book.authors.join(",")}</span>
+						<span class="title">{book.title}</span>
+						<span class="authors">{book.authors.join(",")}</span>
 					</div>
 				</div>
 			{/await}
@@ -155,108 +152,91 @@
 			<div class="book">
 				<img alt="{book.title} cover" src={book.cover} />
 				<div class="info">
-					<span class="title" style:color={theme().text}>{book.title}</span>
-					<span class="authors" style:color={theme().textDull}>{book.authors.join(",")}</span>
+					<span class="title">{book.title}</span>
+					<span class="authors">{book.authors.join(",")}</span>
 				</div>
 				<button class="close" onclick={removeBook(book)}>
-					<TrashIcon stroke="#f38ba8" style="width: 1.25rem; height: 1.25rem;" />
+					<TrashIcon stroke="var(--red)" style="width: 1.25rem; height: 1.25rem;" />
 				</button>
 			</div>
 		{/each}
 	</div>
 {/snippet}
 
-<Page class="new-post-page">
+<Page>
+	<div class="new-post-page">
+		<Header title="New {type} Post" />
 
-	<span>
-		<BackButton />
-		<h1 style:color={theme().text}>New {type} Post</h1>
-	</span>
+		{#if type === "rating"}
+			{#if chosenBooks.length === 0}
+				{@render bookSearch("Choose a book")}
+			{:else}
+				{@render chosenBookList()}
+			{/if}
 
-	{#if type === "rating"}
-		{#if chosenBooks.length === 0}
-			{@render bookSearch("Choose a book")}
-		{:else}
-			{@render chosenBookList()}
+			<h2 class="body-name">Rating</h2>
+			<div class="stars">
+				<input 
+					bind:value={rating}
+					id="rating"
+					oninput={validateRating}
+					style:outline={ratingError ? `2px solid #f38ba8` : "none"}
+				/>
+				{#if ratingError}
+					<span class="error">{ratingError}</span>
+				{/if}
+			</div>
 		{/if}
 
-		<h2 class="body-name" style:color={theme().textDull}>Rating</h2>
-		<div class="stars">
-			<input 
-				bind:value={rating}
-				id="rating"
-				style:background={theme().backgroundDark}
-				style:color={theme().text}
-				oninput={validateRating}
-				style:outline={ratingError ? `2px solid #f38ba8` : "none"}
-			/>
-			{#if ratingError}
-				<span class="error">{ratingError}</span>
+		{#if type === "update"}
+			<h2 class="body-name">Update Type</h2>
+			<Select options={["start", "finish", "abandon"]} bind:value={updateType} style="margin-bottom: 1rem;" />
+
+			{#if chosenBooks.length === 0}
+				{@render bookSearch("Choose a book")}
+			{:else}
+				{@render chosenBookList()}
+			{/if}
+		{/if}
+
+		<div class="body-header">
+			<h2 class="body-name preview-body">{bodyName}</h2>
+			{#if body}
+				<button onclick={() => showPreview = !showPreview}>
+					<EyeIcon stroke={showPreview ? "var(--lavender)" : "var(--overlay-1)"} style="width: 1rem; height: 1rem;" />
+				</button>
 			{/if}
 		</div>
-	{/if}
 
-	{#if type === "update"}
-		<h2 class="body-name" style:color={theme().textDull}>Update Type</h2>
-		<Select options={["start", "finish", "abandon"]} bind:value={updateType} />
-
-		{#if chosenBooks.length === 0}
-			{@render bookSearch("Choose a book")}
+		{#if showPreview}
+			{#await format(body) then body}
+				<div class="preview">{@html body}</div>
+			{/await}
 		{:else}
-			{@render chosenBookList()}
+			<textarea id="body" bind:value={body}></textarea>
 		{/if}
-	{/if}
 
-	<div class="body-header">
-		<h2 class="body-name preview-body" style:color={theme().textDull}>{bodyName}</h2>
-		<button onclick={() => showPreview = !showPreview}><EyeIcon stroke={theme().textDull} style="width: 1rem; height: 1rem;" /></button>
+		{#if type !== "rating" && type !== "update"}
+			{#if chosenBooks.length !== 0}
+				{@render chosenBookList()}
+			{/if}
+			{@render bookSearch("Add a book")}
+		{/if}
+
+		<button onclick={upload} class="post-button">
+			Post
+		</button>
 	</div>
-
-	{#if showPreview}
-		{#await format(body) then body}
-			<div class="preview" style:color={theme().text} style:background={theme().backgroundDark}>{@html body}</div>
-		{/await}
-	{:else}
-		<textarea
-			id="body"
-			bind:value={body}
-			style:color={theme().text}
-			style:background={theme().backgroundDark}
-		></textarea>
-	{/if}
-
-	{#if type !== "rating" && type !== "update"}
-		{#if chosenBooks.length !== 0}
-			{@render chosenBookList()}
-		{/if}
-		{@render bookSearch("Add a book")}
-	{/if}
-
-	<button
-		onclick={upload}
-		class="post-button"
-		style:color={theme().background}
-		style:background-image={`linear-gradient(${theme().accent}, ${theme().accent2})`}
-	>
-		Post
-	</button>
 </Page>
 
 <style>
-	span:has(> h1) {
-		display: flex;
-		gap: 1rem;
-		align-items: center;
+	input, textarea, .preview {
+		background-color: var(--crust);
+		color: var(--subtext-1);
 	}
 
 	.search-book {
 		cursor: pointer;
-	}
-
-	h1 {
-		text-transform: capitalize;
-		font-weight: normal;
-		font-size: 1.5rem;
 	}
 
 	.body-header {
@@ -277,6 +257,11 @@
 		padding-bottom: 0.5rem;
 		gap: 1rem;
 
+
+		.title {
+			color: var(--subtext-1);
+		}
+
 		&:first-child {
 			margin-top: 0.5rem;
 		}
@@ -294,6 +279,7 @@
 
 		.authors {
 			font-size: 0.85rem;
+			color: var(--overlay-1);
 		}
 
 		.close {
@@ -316,7 +302,7 @@
 	}
 
 	.error {
-		color: #f38ba8;
+		color: var(--red);
 		font-size: 0.85rem;
 	}
 
@@ -348,16 +334,18 @@
 		margin-right: auto;
 		margin-top: 3rem;
 		box-shadow: 0px 0px 10px black;
+		background: linear-gradient(to bottom right, var(--lavender), var(--blue));
 	}
 
 	#body {
 		padding: 0.5rem;
 	}
 
-	:global(.new-post-page) {
-		padding-top: 2rem;
+	.new-post-page {
+		padding-top: 4rem;
 		padding-left: 2rem;
 		padding-right: 2rem;
+		padding-bottom: 2rem;
 		display: flex;
 		flex-direction: column;
 	}
@@ -380,5 +368,6 @@
 		font-weight: normal;
 		font-size: 0.85rem;
 		padding-bottom: 0.5rem;
+		color: var(--overlay-1);
 	}
 </style>

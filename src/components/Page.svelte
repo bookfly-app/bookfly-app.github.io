@@ -28,7 +28,7 @@
 	.outer {
 		position: relative;
 		width: 100%;
-		height: calc(100% - 4rem);
+		height: calc(100% - 3rem);
 		overflow: hidden;
 
 		.inner {

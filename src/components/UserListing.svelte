@@ -1,6 +1,5 @@
-<script>
+<script lang="ts">
 	import { getFile } from "../api/storageapi";
-import theme from "../themes/theme.svelte";
 
 	let { user } = $props();
 </script>
@@ -8,21 +7,20 @@ import theme from "../themes/theme.svelte";
 <a
 	href={`/profile/${user.username}`}
 	class="book"
-	style:border-color={theme().textDark}
 >
 	{#await getFile(user.picture) then pfp}
-		<img class="profile-picture" src={pfp} />
+		<img alt="{user.displayName} profile" class="user-listing-profile-picture" src={pfp!} />
 	{/await}
 	<div class="person-info-wrapper">
 		<div class="person-info">
-			<h1 style:color={theme().textBright}>
+			<h1>
 				{user.displayName}
 			</h1>
-			<h2 style:color={theme().textDim}>
+			<h2>
 				@{user.username}
 			</h2>
 		</div>
-		<p style:color={theme().textDull}>{user.bio}</p>
+		<p>{user.bio}</p>
 	</div>
 </a>
 
@@ -33,17 +31,22 @@ import theme from "../themes/theme.svelte";
 
 	.book {
 		display: flex;
-		padding-left: 2rem;
-		padding-top: 1rem;
-		padding-bottom: 1rem;
-		padding-right: 2rem;
-		border-bottom-width: 1px;
-		border-bottom-style: solid;
+		padding: 1rem;
+		border-bottom: 1px solid var(--surface-0);
+	}
+
+	h1 {
+		color: var(--text);
+	}
+
+	h2 {
+		color: var(--surface-2);
 	}
 
 	.person-info-wrapper {
 		display: flex;
 		flex-direction: column;
+		justify-content: center;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow-x: hidden;
@@ -56,14 +59,19 @@ import theme from "../themes/theme.svelte";
 		h1,
 		h2 {
 			font-weight: normal;
-			font-size: 1rem;
+			font-size: 0.85rem;
 		}
 	}
 
-	.profile-picture {
+	.user-listing-profile-picture {
 		height: 3rem;
 		width: 3rem;
 		border-radius: 50%;
 		margin-right: 1rem;
+	}
+
+	p {
+		color: var(--overlay-1);
+		font-size: 0.85rem;
 	}
 </style>

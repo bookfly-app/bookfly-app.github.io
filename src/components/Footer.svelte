@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { getFile } from "../api/storageapi";
+	import BellIcon from "../assets/images/icons/BellIcon.svelte";
 	import EmptyHomeIcon from "../assets/images/icons/EmptyHomeIcon.svelte";
 	import PlusIcon from "../assets/images/icons/PlusIcon.svelte";
 	import ProfileIcon from "../assets/images/icons/ProfileIcon.svelte";
 	import SearchIcon from "../assets/images/icons/SearchIcon.svelte";
 	import { user } from "../backend/auth.svelte";
 
-	let { selected = undefined }: { selected?: "home" | "profile" | "search" | "new" } = $props();
+	let { selected = undefined }: { selected?: "home" | "profile" | "search" | "new" | "inbox" } = $props();
 </script>
 
 <div class="padding">&nbsp;</div>
@@ -17,8 +18,13 @@
 	<a aria-label="Search" href="/search">
 		<SearchIcon stroke={selected === "search" ? "var(--text)" : "var(--overlay-1)"} style="width: 1.5rem;" />
 	</a>
-	<a aria-label="Messages" href="/new">
-		<PlusIcon stroke={selected === "new" ? "var(--text)" : "var(--overlay-1)"} style="width: 1.5rem;" />
+	<a aria-label="New" href="/new">
+		<button>
+			<PlusIcon stroke="var(--crust)" style="width: 1.25rem;" />
+		</button>
+	</a>
+	<a aria-label="Notifications" href="/inbox">
+		<BellIcon stroke={selected === "inbox" ? "var(--text)" : "var(--overlay-1)"} style="width: 1.5rem;" />
 	</a>
 	<a aria-label="Profile" href="/profile">
 		{#if user()}
@@ -33,7 +39,7 @@
 
 <style>
 	.padding {
-		height: 4rem;
+		height: 3rem;
 		width: 100%;
 	}
 
@@ -47,12 +53,21 @@
 		background: var(--crust);
 
 		a {
-			padding-top: 1rem;
-			padding-bottom: 1rem;
+			padding-top: 0.5rem;
+			padding-bottom: 0.5rem;
 			width: 25%;
 			display: flex;
 			align-items: center;
 			justify-content: center;
+
+			&[aria-label="New"] button {
+				background: linear-gradient(to bottom right, var(--mauve), var(--lavender), var(--blue));
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0.25rem;
+				border-radius: 0.5rem;
+			}
 		}
 	}
 

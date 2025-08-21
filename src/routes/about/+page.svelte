@@ -1,15 +1,12 @@
 <script>
 import Wallflower from "../../assets/images/icons/Wallflower.svelte";
-	import BackButton from "../../components/BackButton.svelte";
 	import ExternalLink from "../../components/ExternalLink.svelte";
+	import Header from "../../components/Header.svelte";
 	import Page from "../../components/Page.svelte";
 </script>
 
 <Page class="about">
-	<span class="heading">
-		<BackButton style="position: absolute; left: 1rem;" />
-		<h1>About</h1>
-	</span>
+	<Header title="About"/>
 
 	<div class="definition">
 		<span>
@@ -30,13 +27,13 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 	</p>
 
 	<p>
-		wallflower.land is a social media website (and app soon!) for readers and
+		wallflower.land (or just Wallflower) is a social media website (and app soon!) for readers and
 		writers. It's a space where us bookworms can make posts discussing, rating, 
 		reviewing, and updating our followers on books.
 	</p>
 
 	<p>
-		Wallflower Land LLC&trade;, the legal owner of wallflower.land, is a non-profit organization originally created by
+		The Wallflower team, the legal owner of wallflower.land, is a non-profit organization originally created by
 		<a href="/profile/vi">@vi</a>
 		as a passion project in college. The name <i>Wallflower</i> comes from 
 		<a href="/profile/vi">@vi</a>'s favorite book 
@@ -110,27 +107,6 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 
 		p {
 			color: var(--overlay-1);
-		}
-	}
-
-	.heading {
-		display: flex;
-		gap: 1rem;
-		align-items: center;
-		position: relative;
-		justify-content: center;
-		position: fixed;
-		top: 0px;
-		background-color: var(--crust);
-		width: 100%;
-		padding-top: 1rem;
-		padding-bottom: 1rem;
-		left: 0px;
-
-		h1 {
-			color: var(--text);
-			font-weight: normal;
-			font-size: 1.5rem;
 		}
 	}
 

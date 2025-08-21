@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
 	import { logIn, user } from "../../backend/auth.svelte";
-	import theme from "../../themes/theme.svelte";
 	import Page from "../../components/Page.svelte";
 	import BackButton from "../../components/BackButton.svelte";
+	import Header from "../../components/Header.svelte";
 
 	let email: string = $state("");
 	let password: string = $state("");
@@ -23,27 +23,19 @@
 
 <Page type="profile">
 	<main>
-		<BackButton style="position: absolute; top: 1rem; left: 1rem;"/>
-		<h1>Log In</h1>
-		<div class="section">
-			<p>Don't have an account? <a href="/signup">Create one now.</a></p>
-		</div>
+		<Header title="Log In" />
 		<div>
 			<div class="section">
-				<p style:color={theme().textDull}>Email</p>
+				<p>Email</p>
 				<input
-					style:color={theme().text}
-					style:background={theme().backgroundDark}
 					type="text"
 					placeholder="example@website.com"
 					bind:value={email}
 				/>
 			</div>
 			<div class="section">
-				<p style:color={theme().textDull}>Password</p>
+				<p>Password</p>
 				<input
-					style:color={theme().text}
-					style:background={theme().backgroundDark}
 					type="password"
 					placeholder="s3cr3tp4zzc0d3"
 					bind:value={password}
@@ -52,31 +44,36 @@
 			</div>
 
 		</div>
-		<button disabled={!email || !password} onclick={signIn}>Log In</button>
+		<div class="bottom">
+			<button disabled={!email || !password} onclick={signIn}>Log In</button>
+			<p>Don't have an account? <a href="/signup">Create one now.</a></p>
+		</div>
 	</main>
 </Page>
 
 <style>
+	a {
+		color: var(--blue);
+		text-decoration: none;
+		font-size: 0.85rem;
+
+	}
+
 	.section {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
-
-		a {
-			color: var(--blue);
-			text-decoration: none;
-			font-size: 0.85rem;
-		}
-
-		p {
-			color: var(--overlay-1);
-			font-size: 0.85rem;
-		}
 	}
 
-	h1 {
-		font-weight: normal;
-		color: var(--text);
+	p {
+		color: var(--overlay-1);
+		font-size: 0.85rem;
+	}
+
+	.bottom {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	main {
@@ -98,6 +95,8 @@
 				border-radius: 1rem;
 				width: 15rem;
 				font-size: 0.85rem;
+				background-color: var(--crust);
+				color: var(--subtext-1);
 			}
 		}
 

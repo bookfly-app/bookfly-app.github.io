@@ -34,6 +34,7 @@ clean:
 	rm src-tauri/target -rf
 	$(NPM) install
 
+# Build all possible targets
 build-all: build-site build-linux-app
 	cp -r src-tauri/target/release/bundle/deb build/debian
 

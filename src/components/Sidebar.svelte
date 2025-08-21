@@ -12,6 +12,7 @@
 	import PersonIcon from "../assets/images/icons/PersonIcon.svelte";
 	import ProfileIcon from "../assets/images/icons/ProfileIcon.svelte";
 	import { logOut, user } from "../backend/auth.svelte";
+	import BarChartIcon from "../assets/images/icons/BarChartIcon.svelte";
 
 	let innerWidth = $state(window.innerWidth);
 	let innerHeight = $state(window.innerHeight);
@@ -128,10 +129,12 @@
 		<ProfileIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
 		Profile
 	</button>
-	<button class="listing" style:color="var(--subtext-1)" onclick={nav("/settings")}>
-		<BookmarkIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
-		Saved
-	</button>
+	{#if user()}
+		<button class="listing" style:color="var(--subtext-1)" onclick={nav("/interactions")}>
+			<BarChartIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
+			Interactions
+		</button>
+	{/if}
 	<button class="listing" style:color="var(--subtext-1)" onclick={nav("/settings")}>
 		<GearIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
 		Settings

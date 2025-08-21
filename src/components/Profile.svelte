@@ -183,30 +183,32 @@
 
 		<!-- Line 2: Profile stats -->
 		<div class="profile-line-2">
-			<span class="profile-books">
-				<!-- Favorite Book -->
-				{#await favoriteBook then favorite}
-					{#if favorite}
-						<a href={`/book/${favorite.isbn}`} title={`${profileUser.displayName}'s highest rated book is ${favorite.title}`}>
-							<StarIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem; flex-shrink: 0;" />
-							<span class="truncate">{favorite.title}</span>
-						</a>
-					{/if}
-				{/await}
-
-				<!-- Current book -->
-				{#await currentlyReading then current}
-					{#if current}
-						<a href="/book/{current.isbn}" title={`${profileUser.displayName} is currently reading ${current.title}`}>
-							<ClockIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem; flex-shrink: 0;" />
-							<span class="truncate">{current.title}</span>
-						</a>
-					{/if}
-				{/await}
-			</span>
-
-			<!-- Number of books read -->
 			{#await booksRead then booksRead}
+				{#if booksRead > 0}
+					<span class="profile-books">
+						<!-- Favorite Book -->
+						{#await favoriteBook then favorite}
+							{#if favorite}
+								<a href={`/book/${favorite.isbn}`} title={`${profileUser.displayName}'s highest rated book is ${favorite.title}`}>
+									<StarIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem; flex-shrink: 0;" />
+									<span class="truncate">{favorite.title}</span>
+								</a>
+							{/if}
+						{/await}
+
+						<!-- Current book -->
+						{#await currentlyReading then current}
+							{#if current}
+								<a href="/book/{current.isbn}" title={`${profileUser.displayName} is currently reading ${current.title}`}>
+									<ClockIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem; flex-shrink: 0;" />
+									<span class="truncate">{current.title}</span>
+								</a>
+							{/if}
+						{/await}
+					</span>
+				{/if}
+
+				<!-- Number of books read -->
 				<a onclick={() => view = "books"} href="/profile/{profileUser.username}?view=books" title="{profileUser.displayName} has read {booksRead} book{booksRead === 1 ? '' : 's'}">
 					<BookIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem;" />
 					<span>{booksRead}</span>

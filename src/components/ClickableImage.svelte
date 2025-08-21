@@ -13,11 +13,14 @@
 {:else}
 	<img {src} {...rest} onclick={() => expanded = true} />
 {/if}
-{#if expanded}
-	<div class="preview-wrapper" onclick={() => expanded = false}>
-		<img class="preview" {src} />
-	</div>
-{/if}
+<div 
+	style:pointer-events={expanded ? undefined : "none"} 
+	style:background-color={expanded ? "rgba(0, 0, 0, 0.6)" : "rgba(0, 0, 0, 0)"}
+	class="preview-wrapper" 
+	onclick={() => expanded = false}
+>
+	<img class="preview" {src} style:scale={expanded ? "100%" : "0%"} />
+</div>
 
 <style>
 	.wrapper {
@@ -30,7 +33,6 @@
 		left: 0px;
 		height: 100dvh;
 		width: 100dvw;
-		background: rgba(0, 0, 0, 0.6);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -42,5 +44,7 @@
 		width: 100%;
 		border-radius: 0.5rem;
 		max-width: 50rem;
+		transition: scale 0.25s, background-color 1s;
+		box-shadow: 0px 0px 1rem black;
 	}
 </style>

@@ -7,9 +7,19 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 } from "firebase/auth";
-import { collection, doc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
+import {
+	collection,
+	doc,
+	getDocs,
+	orderBy,
+	query,
+	setDoc,
+	updateDoc,
+	where,
+} from "firebase/firestore";
 import { getPreference, internalUserToUser, resolveUser, type User } from "../api/userapi";
 import initializeFirebase from "./backend";
+import type { InternalPost } from "../api/postapi";
 
 let { db } = initializeFirebase();
 const auth = getAuth();
@@ -127,4 +137,17 @@ export async function logIn(email: string, password: string): Promise<unknown | 
 		console.log(error);
 		return error;
 	}
+}
+
+export async function getUserReplies(user: User): Promise<InternalPost[]> {
+	return (
+		await getDocs(
+			query(
+				collection(db, "posts"),
+				where("poster", "==", user.id),
+				where("type", "==", "reply"),
+				orderBy("timestamp", "desc"),
+			),
+		)
+	).docs.map(doc => doc.data() as InternalPost);
 }

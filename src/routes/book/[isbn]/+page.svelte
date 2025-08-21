@@ -7,7 +7,6 @@
 	import AnyPost from "../../../components/posts/AnyPost.svelte";
 	import Sidebar from "../../../components/Sidebar.svelte";
 	import StarRating from "../../../components/StarRating.svelte";
-	import theme, { accentGradient } from "../../../themes/theme.svelte.js";
 
 	let { data } = $props();
 	let book = data.book;
@@ -117,7 +116,7 @@
 						Remove from Reading List
 					</button>
 				{:else}
-					<button id="add-to-reading-list" style:background={accentGradient()} onclick={addToReadingList}>
+					<button id="add-to-reading-list"onclick={addToReadingList}>
 						Add to Reading List
 					</button>
 				{/if}
@@ -213,13 +212,17 @@
 		transition: scale 0.1s;
 		margin-top: 1rem;
 
+		&:not(.remove-from-reading-list) {
+			background: linear-gradient(to bottom right, var(--lavender), var(--blue));
+		}
+
 		&:hover {
 			scale: 105%;
 		}
 	}
 
 	.remove-from-reading-list {
-		background: linear-gradient(#f38ba8, #ff7788);
+		background: linear-gradient(to bottom right, var(--pink), var(--red));
 	}
 
 	.book-info {

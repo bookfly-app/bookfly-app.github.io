@@ -8,11 +8,6 @@
 	import Page from "../../components/Page.svelte";
 	import AnyPost from "../../components/posts/AnyPost.svelte";
 	import UserListing from "../../components/UserListing.svelte";
-	import { getFile } from "../../api/storageapi";
-	import { user } from "../../backend/auth.svelte";
-	import SearchIcon from "../../assets/images/icons/SearchIcon.svelte";
-	import Wallflower from "../../assets/images/icons/Wallflower.svelte";
-	import PersonIcon from "../../assets/images/icons/PersonIcon.svelte";
 	import Sidebar from "../../components/Sidebar.svelte";
 	import BookCover from "../../components/BookCover.svelte";
 	import Header from "../../components/Header.svelte";
@@ -330,34 +325,5 @@
 		background-color: var(--base);
 		font-size: 1rem;
 		color: var(--subtext-1);
-	}
-
-	.banner {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 1rem;
-
-		button {
-			background-size: cover;
-			background-position: center;
-			overflow: hidden;
-
-			img {
-				border-radius: 50%;
-				width: 3rem;
-				height: 3rem;
-			}
-		}
-	}
-
-	nav {
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-		max-width: var(--max-width);
-		background: var(--crust);
-		position: fixed;
-		top: 0px;
 	}
 </style>

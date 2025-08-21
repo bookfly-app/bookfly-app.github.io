@@ -1,6 +1,4 @@
 <script lang="ts">
-	import theme, { accentGradient } from "../themes/theme.svelte";
-
 	let { 
 		value = $bindable(), 
 		size = 1, 

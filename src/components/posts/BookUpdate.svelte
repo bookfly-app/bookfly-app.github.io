@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { getBook } from "../../api/bookapi";
-	import theme from "../../themes/theme.svelte";
 
 	let { isbn, body, user, updateType } = $props();
 

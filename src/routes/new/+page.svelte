@@ -1,5 +1,4 @@
 <script lang="ts">
-	import theme, { accentGradient } from "../../themes/theme.svelte";
 	import Page from "../../components/Page.svelte";
 	import Header from "../../components/Header.svelte";
 </script>

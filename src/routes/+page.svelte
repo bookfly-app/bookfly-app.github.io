@@ -9,8 +9,14 @@
 	import Wallflower from "../assets/images/icons/Wallflower.svelte";
 	import { getFile } from "../api/storageapi";
 	import BellIcon from "../assets/images/icons/BellIcon.svelte";
+	import { goto } from "$app/navigation";
 
-	let view: "following" | "for you" = $state(user() ? "following" : "for you");
+	let view: "following" | "for you" = $state(
+		user() ? 
+			new URLSearchParams(window.location.search).get("view") as "following" | "for you"
+			?? "following"
+		: "for you"
+	);
 
 	let followedPosts = $derived(user() ? getFollowedPosts(user()!, true).then(posts => posts.toSorted((a, b) => b.timestamp - a.timestamp)) : Promise.resolve([]));
 	let forYouPosts = getForYouPosts(user()!);
@@ -22,6 +28,14 @@
 		if (!spinLogo) {
 			spinLogo = true;
 			setTimeout(() => spinLogo = false, 2000);
+		}
+	}
+
+	function setView(newView: "following" | "for you") {
+		return function() {
+			view = newView;
+			const params = new URLSearchParams({ view });
+			goto(`/?${params}`);
 		}
 	}
 </script>
@@ -55,7 +69,7 @@
 				<button
 					style:color={view === "following" ? "var(--lavender)" : "var(--overlay-1)"}
 					style:border-bottom-color={view === "following" ? "var(--lavender)" : "transparent"}
-					onclick={() => (view = "following")}
+					onclick={setView("following")}
 				>
 					Following
 				</button>
@@ -63,7 +77,7 @@
 			<button
 				style:color={view === "for you" ? "var(--lavender)" : "var(--overlay-1)"}
 				style:border-bottom-color={view === "for you" ? "var(--lavender)" : "transparent"}
-				onclick={() => (view = "for you")}
+				onclick={setView("for you")}
 			>
 				Discover
 			</button>
@@ -134,6 +148,7 @@
 		padding-right: 2rem;
 		padding-left: 2rem;
 		background-color: var(--crust);
+		view-transition-name: home-views;
 
 		&:not(:has(> *:nth-child(2))) {
 			justify-content: center;
@@ -186,5 +201,6 @@
 		width: 100%;
 		max-width: var(--max-width);
 		background: var(--crust);
+		view-transition-name: home-nav;
 	}
 </style>

@@ -2,7 +2,6 @@
 	import { goto } from "$app/navigation";
 	import { onMount } from "svelte";
 	import { getFile } from "../api/storageapi";
-	import BookmarkIcon from "../assets/images/icons/BookmarkIcon.svelte";
 	import CloseIcon from "../assets/images/icons/CloseIcon.svelte";
 	import EmptyHomeIcon from "../assets/images/icons/EmptyHomeIcon.svelte";
 	import EnterIcon from "../assets/images/icons/EnterIcon.svelte";
@@ -45,7 +44,7 @@
 	function nav(to: string) {
 		return function () {
 			goto(to);
-			hide();
+			if (window.innerWidth < window.innerHeight) hide();
 		};
 	}
 

@@ -51,6 +51,7 @@
 		align-items: center;
 		max-width: var(--max-width);
 		background: var(--crust);
+		view-transition-name: footer;
 
 		a {
 			padding-top: 0.5rem;

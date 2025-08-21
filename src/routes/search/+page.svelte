@@ -204,6 +204,7 @@
 		padding-top: 1rem;
 		background-color: var(--crust);
 		margin-top: 2.5rem;
+		view-transition-name: search-box;
 	}
 
 	.loading {

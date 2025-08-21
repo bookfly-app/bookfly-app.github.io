@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from "$app/navigation";
 	import { getBookDiscussions, getBookRating } from "../../../api/bookapi";
 	import { updateUser, user } from "../../../backend/auth.svelte";
 	import BackButton from "../../../components/BackButton.svelte";
@@ -17,6 +18,8 @@
 		return function() {
 			view = viewName;
 			content.scrollTop = 0;
+			const params = new URLSearchParams({ view });
+			goto(`/book/${book.isbn}?${params}`);
 		}
 	}
 
@@ -222,7 +225,7 @@
 	}
 
 	.remove-from-reading-list {
-		background: linear-gradient(to bottom right, var(--pink), var(--red));
+		background: linear-gradient(to bottom right, var(--peach), var(--red));
 	}
 
 	.book-info {
@@ -289,6 +292,7 @@
 	}
 
 	nav {
+		view-transition-name: book-view;
 		display: flex;
 		flex-direction: column;
 		position: sticky;

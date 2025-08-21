@@ -9,7 +9,7 @@
 {#if children}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div class="wrapper" onclick={() => expanded = true} style:cursor="pointer">
+	<div {...rest} class="wrapper" onclick={() => expanded = true} style:cursor="pointer">
 		{@render children()}
 	</div>
 {:else}

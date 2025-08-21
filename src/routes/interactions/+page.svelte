@@ -57,7 +57,7 @@
 	}
 </script>
 
-<Page bind:sidebar type="search">
+<Page bind:sidebar type="profile">
 	<nav>
 		<div class="banner">
 			<button onclick={() => sidebar.show()} aria-label="Open sidebar">
@@ -121,6 +121,7 @@
 		grid-template-columns: repeat(5, 1fr);
 		padding-left: 1rem;
 		padding-right: 1rem;
+		view-transition-name: interactions-views;
 
 		> * {
 			padding-bottom: 0.75rem;
@@ -156,6 +157,7 @@
 	}
 
 	nav {
+		view-transition-name: interactions-nav;
 		display: flex;
 		flex-direction: column;
 		width: 100%;

@@ -132,8 +132,8 @@
 
 <section>
 	{#await getFile(profileUser.banner) then bnr}
-		<ClickableImage src={bnr!}>
-			<div class="banner" style:background-image={`url("${bnr}")`}></div>
+		<ClickableImage src={bnr!} style="view-transition-name: profile-banner;">
+			<div style="view-transition-name: profile-banner-image;" class="banner" style:background-image={`url("${bnr}")`}></div>
 		</ClickableImage>
 	{/await}
 	<button class="back-arrow" onclick={() => sidebar.show()}>
@@ -420,6 +420,7 @@
 	}
 
 	.back-arrow {
+		view-transition-name: profile-back-arrow;
 		width: 2rem;
 		height: 2rem;
 		position: absolute;
@@ -470,6 +471,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+		view-transition-name: profile;
 
 		:global(.profile-picture) {
 			margin-left: 1rem;

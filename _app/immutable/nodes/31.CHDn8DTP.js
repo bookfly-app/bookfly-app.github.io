@@ -1,0 +1,9 @@
+import"../chunks/Bg9kRutz.js";import"../chunks/69_IOA4Y.js";import{f as $,s as e,c as d,r as f,a4 as a}from"../chunks/BSx8zodA.js";import{b as h,a as s,t as y}from"../chunks/DM033ULQ.js";import{W as b}from"../chunks/B8mZ-WtS.js";import{E as m}from"../chunks/F-IvcE5d.js";import{H as I}from"../chunks/BYo1ne7F.js";import{P as _}from"../chunks/CZrDidyk.js";var x=y(`<!> <div class="wrench svelte-1484301"><!></div> <h2 class="svelte-1484301">Becoming a Moderator</h2> <p class="svelte-1484301">If you're interested in becoming a moderator for wallflower.land, reach out
+		to <a href="/@vi" class="svelte-1484301">@vi</a> at <!>,
+		or the whole staff team at <!>.
+		I'll try get in touch with you soon after.</p> <h2 class="svelte-1484301">Moderating Details</h2> <p class="svelte-1484301">Moderators for wallflower.land can delete other users posts, ban
+		their accounts, unban their accounts, etc. It's a lot of responsibility.</p> <p class="svelte-1484301">Because of that, I'm currently only accepting moderator requests from people
+		I trust. This may change in the future as wallflower.land expands, but right
+		now, I will admit that your chances of becoming a moderator&mdash;if I don't know
+		you personally&mdash;are slim.</p> <p class="svelte-1484301">That being said, it's not impossible. Reach out to me and we can chat. It helps
+		if you have a long-standing active account on wallflower.land.</p>`,1);function D(p){_(p,{class:"about",children:(u,P)=>{var l=x(),n=$(l);I(n,{title:"Become a moderator"});var t=e(n,2),v=d(t);b(v,{stroke:"var(--crust)",style:"width: 3rem; height: 3rem;"}),f(t);var i=e(t,4),c=e(d(i),3);m(c,{href:"mailto:vi@wallflower.land",children:(o,g)=>{a();var r=h("vi@wallflower.land");s(o,r)},$$slots:{default:!0}});var w=e(c,2);m(w,{href:"mailto:staff@wallflower.land",children:(o,g)=>{a();var r=h("staff@wallflower.land");s(o,r)},$$slots:{default:!0}}),a(),f(i),a(8),s(u,l)},$$slots:{default:!0}})}export{D as component};

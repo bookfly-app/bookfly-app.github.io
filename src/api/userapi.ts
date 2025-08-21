@@ -33,8 +33,11 @@ export type User = {
 
 	following: UserId[];
 
+	requestedAuthorVerification: boolean,
+
 	// Preferences
 	darkMode: boolean;
+	uiScale: number;
 };
 
 let { db } = initializeFirebase();
@@ -167,10 +170,12 @@ export async function searchUsers(searchTerm: string): Promise<User[]> {
 
 export const defaultPreferences = {
 	darkMode: true,
+	uiScale: 1,
 } as const satisfies Preferences;
 
 type Preferences = {
 	darkMode: boolean;
+	uiScale: number;
 };
 
 export type Preference = keyof Preferences;
@@ -188,9 +193,9 @@ export function getPreference<Name extends Preference>(name: Name): PreferenceVa
 	return preference;
 }
 
-export async function setPreference<Name extends keyof typeof defaultPreferences>(
+export async function setPreference<Name extends Preference>(
 	name: Name,
-	value: (typeof defaultPreferences)[Name],
+	value: PreferenceValue<Name>,
 ): Promise<void> {
 	localStorage.setItem(`preference-${name}`, JSON.stringify(value));
 	if (user()) await updateUser({ [name]: value });

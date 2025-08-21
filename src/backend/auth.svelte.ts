@@ -6,6 +6,7 @@ import {
 	setPersistence,
 	signInWithEmailAndPassword,
 	signOut,
+	updateEmail
 } from "firebase/auth";
 import {
 	collection,
@@ -17,7 +18,13 @@ import {
 	updateDoc,
 	where,
 } from "firebase/firestore";
-import { getPreference, internalUserToUser, resolveUser, type User } from "../api/userapi";
+import {
+	defaultPreferences,
+	getPreference,
+	internalUserToUser,
+	resolveUser,
+	type User,
+} from "../api/userapi";
 import initializeFirebase from "./backend";
 import type { InternalPost } from "../api/postapi";
 
@@ -92,6 +99,11 @@ export async function updateUser(userInfo: Partial<User>) {
 	await updateDoc(doc(db, "users", user()!.id), userInfo);
 }
 
+export async function changeEmail(email: string) {
+	await updateEmail(auth.currentUser, email);
+	updateUser({ email });
+}
+
 export async function signUp(
 	email: string,
 	password: string,
@@ -99,6 +111,7 @@ export async function signUp(
 ): Promise<unknown | null> {
 	try {
 		const darkMode = getPreference("darkMode");
+		const uiScale = getPreference("uiScale");
 		let userInfo = await createUserWithEmailAndPassword(auth, email, password);
 		let user: User = {
 			displayName: username,
@@ -117,8 +130,10 @@ export async function signUp(
 			readingList: [],
 			following: [],
 			darkMode,
+			uiScale,
 			views: [],
 			shares: [],
+			requestedAuthorVerification: false,
 			birthmoment: Date.now(),
 		};
 		await setDoc(doc(db, "users", user.id), user);

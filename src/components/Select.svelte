@@ -20,7 +20,7 @@
 <div {...rest} class="select" bind:this={optionsElement}>
 	<button class="value" onclick={() => expanded = !expanded}>
 		{value}
-		<RightArrowIcon stroke="var(--subtext-1)" style="width: 1rem; height: 1rem;" />
+		<RightArrowIcon stroke="var(--subtext-1)" style="width: 1rem; height: 1rem; rotate: {expanded ? "90deg" : "0deg"}; transition: rotate 0.2s;" />
 	</button>
 	<div class="options" style:display={expanded ? "flex" : "none"}>
 		{#each options as option}
@@ -37,12 +37,14 @@
 		background-color: var(--crust);
 		color: var(--subtext-1);
 		border-radius: 0.5rem;
+		border: 1px solid var(--surface-0);
 	}
 
 	.value {
 		border-radius: 0.5rem;
 		display: flex;
 		align-items: center;
+		gap: 0.5rem;
 
 		:global(>*:last-child) {
 			margin-left: auto;
@@ -63,6 +65,14 @@
 		box-shadow: 0px 0px 0.5rem black;
 		background-color: var(--crust);
 		color: var(--subtext-1);
+		max-height: 10rem;
+		overflow-y: auto;
+	}
+
+	.option {
+		&:hover {
+			background: rgba(150, 150, 255, 10%);
+		}
 	}
 
 	button {

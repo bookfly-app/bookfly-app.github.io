@@ -1,13 +1,15 @@
 <script lang="ts">
 	import CatIcon from "../assets/images/icons/CatIcon.svelte";
-	import Footer from "../components/Footer.svelte";
+	import Header from "../components/Header.svelte";
 	import Page from "../components/Page.svelte";
 </script>
 
 <Page>
+	<Header title="Uh oh!" />
 	<section>
-		<h1>Uh oh!</h1>
 		<p>We couldn't find that page :c</p>
+		<p>wallflower.land is still in development, and some pages are missing. They'll be here soon!</p>
+		<p>Thanks for your patience :)</p>
 		<CatIcon stroke="var(--mantle)" style="width: 50; height: 50%; margin-left: auto; margin-right: auto; margin-top: 2rem;"/>
 		<a href="/">Go to Wallflower Home</a>
 	</section>
@@ -18,11 +20,8 @@
 		padding: 2rem;
 		display:  flex;
 		flex-direction: column;
-		
-		h1 {
-			color: var(--subtext-1);
-			font-weight: normal;
-		}
+		gap: 1rem;
+		margin-top: 3rem;
 
 		p {
 			color: var(--overlay-1);

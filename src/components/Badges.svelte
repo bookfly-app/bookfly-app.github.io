@@ -27,7 +27,7 @@
 				style:width="{size * 1.5}rem"
 				style:height="{size * 1.5}rem"
 				style:border-radius="{size / 2}rem"
-				href="/settings/account/author-verification"
+				href="/settings/account"
 				title="{forUser.displayName} is a verified published author"
 				class="badge author"
 			>

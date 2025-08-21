@@ -1,5 +1,5 @@
-NPM := $(shell command -v bun 2>/dev/null || command -v pnpm 2>/dev/null || command -v npm 2>/dev/null || command -v yarn 2>/dev/null)
-TAURI := $(shell command -v cargo-tauri 2>/dev/null)
+NPM := "$(shell command -v bun 2>/dev/null || command -v pnpm 2>/dev/null || command -v npm 2>/dev/null || command -v yarn 2>/dev/null)"
+TAURI := "$(shell command -v cargo-tauri 2>/dev/null)"
 TAURI ?= $(NPM) tauri
 
 .PHONY: all build-site deploy dev-site dev-native-app build-linux-app clean build-exe build-all
@@ -36,7 +36,7 @@ clean:
 
 # Build all possible targets
 build-all: build-site build-linux-app
-	cp -r src-tauri/target/release/bundle/deb build/debian
+	[ -d src-tauri/target/release/bundle/deb ] && cp -r src-tauri/target/release/bundle/deb build/debian
 
 # Builds the website for production and deploys it publicly
 deploy-site: build-site

@@ -41,7 +41,7 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 		by Stephen Chbosky.
 	</p>
 	<p>
-		Powered by volunteers, no one at Wallflower LLC makes a cent off of the project. 
+		Powered by volunteers, no one on the Wallflower team makes a cent off of the project. 
 		wallflower.land is completely ad-free with zero in-app purchases.
 	</p>
 
@@ -50,11 +50,11 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 	<p>
 		Wallflower is still led by its original creator,
 		<a href="/profile/vi">@vi</a>, 
-		a nonbinary reader and writer. Wallflower will always support kindness, acceptance, diversity, equity, and inclusion.
+		a nonbinary reader writer, and college student. Wallflower will always support kindness, acceptance, diversity, equity, and inclusion.
 	</p>
 	<p>Currently, Wallflower has no other team members.</p>
 	<p>
-		Wallflower does not support the use of AI, and will not be integrating AI features into the website.
+		Wallflower does not support the use of AI, and will not be integrating AI features into the website or app.
 	</p>
 
 	<!-- Moderation -->
@@ -88,30 +88,41 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 
 	<p>
 		You are free to contact <a href="/profile/vi">@vi</a>
-		to ask for permission to use Wallflower's code for some specific circumstance. I don't bite, I promise.
+		to ask for permission to use Wallflower's code for some specific circumstance. 
+		You can email me <i>personally</i> at
+		<ExternalLink href="mailto:vi@wallflower.land">vi@wallflower.land</ExternalLink>. 
+		I don't bite, I promise. Alternatively, you can reach out to
+		<ExternalLink href="mailto:staff@wallflower.land">staff@wallflower.land</ExternalLink>
+		and it'll make its way to me. 
 	</p>
 </Page>
 
 <style>
 	:global(.about) {
 		padding: 2rem;
+		padding-top: 4rem;
 		font-size: 0.9rem;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-
-		a {
-			text-decoration: none;
-			color: var(--blue);
-		}
 
 		p {
 			color: var(--overlay-1);
 		}
 	}
 
+
+	a {
+		text-decoration: none;
+		color: var(--blue);
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
 	.definition {
-		margin-top: 4rem;
+		margin-top: 1rem;
 		padding-top: 1rem;
 		color: var(--overlay-1);
 		display: flex;

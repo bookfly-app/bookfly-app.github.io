@@ -29,6 +29,10 @@
 	let currentIndex = 0; 
 
 	function getTabIndex(url: URL) {
+		if (url.pathname.match(/\/settings\/account\/(become\-a\-moderator|become\-a\-developer)/)) {
+			return 102;
+		}
+
 		if (url.pathname.match(/\/settings\/(appearance|account|notifications)/)) {
 			return 101;
 		}
@@ -101,8 +105,9 @@
 </script>
 
 <svelte:head>
-<link rel="icon" href={favicon} />
-<link rel="stylesheet" href={globalCss} />
+	<link rel="icon" href={favicon} />
+	<link rel="stylesheet" href={globalCss} />
+	<title>Wallflower</title>
 </svelte:head>
 
 {@render children()}
@@ -135,6 +140,7 @@
 	:root[data-direction="forward"]::view-transition-old(root) {
 		animation: 0.2s ease both slide-to-left;
 	}
+
 	:root[data-direction="forward"]::view-transition-new(root) {
 		animation: 0.2s ease both slide-from-right;
 	}
@@ -142,12 +148,15 @@
 	:root[data-direction="backward"]::view-transition-old(root) {
 		animation: 0.2s ease both slide-to-right;
 	}
+
 	:root[data-direction="backward"]::view-transition-new(root) {
 		animation: 0.2s ease both slide-from-left;
 	}
+
 	:root[data-direction="none"]::view-transition-new(root) {
 		animation: none;
 	}
+
 	:root[data-direction="none"]::view-transition-old(root) {
 		animation: none;
 	}

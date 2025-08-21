@@ -1,41 +1,51 @@
 
 <script>
-	import BackButton from "../../../../components/BackButton.svelte";
+	import DeveloperIcon from "../../../../assets/images/icons/DeveloperIcon.svelte";
+	import ExternalLink from "../../../../components/ExternalLink.svelte";
+	import Header from "../../../../components/Header.svelte";
 	import Page from "../../../../components/Page.svelte";
 </script>
 
 <Page class="about">
-	<span class="heading">
-		<BackButton style="position: absolute; left: 0px;" />
-		<h1>Become a Developer</h1>
-	</span>
+	<Header title="Become a developer" />
+
+	<div class="icon">
+		<DeveloperIcon stroke="var(--crust)" style="width: 3rem; height: 3rem;" />
+	</div>
+
+	<h2>Becoming a Developer</h2>
+
+	<p>
+		If you're interested in becoming a developer for wallflower.land, reach out
+		to <a href="/@vi">@vi</a> at <ExternalLink href="mailto:vi@wallflower.land">vi@wallflower.land</ExternalLink>,
+		or the whole staff team at
+		<ExternalLink href="mailto:staff@wallflower.land">staff@wallflower.land</ExternalLink>.
+		I'll try get in touch with you soon after.
+	</p>
 
 	<!-- Technical Details -->
-	<h2>Technical Details</h2>
+	<h2>Development Details</h2>
 	<p>
 		On the front end, Wallflower is written using
-		<a href="https://svelte.dev/">Svelte</a>
+		<ExternalLink href="https://svelte.dev/">Svelte</ExternalLink>
 		and
-		<a href="https://svelte.dev/docs/kit/introduction">Sveltekit</a>
+		<ExternalLink href="https://svelte.dev/docs/kit/introduction">Sveltekit</ExternalLink>
 		for the web (flavored with
-		<a href="https://www.typescriptlang.org/">TypeScript</a>
-		and bundled with
-		<a href="https://bun.sh/">Bun</a>
-		), and ported to mobile with
-		<a href="https://v2.tauri.app/">Tauri</a>
+		<ExternalLink href="https://www.typescriptlang.org/">TypeScript</ExternalLink>, 
+		and ported to mobile with
+		<ExternalLink href="https://v2.tauri.app/">Tauri</ExternalLink>
 		.
 	</p>
 	<p>
-		In the back, Wallflower uses <a href="https://firebase.google.com/">Firebase</a>
+		In the back, Wallflower uses <ExternalLink href="https://firebase.google.com/">Firebase</ExternalLink>
 		to store data and manage authentication.
 	</p>
 	<p>
 		This stack was chosen by
 		<a href="/profile/vi">@vi</a>
-		in the very beginning, somewhat arbitrarily and based on limited experience. The goal was a simple but powerful stack that allowed seamless porting
+		in the very beginning. The goal was a simple but powerful stack that allowed seamless porting
 		between platforms.
 	</p>
-	Legal
 </Page>
 
 <style>
@@ -45,10 +55,15 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+		padding-top: 4.5rem;
 
 		a {
 			text-decoration: none;
-			color: cornflowerblue;
+			color: var(--blue);
+			
+			&:hover {
+				text-decoration: underline;
+			}
 		}
 
 		p {
@@ -56,42 +71,13 @@
 		}
 	}
 
-	.heading {
-		display: flex;
-		gap: 1rem;
-		align-items: center;
-		position: relative;
-		justify-content: center;
-	}
-
-	.definition {
-		margin-top: 0.5rem;
-		padding-top: 1rem;
-		color: var(--overlay-1);
-		display: flex;
-		flex-direction: column;
-		border-bottom: 1px solid var(--overlay-1);
-		border-top: 1px solid var(--overlay-1);
-		padding-bottom: 1rem;
-
-		span {
-			display: flex;
-			align-items: center;
-			gap: 1rem;
-		}
-
-		h2, h2 > i {
-			color: var(--subtext-1);
-			font-family: "Garamond";
-		}
-
-		.body {
-			padding-top: 0.5rem;
-
-			i {
-				color: var(--surface-2);
-			}
-		}
+	.icon {
+		background-image: linear-gradient(to bottom right, var(--green), var(--teal));
+		padding: 1rem;
+		width: fit-content;
+		border-radius: 1rem;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	h2:not(.wallflower) {

@@ -73,7 +73,8 @@
 		}
 
 		&:first-of-type {
-			margin-top: 4.5rem;
+			margin-top: 3.5rem;
+			padding-top: 1.5rem;
 		}
 
 		&:hover {

@@ -7,6 +7,10 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 	updateEmail,
+	updatePassword, 
+	reauthenticateWithCredential,
+	EmailAuthProvider,
+	deleteUser
 } from "firebase/auth";
 import {
 	collection,
@@ -165,4 +169,14 @@ export async function getUserReplies(user: User): Promise<InternalPost[]> {
 			),
 		)
 	).docs.map(doc => doc.data() as InternalPost);
+}
+
+export async function changePassword(oldPassword: string, newPassword: string) {
+	const credential = EmailAuthProvider.credential(auth.currentUser, oldPassword);
+	await reauthenticateWithCredential(auth.currentUser, credential);
+	await updatePassword(user, newPassword);
+}
+
+export async function deleteAccount() {
+	await deleteUser(auth.currentUser);
 }

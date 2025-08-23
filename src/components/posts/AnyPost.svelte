@@ -27,6 +27,7 @@
 	import Badges from "../Badges.svelte";
 	import ContextMenu from "../ContextMenu.svelte";
 	import ImageCarousel from "../ImageCarousel.svelte";
+	import Link from "../Link.svelte";
 	import Notification from "../Notification.svelte";
 	import BookUpdate from "./BookUpdate.svelte";
 	import Discussion from "./Discussion.svelte";
@@ -286,7 +287,7 @@
 					{#await getUserFromId(parent!.poster)}
 						<div class="loading-replying"></div>
 					{:then parentPoster}
-						<a href="/profile/{parentPoster.username}">@{parentPoster.username}</a>
+						<Link href="/profile/{parentPoster.username}">@{parentPoster.username}</Link>
 					{/await}
 				{/await}
 			</span>

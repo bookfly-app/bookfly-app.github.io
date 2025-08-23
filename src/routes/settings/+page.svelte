@@ -1,5 +1,6 @@
 <script>
 	import BellIcon from "../../assets/images/icons/BellIcon.svelte";
+	import DeveloperIcon from "../../assets/images/icons/DeveloperIcon.svelte";
 	import InfoIcon2 from "../../assets/images/icons/InfoIcon2.svelte";
 	import PaintRollerIcon from "../../assets/images/icons/PaintRollerIcon.svelte";
 	import ProfileIcon from "../../assets/images/icons/ProfileIcon.svelte";
@@ -41,6 +42,14 @@
 			<span>About</span>
 		</div>
 		<p>The story behind wallflower.land, and what we're all about around here.</p>
+	</a>
+
+	<a href="/settings/api">
+		<div>
+			<DeveloperIcon style="width: 1.25rem; height: 1.25rem;" stroke="var(--text)" />
+			<span>API Usage</span>
+		</div>
+		<p>Use the wallflowr.land API to get data on books and authors.</p>
 	</a>
 </Page>
 

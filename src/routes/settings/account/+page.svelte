@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import { getAuth, reauthenticateWithCredential } from "firebase/auth";
 	import AuthorIcon from "../../../assets/images/icons/AuthorIcon.svelte";
+	import ClosedEyeIcon from "../../../assets/images/icons/ClosedEyeIcon.svelte";
 	import CloseIcon from "../../../assets/images/icons/CloseIcon.svelte";
 	import DeveloperIcon from "../../../assets/images/icons/DeveloperIcon.svelte";
 	import EditMailIcon from "../../../assets/images/icons/EditMailIcon.svelte";
+	import EyeIcon from "../../../assets/images/icons/EyeIcon.svelte";
 	import PasswordIcon from "../../../assets/images/icons/PasswordIcon.svelte";
 	import TrashIcon from "../../../assets/images/icons/TrashIcon.svelte";
 	import WrenchIcon from "../../../assets/images/icons/WrenchIcon.svelte";
-	import { changeEmail, passwordErrors, updateUser, user } from "../../../backend/auth.svelte";
+	import { changeEmail, changePassword, deleteAccount, passwordErrors, updateUser, user } from "../../../backend/auth.svelte";
 	import Header from "../../../components/Header.svelte";
 	import Page from "../../../components/Page.svelte";
 	import Popup from "../../../components/Popup.svelte";
@@ -23,21 +24,47 @@
 	let oldPassword = $state("");
 	let newPassword = $state("");
 	let newPassword2 = $state("");
-	let newPasswordErrors = $derived(newPassword ? passwordErrors(newPassword): []);
+	let deleteUsername = $state("");
+	let showOldPassword = $state(false);
+	let showNewPassword = $state(false);
+	let showNewPassword2 = $state(false);
+	let newPasswordErrors = $derived(
+		newPassword ? 
+		[...passwordErrors(newPassword), ...(newPassword === oldPassword ? ["New password cannot be the same as old password."] : [])] : 
+		[]
+	);
 	let passwordMatchError = $derived(newPassword && newPassword2 && newPassword !== newPassword2 ? "Passwords must match" : null);
-	let canChangePassword = $derived(newPassword && oldPassword && newPassword2 && !passwordMatchError && newPasswordErrors.length === 0);
+	let canChangePassword = $derived(
+		newPassword && 
+		oldPassword && 
+		newPassword2 && 
+		!passwordMatchError && 
+		newPasswordErrors.length === 0 &&
+		newPassword !== oldPassword
+	);
 
 	let changeEmailVisible = $state(false);
 	let changeAuthorVisible = $state(false);
 	let changePasswordVisible = $state(false);
+	let deleteAccountVisible = $state(false);
+	let usernameError = $derived((!deleteUsername || deleteUsername === user()?.username) ? null : "Incorrect username");
+	let confirmDeleteAccount = $state(false);
+	let canDeleteAccount = $derived(!usernameError && deleteUsername && confirmDeleteAccount);
 
-	async function changePassword() {
-		await reauthenticateWithCredential(getAuth().currentUser!, oldPassword);
+	async function submitDeleteAccount() {
+		await deleteAccount();
+		goto("/");
 	}
 
-	function submitChangeEmail() {
-		changeEmail(email);
+	async function submitChangePassword() {
+		if (!canChangePassword) return;
+		changePasswordVisible = false;
+		await changePassword(oldPassword, newPassword);
+	}
+
+	async function submitChangeEmail() {
 		changeEmailVisible = false;
+		await changeEmail(email);
 	}
 
 	async function requestAuthorVerification() {
@@ -69,7 +96,7 @@
 			<input placeholder="new@example.com" type="text" bind:value={email} enterkeyhint="done" />
 			<div class="buttons">
 				<button class="cancel" onclick={() => changeEmailVisible = false}>Cancel</button>
-				<button class="submit" onclick={changePassword}>Change</button>
+				<button class="submit" onclick={submitChangePassword}>Change</button>
 			</div>
 			<button class="close" onclick={() => changeEmailVisible = false}>
 				<CloseIcon stroke="var(--red)" style="width: 1rem; height: 1rem;" />
@@ -93,11 +120,29 @@
 			<span class="title">Change Password</span>
 			<div class="section">
 				<span>Old Password</span>
-				<input placeholder="Old Password" type="password" bind:value={oldPassword} enterkeyhint="done" />
+				<input placeholder="Old Password" type={showOldPassword ? "text" : "password"} bind:value={oldPassword} enterkeyhint="done" />
+				{#if showOldPassword}
+					<button class="show-password" onclick={() => showOldPassword = false}>
+						<ClosedEyeIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem;" />
+					</button>
+				{:else}
+					<button class="show-password" onclick={() => showOldPassword = true}>
+						<EyeIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem;" />
+					</button>
+				{/if}
 			</div>
 			<div class="section">
 				<span>New Password</span>
-				<input placeholder="New Password" type="password" bind:value={newPassword} enterkeyhint="done" />
+				<input placeholder="New Password" type={showNewPassword ? "text" : "password"} bind:value={newPassword} enterkeyhint="done" />
+				{#if showNewPassword}
+					<button class="show-password" onclick={() => showNewPassword = false}>
+						<ClosedEyeIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem;" />
+					</button>
+				{:else}
+					<button class="show-password" onclick={() => showNewPassword = true}>
+						<EyeIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem;" />
+					</button>
+				{/if}
 			</div>
 			{#if newPasswordErrors.length > 0}
 				<div class="errors">
@@ -108,7 +153,16 @@
 			{/if}
 			<div class="section">
 				<span>Retype New Password</span>
-				<input placeholder="Retype New Password" type="password" bind:value={newPassword2} enterkeyhint="done" />
+				<input placeholder="Retype New Password" type={showNewPassword2 ? "text" : "password"} bind:value={newPassword2} enterkeyhint="done" />
+				{#if showNewPassword2}
+					<button class="show-password" onclick={() => showNewPassword2 = false}>
+						<ClosedEyeIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem;" />
+					</button>
+				{:else}
+					<button class="show-password" onclick={() => showNewPassword2 = true}>
+						<EyeIcon stroke="var(--overlay-1)" style="width: 1rem; height: 1rem;" />
+					</button>
+				{/if}
 			</div>
 			{#if passwordMatchError}
 				<div class="errors">
@@ -189,19 +243,57 @@
 	</a>
 
 	<!-- Delete account -->
-	<a class="listing" href="/settings/account/delete">
+	<button class="listing" onclick={() => deleteAccountVisible = true}>
 		<div>
 			<TrashIcon style="width: 1.25rem; height: 1.25rem;" stroke="var(--red)" />
 			<span style:color="var(--red)">Delete your account</span>
 		</div>
 		<p>
 			<b>This cannot be undone.</b>
-			You will be taken to a confirmation page first.
+			You will be shown a confirmation popup first.
 		</p>
-	</a>
+	</button>
+
+	<Popup bind:visible={deleteAccountVisible}>
+		<div class="popup">
+			<span class="title">Delete Account</span>
+			<p>Enter your username to confirm account deletion.</p>
+			<div class="section">
+				<span>Username</span>
+				<input placeholder="username" type="text" bind:value={deleteUsername} enterkeyhint="done" />
+			</div>
+			{#if usernameError}
+				<div class="errors">
+					<span class="error">{usernameError}</span>
+				</div>
+			{/if}
+			<p class="confirm-delete">
+				<input type="checkbox" bind:checked={confirmDeleteAccount} />
+				I confirm that I want to delete my wallflower.land account permanently.
+			</p>
+			<div class="buttons">
+				<button class="cancel" onclick={() => deleteAccountVisible = false}>Cancel</button>
+				<button disabled={!canDeleteAccount} class="delete" onclick={submitDeleteAccount}>Delete</button>
+			</div>
+			<button class="close" onclick={() => deleteAccountVisible = false}>
+				<CloseIcon stroke="var(--red)" style="width: 1rem; height: 1rem;" />
+			</button>
+		</div>
+	</Popup>
 </Page>
 
 <style>
+	input[type="checkbox"] {
+		margin-right: 0.5rem;
+		accent-color: var(--lavender);
+	}
+
+	.show-password {
+		position: absolute;
+		bottom: 0.35rem;
+		right: 0.5rem;
+	}
+
 	.become-author {
 		padding: 0.25rem 2rem 0.25rem 2rem;
 		font-size: 0.85rem;
@@ -222,11 +314,12 @@
 			scale: 105%;
 		}
 	}
-	
+
 	.section {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+		position: relative;
 
 		span {
 			color: var(--overlay-1);
@@ -277,6 +370,20 @@
 				background: linear-gradient(to bottom right, var(--peach), var(--red));
 			}
 
+			.delete {
+				&:not([disabled]) {
+					background: linear-gradient(to bottom right, var(--pink), var(--red));
+				}
+
+				&[disabled] {
+					background-color: var(--crust);
+					color: var(--surface-2);
+					box-shadow: none;
+					scale: 100%;
+					cursor: default;
+				}
+			}
+
 			.submit {
 				&:not([disabled]) {
 					background: linear-gradient(to bottom right, var(--lavender), var(--blue));
@@ -312,7 +419,7 @@
 		}
 
 
-		input {
+		input[type="text"], input[type="password"] {
 			background: var(--crust);
 			color: var(--subtext-1);
 			padding: 0.5rem;

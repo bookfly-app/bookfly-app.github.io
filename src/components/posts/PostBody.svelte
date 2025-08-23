@@ -41,7 +41,7 @@
 
 		:global(code) {
 			font-family: monospace;
-			background-color: #11111b;
+			background-color: var(--crust);
 			padding-left: 0.5ch;
 			padding-right: 0.5ch;
 			border-radius: 0.25rem;

@@ -57,6 +57,7 @@
 	.info {
 		display: flex;
 		align-items: center;
+		margin-bottom: 1rem;
 	}
 
 	.content {
@@ -75,6 +76,7 @@
 		.title {
 			font-size: 1.2rem;
 			color: var(--text);
+			font-weight: bold;
 		}
 
 		.author {

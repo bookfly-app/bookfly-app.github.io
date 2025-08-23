@@ -53,7 +53,7 @@ export async function getBookRating(isbn: ISBN): Promise<{ rating: number; count
 }
 
 export async function getBook(isbn: ISBN): Promise<Book> {
-	const item = localStorage.getItem(`book-${isbn}`);
+	const item = globalThis.localStorage ? globalThis.localStorage.getItem(`book-${isbn}`) : null;
 	if (item) return JSON.parse(item);
 
 	let [openLibraryResponse, googleResponse] = await Promise.all([
@@ -87,8 +87,10 @@ export async function getBook(isbn: ISBN): Promise<Book> {
 		characters: workData.subject_people ?? [],
 	};
 
-	localStorage.setItem(`book-${isbn}`, JSON.stringify(book));
-	console.log(`Updated book "${book.title}" in localStorage`);
+	if (globalThis.localStorage) {
+		globalThis.localStorage.setItem(`book-${isbn}`, JSON.stringify(book));
+		console.log(`Updated book "${book.title}" in localStorage`);
+	}
 
 	return book;
 }
@@ -101,4 +103,13 @@ export async function searchBooks(searchTerm: string, max = 10): Promise<Promise
 	const data = await response.json();
 	let books: { isbn: string[] }[] = data.docs.filter((book: Book) => book.isbn).slice(0, max);
 	return books.map(book => getBook(book.isbn.find(isbn => /^\d{13}$/.test(isbn))!));
+}
+
+export async function searchBookISBNs(searchTerm: string, max = 10): Promise<string[]> {
+	if (/^\d{3}\-?\d{10}$/.test(searchTerm)) getBook(searchTerm).then(book => [book]);
+	const query = new URLSearchParams({ q: searchTerm });
+	let response = await fetch(`https://openlibrary.org/search.json?${query}&fields=isbn,editions`);
+	const data = await response.json();
+	let books: { isbn: string[] }[] = data.docs.filter((book: any) => book.isbn).slice(0, max);
+	return books.map(book => book.isbn.find(isbn => /^\d{13}$/.test(isbn))!);
 }

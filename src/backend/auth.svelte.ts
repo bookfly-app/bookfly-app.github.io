@@ -183,6 +183,8 @@ export async function changePassword(oldPassword: string, newPassword: string) {
 	await updatePassword(user, newPassword);
 }
 
-export async function deleteAccount() {
+export async function deleteAccount(password: string) {
+	const credential = EmailAuthProvider.credential(auth.currentUser, password);
+	await reauthenticateWithCredential(auth.currentUser, credential);
 	await deleteUser(auth.currentUser);
 }

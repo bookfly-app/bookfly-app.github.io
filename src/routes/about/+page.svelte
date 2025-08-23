@@ -34,9 +34,9 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 
 	<p>
 		The Wallflower team, the legal owner of wallflower.land, is a non-profit organization originally created by
-		<Link href="/profile/vi">@vi</Link>
+		<Link href="/@vi">@vi</Link>
 		as a passion project in college. The name <i>Wallflower</i> comes from 
-		<Link href="/profile/vi">@vi</Link>'s favorite book 
+		<Link href="/@vi">@vi</Link>'s favorite book 
 		<Link href="/book/9780671027346"><i>The Perks of Being a Wallflower</i></Link>
 		by Stephen Chbosky.
 	</p>
@@ -49,7 +49,7 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 	<h2>Team &amp; Values</h2>
 	<p>
 		Wallflower is still led by its original creator,
-		<Link href="/profile/vi">@vi</Link>, 
+		<Link href="/@vi">@vi</Link>, 
 		a nonbinary reader, writer, and college student. Wallflower will always support kindness, acceptance, diversity, equity, and inclusion.
 	</p>
 	<p>Currently, Wallflower has no other team members.</p>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getUserFromId, getUserFromUsername, getFollowers } from "../../../../api/userapi";
+	import Header from "../../../../components/Header.svelte";
 	import Page from "../../../../components/Page.svelte";
 	import UserListing from "../../../../components/UserListing.svelte";
 
@@ -14,6 +15,8 @@
 </script>
 
 <Page type="profile">
+	<Header title="Follows" />
+
 	{#await profileUser then}
 		<div class="view">
 			{#await following then following}
@@ -57,6 +60,7 @@
 		display: flex;
 		justify-content: space-evenly;
 		background-color: var(--crust);
+		margin-top: 1.5rem;
 
 		button {
 			border-bottom-style: solid;

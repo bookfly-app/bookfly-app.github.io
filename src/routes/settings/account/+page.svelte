@@ -48,11 +48,12 @@
 	let changePasswordVisible = $state(false);
 	let deleteAccountVisible = $state(false);
 	let usernameError = $derived((!deleteUsername || deleteUsername === user()?.username) ? null : "Incorrect username");
+	let deletePassword = $state("");
 	let confirmDeleteAccount = $state(false);
 	let canDeleteAccount = $derived(!usernameError && deleteUsername && confirmDeleteAccount);
 
 	async function submitDeleteAccount() {
-		await deleteAccount();
+		await deleteAccount(deletePassword);
 		goto("/");
 	}
 
@@ -257,7 +258,7 @@
 	<Popup bind:visible={deleteAccountVisible}>
 		<div class="popup">
 			<span class="title">Delete Account</span>
-			<p>Enter your username to confirm account deletion.</p>
+			<p>Enter your username and password to confirm account deletion.</p>
 			<div class="section">
 				<span>Username</span>
 				<input placeholder="username" type="text" bind:value={deleteUsername} enterkeyhint="done" />
@@ -267,6 +268,10 @@
 					<span class="error">{usernameError}</span>
 				</div>
 			{/if}
+			<div class="section">
+				<span>Password</span>
+				<input placeholder="password" type="password" bind:value={deletePassword} enterkeyhint="done" />
+			</div>
 			<p class="confirm-delete">
 				<input type="checkbox" bind:checked={confirmDeleteAccount} />
 				I confirm that I want to delete my wallflower.land account permanently.

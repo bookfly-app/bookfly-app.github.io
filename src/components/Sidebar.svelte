@@ -12,6 +12,7 @@
 	import ProfileIcon from "../assets/images/icons/ProfileIcon.svelte";
 	import { logOut, user } from "../backend/auth.svelte";
 	import BarChartIcon from "../assets/images/icons/BarChartIcon.svelte";
+	import WrenchIcon from "../assets/images/icons/WrenchIcon.svelte";
 
 	let innerWidth = $state(window.innerWidth);
 	let innerHeight = $state(window.innerHeight);
@@ -132,6 +133,12 @@
 		<button class="listing" style:color="var(--subtext-1)" onclick={nav("/interactions")}>
 			<BarChartIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
 			Interactions
+		</button>
+	{/if}
+	{#if user() && user()!.tags.includes("mod")}
+		<button class="listing" style:color="var(--subtext-1)" onclick={nav("/moderator-tools")}>
+			<WrenchIcon stroke="var(--subtext-1)" style="width: 1.5rem;" />
+			Moderator Tools
 		</button>
 	{/if}
 	<button class="listing" style:color="var(--subtext-1)" onclick={nav("/settings")}>

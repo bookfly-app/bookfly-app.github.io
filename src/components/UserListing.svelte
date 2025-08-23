@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getFile } from "../api/storageapi";
+	import Badges from "./Badges.svelte";
 
 	let { user } = $props();
 </script>
@@ -19,6 +20,7 @@
 			<h2>
 				@{user.username}
 			</h2>
+			<Badges forUser={user} size={1} />
 		</div>
 		<p>{user.bio}</p>
 	</div>

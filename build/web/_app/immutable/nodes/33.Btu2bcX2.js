@@ -1,0 +1,1 @@
+import"../chunks/Bzak7iHL.js";import{p,a5 as s,g as a}from"../chunks/B-4qJ0jo.js";import{g as o}from"../chunks/BYxnAq2c.js";import{u as r}from"../chunks/CSLRLUv4.js";function u(t,e){p(e,!0),s(()=>{r()?o(`/profile/${r().username}`):o("/login")}),a()}export{u as component};

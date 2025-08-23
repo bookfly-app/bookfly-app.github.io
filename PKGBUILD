@@ -1,7 +1,7 @@
 # Maintainer: Violet Iapalucci <vi@wallflower.land>
 
 pkgname="wallflower-land"
-pkgver=r132.5938317
+pkgver=r134.9a9ed96
 pkgrel=1
 pkgdesc="A social media client for readers and writers."
 arch=('x86_64' 'aarch64')
@@ -14,23 +14,24 @@ source=("git+${url}.git")
 sha256sums=('SKIP')
 
 pkgver() {
-  cd wallflower-land
-  ( set -o pipefail
-    git describe --long --abbrev=7 2>/dev/null | sed 's/\([^-]*-g\)/r\1/;s/-/./g' ||
+	cd wallflower-land
+	( set -o pipefail
+	git describe --long --abbrev=7 2>/dev/null | sed 's/\([^-]*-g\)/r\1/;s/-/./g' ||
     printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
-  )
+	)
 }
 
 prepare() {
-  cd wallflower-land
-  pnpm install
+	cd wallflower-land
+	pnpm install
+	sed -i "s/\"version\": \".*\"/\"version\": \"${pkgver}\"/" src-tauri/tauri.conf.json
 }
 
 build() {
-  cd wallflower-land
-  pnpm tauri build -b deb
+	cd wallflower-land
+	pnpm tauri build -b deb
 }
 
 package() {
-  cp -a wallflower-land/src-tauri/target/release/bundle/deb/wallflower_${pkgver}_*/data/* "${pkgdir}"
+	cp -a wallflower-land/src-tauri/target/release/bundle/deb/wallflower_${pkgver}_*/data/* "${pkgdir}"
 }

@@ -1,7 +1,7 @@
 # Maintainer: Violet Iapalucci <vi@wallflower.land>
 
 pkgname="wallflower-land"
-pkgver=r134.9a9ed96
+pkgver=r135.d4a1e17
 pkgrel=1
 pkgdesc="A social media client for readers and writers."
 arch=('x86_64' 'aarch64')
@@ -24,7 +24,6 @@ pkgver() {
 prepare() {
 	cd wallflower-land
 	pnpm install
-	sed -i "s/\"version\": \".*\"/\"version\": \"${pkgver}\"/" src-tauri/tauri.conf.json
 }
 
 build() {
@@ -33,5 +32,5 @@ build() {
 }
 
 package() {
-	cp -a wallflower-land/src-tauri/target/release/bundle/deb/wallflower_${pkgver}_*/data/* "${pkgdir}"
+	cp -a wallflower-land/src-tauri/target/release/bundle/deb/wallflower_*_*/data/* "${pkgdir}"
 }

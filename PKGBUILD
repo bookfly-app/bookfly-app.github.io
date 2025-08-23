@@ -1,7 +1,7 @@
 # Maintainer: Violet Iapalucci <vi@wallflower.land>
 
 pkgname="wallflower-land"
-pkgver=r131.98f01da
+pkgver=r132.5938317
 pkgrel=1
 pkgdesc="A social media client for readers and writers."
 arch=('x86_64' 'aarch64')

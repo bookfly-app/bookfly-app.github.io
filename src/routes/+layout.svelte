@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onNavigate } from '$app/navigation';
 	import globalCss from "../global.css?url";
+	import favicon from "../assets/images/favicon.png";
 
 	let { children } = $props();
 
@@ -108,8 +109,8 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href="/assets/images/favicon.png" />
-	<link rel="apple-touch-icon" href="/assets/images/favicon.png" />
+	<link rel="icon" href={favicon}/>
+	<link rel="apple-touch-icon" href={favicon} />
 	<link rel="stylesheet" href={globalCss} />
 	<title>Wallflower</title>
 </svelte:head>

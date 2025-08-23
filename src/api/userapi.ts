@@ -1,7 +1,7 @@
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import initializeFirebase from "../backend/backend";
 import { getBook, type Book, type ISBN } from "./bookapi";
-import { type InternalPost, type Post, type PostId } from "./postapi";
+import { getPostFromId, type InternalPost, type Post, type PostId } from "./postapi";
 import { fuzzyQuery } from "./util";
 import { updateUser, user } from "../backend/auth.svelte";
 
@@ -33,7 +33,7 @@ export type User = {
 
 	following: UserId[];
 
-	requestedAuthorVerification: boolean,
+	requestedAuthorVerification: boolean;
 
 	// Preferences
 	darkMode: boolean;
@@ -199,4 +199,46 @@ export async function setPreference<Name extends Preference>(
 ): Promise<void> {
 	localStorage.setItem(`preference-${name}`, JSON.stringify(value));
 	if (user()) await updateUser({ [name]: value });
+}
+
+export async function getMentions(): Promise<InternalPost[]> {
+	const username = user()!.username;
+	const allPosts = (
+		await getDocs(query(collection(db, "posts"), orderBy("timestamp", "desc")))
+	).docs.map(doc => doc.data() as InternalPost);
+	const mentions = allPosts.filter(post => new RegExp(`@${username}\\b`).test(post.body));
+	return mentions;
+}
+
+export async function getRepliesToUser(user: User): Promise<InternalPost[]> {
+	const allPosts = (
+		await getDocs(
+			query(
+				collection(db, "posts"),
+				where("type", "==", "reply"),
+				orderBy("timestamp", "desc"),
+			),
+		)
+	).docs.map(doc => doc.data() as InternalPost);
+
+	const repliesToUser = allPosts.filter(async post => {
+		const parent = await getPostFromId(post.parent);
+		return parent.poster === user.id;
+	});
+
+	return repliesToUser;
+}
+
+export async function getFollowingPosts(): Promise<InternalPost[]> {
+	const allPosts = (
+		await getDocs(
+			query(
+				collection(db, "posts"),
+				where("poster", "in", user().following),
+				orderBy("timestamp", "desc"),
+			),
+		)
+	).docs.map(doc => doc.data() as InternalPost);
+
+	return allPosts;
 }

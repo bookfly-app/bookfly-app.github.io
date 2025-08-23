@@ -72,9 +72,9 @@
 		}
 
 		if (url.pathname.startsWith("/book")) {
-			const term = url.searchParams.get("view") ?? "info";
-			if (term === "info") return 250;
-			if (term === "discussion") return 251;
+			const view = url.searchParams.get("view") ?? "info";
+			if (view === "info") return 250;
+			if (view === "discussion") return 251;
 			return -1;
 		}
 
@@ -87,7 +87,11 @@
 		}
 
 		if (url.pathname.startsWith("/inbox")) {
-			return 400;
+			const view = url.searchParams.get("view") ?? "mentions";
+			if (view === "mentions") return 400;
+			if (view === "replies") return 401;
+			if (view === "following") return 402;
+			return -1;
 		}
 
 		if (url.pathname.startsWith("/profile")) {

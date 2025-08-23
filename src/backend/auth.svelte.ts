@@ -6,7 +6,7 @@ import {
 	setPersistence,
 	signInWithEmailAndPassword,
 	signOut,
-	updateEmail
+	updateEmail,
 } from "firebase/auth";
 import {
 	collection,

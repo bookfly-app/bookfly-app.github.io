@@ -6,7 +6,13 @@
 	let isExternal = $derived(!/^[\.\/]/.test(href));
 </script>
 
-<a {...rest} {href} target="_blank" rel="noopener noreferrer" class={isExternal ? "external" : "local"}>
+<a
+	{...rest} 
+	{href} 
+	target={isExternal ? "_blank" : undefined} 
+	rel={isExternal ? "noopener noreferrer" : undefined} 
+	class={isExternal ? "external" : "local"}
+>
 	{@render children()}
 
 	{#if isExternal}

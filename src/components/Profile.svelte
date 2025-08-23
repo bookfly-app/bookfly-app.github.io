@@ -19,6 +19,7 @@
 	import { getFile } from "../api/storageapi";
 	import Sidebar from "./Sidebar.svelte";
 	import ClickableImage from "./ClickableImage.svelte";
+	import PostBody from "./posts/PostBody.svelte";
 
 	let props = $props();
 	let profileUser: User = props.user;
@@ -180,9 +181,7 @@
 			{/if}
 		</div>
 
-		{#await format(profileUser.bio) then bio}
-			<p class="bio">{@html bio}</p>
-		{/await}
+		<PostBody body={profileUser.bio} style="color: var(--overlay-1); margin-left: 1rem;" />
 
 		<!-- Line 2: Profile stats -->
 		<div class="profile-line-2">

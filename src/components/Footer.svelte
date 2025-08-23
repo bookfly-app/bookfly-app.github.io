@@ -11,21 +11,23 @@
 </script>
 
 <div class="padding">&nbsp;</div>
-<footer>
+<footer style:grid-template-columns="repeat({user() ? 5 : 3}, 1fr)">
 	<a aria-label="Home" href="/">
 		<EmptyHomeIcon stroke={selected === "home" ? "var(--text)" : "var(--overlay-1)"} style="width: 1.5rem;" />
 	</a>
 	<a aria-label="Search" href="/search">
 		<SearchIcon stroke={selected === "search" ? "var(--text)" : "var(--overlay-1)"} style="width: 1.5rem;" />
 	</a>
-	<a aria-label="New" href="/new">
-		<button>
-			<PlusIcon stroke="var(--crust)" style="width: 1.25rem;" />
-		</button>
-	</a>
-	<a aria-label="Notifications" href="/inbox">
-		<BellIcon stroke={selected === "inbox" ? "var(--text)" : "var(--overlay-1)"} style="width: 1.5rem;" />
-	</a>
+	{#if user()}
+		<a aria-label="New" href="/new">
+			<button>
+				<PlusIcon stroke="var(--crust)" style="width: 1.25rem;" />
+			</button>
+		</a>
+		<a aria-label="Notifications" href="/inbox">
+			<BellIcon stroke={selected === "inbox" ? "var(--text)" : "var(--overlay-1)"} style="width: 1.5rem;" />
+		</a>
+	{/if}
 	<a aria-label="Profile" href="/profile">
 		{#if user()}
 			{#await getFile(user()!.picture) then pfp}
@@ -47,8 +49,7 @@
 		position: fixed;
 		bottom: 0px;
 		left: 0px;
-		display: flex;
-		align-items: center;
+		display: grid;
 		max-width: var(--max-width);
 		background: var(--crust);
 		view-transition-name: footer;
@@ -56,7 +57,6 @@
 		a {
 			padding-top: 0.5rem;
 			padding-bottom: 0.5rem;
-			width: 25%;
 			display: flex;
 			align-items: center;
 			justify-content: center;

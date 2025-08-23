@@ -297,8 +297,7 @@ function escapeHTML(text: string): string {
 		.replaceAll("<", "&lt;")
 		.replaceAll(">", "&gt;")
 		.replaceAll('"', "&quot;")
-		.replaceAll("'", "&#x27;")
-		.replaceAll("`", "&#x60;");
+		.replaceAll("'", "&#x27;");
 }
 
 function isSafeUrl(url: string): boolean {
@@ -329,21 +328,18 @@ export async function format(text: string): Promise<string> {
 	});
 
 	return text
-		.replaceAll(
-			/@(\w+)/g,
-			(match, username) =>
-				`<a style="text-decoration: none;" href="/profile/${username}">${match}</a>`,
-		)
+		.replaceAll(/@(\w+)/g, (match, username) => `<a href="/profile/${username}">${match}</a>`)
 		.replaceAll(/\*\*([^\*]+)\*\*/g, (_match, content) => `<b>${content}</b>`)
 		.replaceAll(/\*([^\*]+)\*/g, (_match, content) => `<i>${content}</i>`)
 		.replaceAll(/`([^\`]+)`/g, (_match, code) => `<code>${code}</code>`)
 		.replaceAll(/~~([^~]+)~~/g, (_match, code) => `<s>${code}</s>`)
 		.replaceAll(linkRegex, url => {
 			if (!isSafeUrl(url)) return url;
-			return `<a target="_blank" rel="noopener noreferrer" href="${url}">${url}</a>`;
+			return `<a href="${url}">${url}</a>`;
 		})
 		.replaceAll(/\\\*/g, "*")
 		.replaceAll(/\\`/g, "`")
+		.replaceAll("`", "&#x60;")
 		.replaceAll("`", "&#x60;");
 }
 

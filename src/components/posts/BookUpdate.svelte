@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getBook } from "../../api/bookapi";
+	import PostBody from "./PostBody.svelte";
 
 	let { isbn, body, user, updateType } = $props();
 
@@ -44,8 +45,7 @@
 		</div>
 	{/await}
 
-	<!-- Post body -->
-	<p class="review">{body}</p>
+	<PostBody {body} />
 </section>
 
 <style>
@@ -103,11 +103,5 @@
 	img {
 		width: 6rem;
 		height: 9rem;
-	}
-
-	.review {
-		padding-top: 1rem;
-		font-size: 0.85rem;
-		color: var(--subtext-1);
 	}
 </style>

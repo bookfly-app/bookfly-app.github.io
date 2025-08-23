@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getBook } from "../../api/bookapi";
-	import { format } from "../../api/postapi";
 	import BookCover from "../BookCover.svelte";
 	import StarRating from "../StarRating.svelte";
+	import PostBody from "./PostBody.svelte";
 
 	let { isbn, rating, review, user } = $props();
 
@@ -23,7 +23,7 @@
 					{book?.authors.join(", ")}
 				</a>
 				<div class="stars">
-					<StarRating {rating} size={1.5} />
+					<StarRating {rating} size={1.2} />
 				</div>
 				<h1 class="rating-number">
 					{rating} / 10
@@ -33,9 +33,7 @@
 				<BookCover {book} style="width: 6rem; margin-left: 1rem;" />
 			</a>
 		</div>
-		{#await format(review) then body}
-			<p class="review">{@html body}</p>
-		{/await}
+		<PostBody body={review} />
 	{/await}
 </div>
 
@@ -44,6 +42,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-evenly;
+		margin-bottom: 1rem;
 	}
 
 	a {
@@ -51,13 +50,13 @@
 	}
 
 	.rating-number {
-		font-size: 2rem;
+		font-size: 1.75rem;
 		color: var(--text);
 	}
 
 	.stars {
-		padding-top: 1rem;
-		padding-bottom: 1rem;
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
 	}
 
 	.content {
@@ -72,12 +71,12 @@
 		}
 
 		.author {
-			font-size: 1rem;
+			font-size: 0.85rem;
 			color: var(--surface-2);
 		}
 
 		.title {
-			font-size: 1.25rem;
+			font-size: 1rem;
 			font-weight: 600;
 			color: var(--subtext-1);
 		}
@@ -95,16 +94,6 @@
 		span {
 			font-size: inherit;
 			color: var(--yellow);
-		}
-	}
-
-	.review {
-		padding-top: 1rem;
-		font-size: 0.85rem;
-		color: var(--subtext-1);
-
-		:global(a) {
-			color: var(--blue);
 		}
 	}
 </style>

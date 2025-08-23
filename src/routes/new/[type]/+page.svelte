@@ -7,6 +7,7 @@
 	import TrashIcon from "../../../assets/images/icons/TrashIcon.svelte";
 	import EyeIcon from "../../../assets/images/icons/EyeIcon.svelte";
 	import Header from "../../../components/Header.svelte";
+	import CharacterLimitMeter from "../../../components/CharacterLimitMeter.svelte";
 
 	let { data }: { data: { type: PostType } } = $props();
 	let { type } = data;
@@ -213,7 +214,10 @@
 				<div class="preview">{@html body}</div>
 			{/await}
 		{:else}
-			<textarea id="body" bind:value={body}></textarea>
+			<div class="text-container">
+				<textarea maxlength="144" id="body" bind:value={body}></textarea>
+				<CharacterLimitMeter limit={144} bind:text={body} />
+			</div>
 		{/if}
 
 		{#if type !== "rating" && type !== "update"}
@@ -248,6 +252,10 @@
 
 	.body-name:not(.preview-body) {
 		margin-top: 1rem;
+	}
+
+	.text-container {
+		position: relative;
 	}
 
 	.book {

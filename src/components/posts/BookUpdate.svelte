@@ -31,11 +31,6 @@
 				<a href="/book/{book?.isbn}" class="author">
 					{book?.authors.join(", ")}
 				</a>
-
-				<!-- Book genres -->
-				<p>
-					{[...(book?.genres ?? [])].splice(0, 2).join(", ")}
-				</p>
 			</div>
 
 			<!-- Book cover image -->
@@ -76,19 +71,11 @@
 		.title {
 			font-size: 1.2rem;
 			color: var(--text);
-			font-weight: bold;
 		}
 
 		.author {
 			font-size: 0.9rem;
 			color: var(--surface-2);
-		}
-
-		p {
-			font-size: 0.85rem;
-			padding-top: 1rem;
-			color: var(--subtext-1);
-			text-align: center;
 		}
 	}
 

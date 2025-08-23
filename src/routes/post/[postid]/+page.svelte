@@ -4,6 +4,7 @@
 	import AddImageIcon from "../../../assets/images/icons/AddImageIcon.svelte";
 	import SendIcon from "../../../assets/images/icons/SendIcon.svelte";
 	import { user } from "../../../backend/auth.svelte";
+	import CharacterLimitMeter from "../../../components/CharacterLimitMeter.svelte";
 	import ImageCarousel from "../../../components/ImageCarousel.svelte";
 	import ImagePicker from "../../../components/ImagePicker.svelte";
 	import Page from "../../../components/Page.svelte";
@@ -108,6 +109,7 @@
 							onfocus={expand}
 							onblur={contract}
 							placeholder="Leave a reply"
+							maxlength="144"
 						></textarea>
 
 						<ImageCarousel bind:images editable />
@@ -122,6 +124,8 @@
 								<SendIcon stroke="var(--overlay-1)" style="width: 1.5rem;" />
 							</button>
 						</div>
+
+						<CharacterLimitMeter limit={144} bind:text={replyBody} />
 					</div>
 				</div>
 			{/if}

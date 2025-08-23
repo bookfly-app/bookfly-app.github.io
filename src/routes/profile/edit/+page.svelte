@@ -5,6 +5,7 @@
 	import EditIcon from "../../../assets/images/icons/EditIcon.svelte";
 	import { updateUser, usernameIsTaken } from "../../../backend/auth.svelte";
 	import BackButton from "../../../components/BackButton.svelte";
+	import CharacterLimitMeter from "../../../components/CharacterLimitMeter.svelte";
 	import ImagePicker from "../../../components/ImagePicker.svelte";
 	import Page from "../../../components/Page.svelte";
 	import RadioInput from "../../../components/RadioInput.svelte";
@@ -25,7 +26,14 @@
 	let pronouns = $state("");
 	let picture = $state("")
 
-	let usernameErrorList = $derived(usernameErrors(username));
+	let displayNameErrorList = $derived([
+		...(displayName ? [] : ["Display name can't be empty"])
+	]);
+
+	let usernameErrorList = $derived([
+		...usernameErrors(username),
+		...(username ? [] : ["Username can't be empty"])
+	]);
 
 	// svelte-ignore non_reactive_update
 	let usernameInput: HTMLInputElement;
@@ -34,6 +42,12 @@
 	function onInput() {
 		usernameTaken = false;
 	}
+
+	let canSave = $derived(
+		displayNameErrorList.length === 0 && 
+		usernameErrorList.length === 0 && 
+		!usernameTaken
+	);
 
 	async function update() {
 		if (usernameErrorList.length > 0) {
@@ -78,21 +92,35 @@
 						/>
 					</label>
 				{/await}
-				<ImagePicker id="set-profile-picture" bind:imageId={picture} aspectRatio={1 / 1} />
+				<ImagePicker id="set-profile-picture" bind:imageId={picture} aspectRatio={1 / 1} circular />
 
-				<button class="save" onclick={update}>Save</button>
+				<button disabled={!canSave} class="save" onclick={update}>Save</button>
 			</div>
 
 			<label for="display-name">Display Name</label>
-			<input enterkeyhint="done" type="text" id="display-name" bind:value={displayName} />
+			<div class="text-container">
+				<input 
+					maxlength="20" 
+					enterkeyhint="done" 
+					type="text" 
+					id="display-name" 
+					bind:value={displayName} 
+					style:outline={displayNameErrorList.length > 0 ? "2px solid var(--red)" : "none"}
+				/>
+				<CharacterLimitMeter padding="0.31rem" limit={20} bind:text={displayName} />
+			</div>
+			{#each displayNameErrorList as displayNameError}
+				<span class="error">{displayNameError}</span>
+			{/each}
 
 			<label for="username">Username</label>
 			<div
-				style:outline={usernameTaken || usernameErrorList.length > 0 ? "2px solid indianred" : "none"}
+				style:outline={usernameTaken || usernameErrorList.length > 0 ? "2px solid var(--red)" : "none"}
 				class="username" 
 			>
 				<span class="at">@</span>
 				<input
+					maxlength="20"
 					type="text"
 					id="username"
 					enterkeyhint="done"
@@ -100,10 +128,11 @@
 					bind:value={username}
 					bind:this={usernameInput}
 				/>
+				<CharacterLimitMeter padding="0.31rem" limit={20} bind:text={username} />
 			</div>
-				{#each usernameErrorList as usernameError}
-					<span class="error">{usernameError}</span>
-				{/each}
+			{#each usernameErrorList as usernameError}
+				<span class="error">{usernameError}</span>
+			{/each}
 			{#if usernameTaken}
 				<span class="error">Username already taken</span>
 			{/if}
@@ -113,7 +142,10 @@
 			<hr />
 
 			<label for="pronouns">Pronouns</label>
-			<input enterkeyhint="done" type="text" id="pronouns" bind:value={pronouns} />
+			<div class="text-container">
+				<input maxlength="20" enterkeyhint="done" type="text" id="pronouns" bind:value={pronouns} />
+				<CharacterLimitMeter padding="0.31rem" limit={20} bind:text={pronouns} />
+			</div>
 
 			<span class="radio-input">
 				<label for="display-pronouns">Display pronouns on your profile</label>
@@ -130,9 +162,12 @@
 			<hr />
 
 			<label for="bio">Bio</label>
-			<textarea enterkeyhint="done" class="bio" id="bio" bind:value={bio}>
-				{currentUser.bio}
-			</textarea>
+			<div>
+				<textarea maxlength="144" enterkeyhint="done" class="bio" id="bio" bind:value={bio}>
+					{currentUser.bio}
+				</textarea>
+				<CharacterLimitMeter limit={144} bind:text={bio} />
+			</div>
 
 			<hr />
 
@@ -158,7 +193,7 @@
 		</div>
 	{/await}
 
-	<button class="save-bottom" onclick={update}>Save</button>
+	<button disabled={!canSave} class="save bottom" onclick={update}>Save</button>
 </Page>
 
 <style>
@@ -171,6 +206,7 @@
 		border-radius: 0.5rem;
 		margin-right: 2rem;
 		background-color: var(--crust);
+		position: relative;
 	}
 
 	.badge-line {
@@ -184,6 +220,25 @@
 
 	span {
 		color: var(--overlay-1);
+	}
+
+	textarea {
+		font-size: 0.85rem;
+		width: 100%;
+	}
+
+	div:has(> textarea), .text-container {
+		width: calc(100% - 4rem);
+		display: flex;
+		flex-direction: column;
+		position: relative;
+		padding: 0px;
+		margin-right: 2rem;
+		margin-left: 2rem;
+
+		input {
+			margin: 0px;
+		}
 	}
 
 	h2 {
@@ -224,7 +279,7 @@
 
 	.error {
 		font-size: 0.85rem;
-		color: indianred;
+		color: var(--red);
 		margin-left: 2rem;
 		margin-right: 2rem;
 	}
@@ -241,7 +296,6 @@
 		padding-bottom: 0.5rem;
 		border-radius: 100vmax;
 		font-size: 0.85rem;
-		box-shadow: 0px 0px 0.5rem black;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -249,29 +303,31 @@
 		margin-right: 2rem;
 		margin-bottom: -1rem;
 		margin-top: -1rem;
-		background: linear-gradient(to bottom right, var(--lavender), var(--blue));
+
+		&:not([disabled]) {
+			background: linear-gradient(to bottom right, var(--lavender), var(--blue));
+			box-shadow: 0px 0px 0.5rem black;
+		}
+
+		&[disabled] {
+			background-color: var(--crust);
+			color: var(--surface-2);
+			box-shadow: none;
+			scale: 100%;
+			cursor: default;
+		}
+
+		&.bottom {
+			padding-left: 4rem;
+			padding-right: 4rem;
+			margin-bottom: 2rem;
+			margin-left: auto;
+			margin-right: auto;
+			margin-top: 1rem;
+		}
 	}
 
-	.save-bottom {
-		padding-left: 4rem;
-		padding-right: 4rem;
-		padding-top: 0.5rem;
-		padding-bottom: 0.5rem;
-		border-radius: 100vmax;
-		font-size: 0.85rem;
-		margin-bottom: 2rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-left: auto;
-		margin-right: auto;
-		margin-top: 1rem;
-		box-shadow: 0px 0px 0.5rem black;
-		background: linear-gradient(to bottom right, var(--lavender), var(--blue));
-	}
 
-	input:not(#username),
-	textarea,
 	label:not(.banner),
 	.profile-picture {
 		margin-left: 2rem;

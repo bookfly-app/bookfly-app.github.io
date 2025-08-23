@@ -77,7 +77,6 @@
 
 		.title {
 			font-size: 1.2rem;
-			font-weight: bold;
 			color: var(--subtext-1);
 		}
 	}

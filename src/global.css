@@ -12,6 +12,10 @@
 	scrollbar-width: none;
 }
 
+button[disabled] {
+	cursor: default;
+}
+
 html,
 body {
 	width: 100dvw;

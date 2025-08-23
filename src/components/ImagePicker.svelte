@@ -337,7 +337,7 @@
 			style:left="{cropperLeft}px"
 			style:cursor={panning ? "grabbing" : "grab"}
 			bind:this={cropper} 
-			class="cropper"
+			class="cropper {circular ? "circular" : ""}"
 		>
 			<div bind:this={topLeftHandle} class="top left handle"></div>
 			<div bind:this={topRightHandle} class="top right handle"></div>
@@ -409,6 +409,19 @@
 			top: 0px;
 			left: 0px;
 			position: absolute;
+
+			&.circular::after {
+				content: "";
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				width: 97%;
+				height: 97%;
+				outline: 3px dashed white;
+				pointer-events: none;
+				border-radius: 50%;
+			}
 
 			.handle {
 				position: absolute;

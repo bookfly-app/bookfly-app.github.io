@@ -44,7 +44,7 @@ let { db } = initializeFirebase();
 
 export function usernameErrors(username: string): string[] {
 	let errors = [];
-	if (username.length > 30) errors.push("Username can't be more than 30 characters");
+	if (username.length > 20) errors.push("Username can't be more than 30 characters");
 	if (username.startsWith("-")) errors.push("Username can't start with a hyphen.");
 	if (username.endsWith("-")) errors.push("Username can'end with a hyphen.");
 	if (!/^[\w\-]*$/.test(username))

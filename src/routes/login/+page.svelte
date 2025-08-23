@@ -2,7 +2,6 @@
 	import { goto } from "$app/navigation";
 	import { logIn, user } from "../../backend/auth.svelte";
 	import Page from "../../components/Page.svelte";
-	import BackButton from "../../components/BackButton.svelte";
 	import Header from "../../components/Header.svelte";
 
 	let email: string = $state("");

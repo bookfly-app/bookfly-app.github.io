@@ -1,6 +1,6 @@
 <script>
 import Wallflower from "../../assets/images/icons/Wallflower.svelte";
-	import ExternalLink from "../../components/ExternalLink.svelte";
+	import Link from "../../components/Link.svelte";
 	import Header from "../../components/Header.svelte";
 	import Page from "../../components/Page.svelte";
 </script>
@@ -34,10 +34,10 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 
 	<p>
 		The Wallflower team, the legal owner of wallflower.land, is a non-profit organization originally created by
-		<a href="/profile/vi">@vi</a>
+		<Link href="/profile/vi">@vi</Link>
 		as a passion project in college. The name <i>Wallflower</i> comes from 
-		<a href="/profile/vi">@vi</a>'s favorite book 
-		<a href="/book/9780671027346"><i>The Perks of Being a Wallflower</i></a>
+		<Link href="/profile/vi">@vi</Link>'s favorite book 
+		<Link href="/book/9780671027346"><i>The Perks of Being a Wallflower</i></Link>
 		by Stephen Chbosky.
 	</p>
 	<p>
@@ -49,8 +49,8 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 	<h2>Team &amp; Values</h2>
 	<p>
 		Wallflower is still led by its original creator,
-		<a href="/profile/vi">@vi</a>, 
-		a nonbinary reader writer, and college student. Wallflower will always support kindness, acceptance, diversity, equity, and inclusion.
+		<Link href="/profile/vi">@vi</Link>, 
+		a nonbinary reader, writer, and college student. Wallflower will always support kindness, acceptance, diversity, equity, and inclusion.
 	</p>
 	<p>Currently, Wallflower has no other team members.</p>
 	<p>
@@ -78,21 +78,21 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 	</p>
 	<h2>Legal</h2>
 	<p>Wallflower is open source, meaning anyone can view and contribute to its code
-		(<ExternalLink href="https://github.com/wallflower-app/wallflower-app.github.io">here</ExternalLink>, if you're curious).
+		(<Link href="https://github.com/wallflower-app/wallflower-app.github.io">here</Link>, if you're curious).
 	</p>
 	<p>
 		Wallflower is licensed as <i>all rights reserved</i>, 
 		meaning you are legally not allowed to use, copy, or distribute its code without explicit authorization from its creator,
-		<a href="/profile/vi">@vi</a>.
+		<Link href="/profile/vi">@vi</Link>.
 	</p>
 
 	<p>
-		You are free to contact <a href="/profile/vi">@vi</a>
+		You are free to contact <Link href="/profile/vi">@vi</Link>
 		to ask for permission to use Wallflower's code for some specific circumstance. 
 		You can email me <i>personally</i> at
-		<ExternalLink href="mailto:vi@wallflower.land">vi@wallflower.land</ExternalLink>. 
+		<Link href="mailto:vi@wallflower.land">vi@wallflower.land</Link>. 
 		I don't bite, I promise. Alternatively, you can reach out to
-		<ExternalLink href="mailto:staff@wallflower.land">staff@wallflower.land</ExternalLink>
+		<Link href="mailto:staff@wallflower.land">staff@wallflower.land</Link>
 		and it'll make its way to me. 
 	</p>
 </Page>
@@ -108,16 +108,6 @@ import Wallflower from "../../assets/images/icons/Wallflower.svelte";
 
 		p {
 			color: var(--overlay-1);
-		}
-	}
-
-
-	a {
-		text-decoration: none;
-		color: var(--blue);
-
-		&:hover {
-			text-decoration: underline;
 		}
 	}
 

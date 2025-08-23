@@ -1,7 +1,7 @@
 
 <script>
 	import DeveloperIcon from "../../../../assets/images/icons/DeveloperIcon.svelte";
-	import ExternalLink from "../../../../components/ExternalLink.svelte";
+	import Link from "../../../../components/Link.svelte";
 	import Header from "../../../../components/Header.svelte";
 	import Page from "../../../../components/Page.svelte";
 </script>
@@ -17,9 +17,9 @@
 
 	<p>
 		If you're interested in becoming a developer for wallflower.land, reach out
-		to <a href="/@vi">@vi</a> at <ExternalLink href="mailto:vi@wallflower.land">vi@wallflower.land</ExternalLink>,
+		to <Link href="/@vi">@vi</Link> at <Link href="mailto:vi@wallflower.land">vi@wallflower.land</Link>,
 		or the whole staff team at
-		<ExternalLink href="mailto:staff@wallflower.land">staff@wallflower.land</ExternalLink>.
+		<Link href="mailto:staff@wallflower.land">staff@wallflower.land</Link>.
 		I'll try get in touch with you soon after.
 	</p>
 
@@ -27,22 +27,21 @@
 	<h2>Development Details</h2>
 	<p>
 		On the front end, Wallflower is written using
-		<ExternalLink href="https://svelte.dev/">Svelte</ExternalLink>
+		<Link href="https://svelte.dev/">Svelte</Link>
 		and
-		<ExternalLink href="https://svelte.dev/docs/kit/introduction">Sveltekit</ExternalLink>
+		<Link href="https://svelte.dev/docs/kit/introduction">Sveltekit</Link>
 		for the web (flavored with
-		<ExternalLink href="https://www.typescriptlang.org/">TypeScript</ExternalLink>, 
+		<Link href="https://www.typescriptlang.org/">TypeScript</Link>, 
 		and ported to mobile with
-		<ExternalLink href="https://v2.tauri.app/">Tauri</ExternalLink>
-		.
+		<Link href="https://v2.tauri.app/">Tauri</Link>.
 	</p>
 	<p>
-		In the back, Wallflower uses <ExternalLink href="https://firebase.google.com/">Firebase</ExternalLink>
+		In the back, Wallflower uses <Link href="https://firebase.google.com/">Firebase</Link>
 		to store data and manage authentication.
 	</p>
 	<p>
 		This stack was chosen by
-		<a href="/profile/vi">@vi</a>
+		<Link href="/profile/vi">@vi</Link>
 		in the very beginning. The goal was a simple but powerful stack that allowed seamless porting
 		between platforms.
 	</p>
@@ -56,15 +55,6 @@
 		flex-direction: column;
 		gap: 1rem;
 		padding-top: 4.5rem;
-
-		a {
-			text-decoration: none;
-			color: var(--blue);
-			
-			&:hover {
-				text-decoration: underline;
-			}
-		}
 
 		p {
 			color: var(--overlay-1);

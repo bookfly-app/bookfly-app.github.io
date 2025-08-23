@@ -27,6 +27,7 @@
 		<div class="images" style:margin-left="{-imageIndex * 100}%">
 			{#each images as image}
 				{#await getFile(image)}
+					<div class="media-wrapper" style:background-color="var(--surface-0)"></div>
 				{:then image}
 					<ClickableImage src={image!}>
 						<div class="media-wrapper" style:background-image="url('{image}')"></div>

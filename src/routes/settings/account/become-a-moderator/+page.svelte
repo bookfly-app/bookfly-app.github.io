@@ -1,6 +1,6 @@
 <script>
 	import WrenchIcon from "../../../../assets/images/icons/WrenchIcon.svelte";
-	import ExternalLink from "../../../../components/ExternalLink.svelte";
+	import Link from "../../../../components/Link.svelte";
 	import Header from "../../../../components/Header.svelte";
 	import Page from "../../../../components/Page.svelte";
 </script>
@@ -16,9 +16,9 @@
 
 	<p>
 		If you're interested in becoming a moderator for wallflower.land, reach out
-		to <a href="/@vi">@vi</a> at <ExternalLink href="mailto:vi@wallflower.land">vi@wallflower.land</ExternalLink>,
+		to <Link href="/@vi">@vi</Link> at <Link href="mailto:vi@wallflower.land">vi@wallflower.land</Link>,
 		or the whole staff team at
-		<ExternalLink href="mailto:staff@wallflower.land">staff@wallflower.land</ExternalLink>.
+		<Link href="mailto:staff@wallflower.land">staff@wallflower.land</Link>.
 		I'll try get in touch with you soon after.
 	</p>
 
@@ -50,15 +50,6 @@
 		flex-direction: column;
 		gap: 1rem;
 		padding-top: 4.5rem;
-
-		a {
-			text-decoration: none;
-			color: var(--blue);
-			
-			&:hover {
-				text-decoration: underline;
-			}
-		}
 
 		p {
 			color: var(--overlay-1);

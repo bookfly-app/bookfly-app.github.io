@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
+	import { getAuth, reauthenticateWithCredential } from "firebase/auth";
 	import AuthorIcon from "../../../assets/images/icons/AuthorIcon.svelte";
 	import CloseIcon from "../../../assets/images/icons/CloseIcon.svelte";
 	import DeveloperIcon from "../../../assets/images/icons/DeveloperIcon.svelte";
 	import EditMailIcon from "../../../assets/images/icons/EditMailIcon.svelte";
+	import PasswordIcon from "../../../assets/images/icons/PasswordIcon.svelte";
 	import TrashIcon from "../../../assets/images/icons/TrashIcon.svelte";
 	import WrenchIcon from "../../../assets/images/icons/WrenchIcon.svelte";
-	import { changeEmail, updateUser, user } from "../../../backend/auth.svelte";
+	import { changeEmail, passwordErrors, updateUser, user } from "../../../backend/auth.svelte";
 	import Header from "../../../components/Header.svelte";
 	import Page from "../../../components/Page.svelte";
+	import Popup from "../../../components/Popup.svelte";
 
 	$effect(() => {
 		if (!user()) {
@@ -17,22 +20,19 @@
 	});
 
 	let email: string = $state("");
+	let oldPassword = $state("");
+	let newPassword = $state("");
+	let newPassword2 = $state("");
+	let newPasswordErrors = $derived(newPassword ? passwordErrors(newPassword): []);
+	let passwordMatchError = $derived(newPassword && newPassword2 && newPassword !== newPassword2 ? "Passwords must match" : null);
+	let canChangePassword = $derived(newPassword && oldPassword && newPassword2 && !passwordMatchError && newPasswordErrors.length === 0);
+
 	let changeEmailVisible = $state(false);
-
-	let changeEmailContainer: HTMLElement;
-	let changeAuthorContainer: HTMLElement;
 	let changeAuthorVisible = $state(false);
+	let changePasswordVisible = $state(false);
 
-	function clickChangeEmail(event: MouseEvent) {
-		if (event.target === changeEmailContainer) {
-			changeEmailVisible = false;
-		}
-	}
-	
-	function clickChangeAuthor(event: MouseEvent) {
-		if (event.target === changeAuthorContainer) {
-			changeAuthorVisible = false;
-		}
+	async function changePassword() {
+		await reauthenticateWithCredential(getAuth().currentUser!, oldPassword);
 	}
 
 	function submitChangeEmail() {
@@ -62,25 +62,68 @@
 		<p>Your email can be changed any number of times. Your current email is <span>{user()?.email}</span>.</p>
 	</button>
 
-	<div 
-		class="change-email" 
-		bind:this={changeEmailContainer}
-		onclick={clickChangeEmail} 
-		style:background={changeEmailVisible ? "rgba(0, 0, 0, 60%)" : "rgba(0, 0, 0, 0%)"}
-		style:pointer-events={changeEmailVisible ? undefined : "none"}
-	>
-		<div style:scale={changeEmailVisible ? "100%" : "0%"}>
-			<span>Change Email</span>
+	<Popup bind:visible={changeEmailVisible}>
+		<div class="popup">
+			<span class="title">Change Email</span>
+			<p>Your current email is <span>{user()?.email}</span>.</p>
 			<input placeholder="new@example.com" type="text" bind:value={email} enterkeyhint="done" />
 			<div class="buttons">
 				<button class="cancel" onclick={() => changeEmailVisible = false}>Cancel</button>
-				<button class="submit" onclick={submitChangeEmail}>Change</button>
+				<button class="submit" onclick={changePassword}>Change</button>
 			</div>
 			<button class="close" onclick={() => changeEmailVisible = false}>
 				<CloseIcon stroke="var(--red)" style="width: 1rem; height: 1rem;" />
 			</button>
 		</div>
-	</div>
+	</Popup>
+
+	<!-- Change Password -->
+	<button class="listing" onclick={() => changePasswordVisible = true}>
+		<div>
+			<PasswordIcon style="width: 1.25rem; height: 1.25rem;" stroke="var(--text)" />
+			<span>Change Password</span>
+		</div>
+		<p>
+			You can change your password any number of times. You will be asked to enter your current password first.
+		</p>
+	</button>
+
+	<Popup bind:visible={changePasswordVisible}>
+		<div class="popup">
+			<span class="title">Change Password</span>
+			<div class="section">
+				<span>Old Password</span>
+				<input placeholder="Old Password" type="password" bind:value={oldPassword} enterkeyhint="done" />
+			</div>
+			<div class="section">
+				<span>New Password</span>
+				<input placeholder="New Password" type="password" bind:value={newPassword} enterkeyhint="done" />
+			</div>
+			{#if newPasswordErrors.length > 0}
+				<div class="errors">
+					{#each newPasswordErrors as error}
+						<span class="error">{error}</span>
+					{/each}
+				</div>
+			{/if}
+			<div class="section">
+				<span>Retype New Password</span>
+				<input placeholder="Retype New Password" type="password" bind:value={newPassword2} enterkeyhint="done" />
+			</div>
+			{#if passwordMatchError}
+				<div class="errors">
+					<span class="error">{passwordMatchError}</span>
+				</div>
+			{/if}
+			<div class="buttons">
+				<button class="cancel" onclick={() => changePasswordVisible = false}>Cancel</button>
+				<button disabled={!canChangePassword} class="submit" onclick={submitChangeEmail}>Change</button>
+			</div>
+			<button class="close" onclick={() => changePasswordVisible = false}>
+				<CloseIcon stroke="var(--red)" style="width: 1rem; height: 1rem;" />
+			</button>
+		</div>
+	</Popup>
 
 	<!-- Request author verification -->
 	<button class="listing" onclick={() => changeAuthorVisible = true}>
@@ -91,18 +134,24 @@
 		<p>Only published authors can recieve author verifications. Independent publishing is allowed.</p>
 	</button>
 
-	<div 
-		class="change-author" 
-		bind:this={changeAuthorContainer}
-		onclick={clickChangeAuthor} 
-		style:background={changeAuthorVisible ? "rgba(0, 0, 0, 60%)" : "rgba(0, 0, 0, 0%)"}
-		style:pointer-events={changeAuthorVisible ? undefined : "none"}
-	>
-		<div style:scale={changeAuthorVisible ? "100%" : "0%"}>
+	<Popup bind:visible={changeAuthorVisible}>
+		<div class="popup">
 			{#if user()?.tags.includes("author")}
-				<span>You are a verified author.</span>
+				<span class="title">You are a verified author.</span>
+				<p>
+					Being a verified author gives you access to special author features in wallflower.land,
+					and will display an author icon on your profile.
+				</p>
 			{:else}
-				<span>Request Author Verification</span>
+				<span class="title">Request Author Verification</span>
+				<p>
+					Being a verified author gives you access to special author features in wallflower.land,
+					and will display an author icon on your profile.
+				</p>
+				<p>
+					Only published authors can receive 
+					author verification. Independent publishing is included.
+				</p>
 				{#if user()?.requestedAuthorVerification}
 					<button class="unrequest become-author" onclick={unrequestAuthorVerification}>
 						Unrequest Author Verification
@@ -117,7 +166,7 @@
 				<CloseIcon stroke="var(--red)" style="width: 1rem; height: 1rem;" />
 			</button>
 		</div>
-	</div>
+	</Popup>
 
 	<!-- Become a moderator -->
 	<a class="listing" href="/settings/account/become-a-moderator">
@@ -173,6 +222,28 @@
 			scale: 105%;
 		}
 	}
+	
+	.section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+
+		span {
+			color: var(--overlay-1);
+			font-size: 0.85rem;
+		}
+	}
+
+	.error {
+		color: var(--red);
+		font-size: 0.85rem;
+	}
+
+	.errors {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+	}
 
 	.close {
 		position: absolute;
@@ -180,17 +251,22 @@
 		right: 1rem;
 	}
 
-	.change-email, .change-author {
-		position: fixed;
-		top: 0px;
-		left: 0px;
-		width: 100dvw;
-		height: 100dvh;
-		z-index: 999;
+	.popup {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: background 0.1s;
+		flex-direction: column;
+		gap: 1rem;
+
+		p {
+			color: var(--overlay-1);
+			font-size: 0.85rem;
+			text-align: center;
+
+			span {
+				color: var(--subtext-1);
+			}
+		}
 
 		.buttons {
 			display: flex;
@@ -202,7 +278,17 @@
 			}
 
 			.submit {
-				background: linear-gradient(to bottom right, var(--lavender), var(--blue));
+				&:not([disabled]) {
+					background: linear-gradient(to bottom right, var(--lavender), var(--blue));
+				}
+
+				&[disabled] {
+					background-color: var(--crust);
+					color: var(--surface-2);
+					box-shadow: none;
+					scale: 100%;
+					cursor: default;
+				}
 			}
 
 			button {
@@ -219,21 +305,10 @@
 			}
 		}
 
-
-		> div {
-			background: var(--base);
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			padding: 2rem;
-			border-radius: 0.5rem;
-			box-shadow: 0px 0px 0.5rem black;
-			gap: 1rem;
-			transition: scale 0.1s;
-		}
-
-		span {
+		.title {
 			color: var(--subtext-1);
+			font-size: 1.2rem;
+			text-align: center;
 		}
 
 

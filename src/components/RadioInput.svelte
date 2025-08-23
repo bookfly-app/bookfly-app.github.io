@@ -4,7 +4,7 @@
 		size = 1, 
 		onenable = () => {},
 		ondisable = () => {},
-		onchange = (value: boolean) => {},
+		onchange = (_value: boolean) => {},
 		...rest 
 	} = $props();
 

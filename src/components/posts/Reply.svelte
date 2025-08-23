@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { format } from "../../api/postapi";
 
-	let { body, images, main } = $props();
+	let { body, main } = $props();
 </script>
 
 <section>
@@ -17,16 +17,6 @@
 </section>
 
 <style>
-	.image {
-		width: 18rem;
-		height: 14rem;
-		border-radius: 1rem;
-		margin-top: 1rem;
-		background-size: cover;
-		background-position: center;
-		position: relative;
-	}
-
 	.body {
 		color: var(--subtext-1);
 
@@ -41,17 +31,5 @@
 			padding-right: 0.5ch;
 			border-radius: 0.25rem;
 		}
-	}
-
-	.dot {
-		width: 0.3rem;
-		height: 0.3rem;
-		background-color: white;
-		border-radius: 50%;
-		position: absolute;
-		bottom: 0.5rem;
-		left: 50%;
-		transform: translateX(-50%);
-		box-shadow: 0px 0px 5px black;
 	}
 </style>

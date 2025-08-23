@@ -13,7 +13,7 @@
 	let postid = $derived(data.postid);
 	let thePost = $derived(getPostFromId(postid)!);
 
-	let reply: HTMLTextAreaElement;
+	let reply: HTMLTextAreaElement = $state(null!);
 
 	let replyState: "contracted" | "expanded" = "contracted";
 

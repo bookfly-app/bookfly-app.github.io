@@ -300,7 +300,7 @@
 		{:else if post.type === "general"}
 			<Discussion main={postpage} body={post.body} images={post.pictures} />
 		{:else if post.type === "reply"}
-			<Reply main={postpage} body={post.body} images={post.pictures} />
+			<Reply main={postpage} body={post.body} />
 		{:else if post.type === "update"}
 			{#await books[0] then book}
 				<BookUpdate updateType={post.updateType} body={post.body} isbn={book.isbn} user={post.poster} />

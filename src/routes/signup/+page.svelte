@@ -2,9 +2,7 @@
 	import { goto } from "$app/navigation";
 	import { usernameErrors } from "../../api/userapi";
 	import { emailIsTaken, passwordErrors, signUp, user, usernameIsTaken } from "../../backend/auth.svelte";
-	import Footer from "../../components/Footer.svelte";
 	import Page from "../../components/Page.svelte";
-	import BackButton from "../../components/BackButton.svelte";
 	import Header from "../../components/Header.svelte";
 
 	let email = $state("");
@@ -170,11 +168,6 @@
 </Page>
 
 <style>
-	h1 {
-		font-weight: normal;
-		color: var(--text);
-	}
-
 	.error {
 		font-size: 0.8rem;
 		color: var(--red);

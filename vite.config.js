@@ -7,13 +7,14 @@ const host = process.env.TAURI_DEV_HOST;
 export default defineConfig(async () => ({
 	plugins: [sveltekit()],
 	build: {
-    rollupOptions: {
-    	output: {
-			assetFileNames: (assetInfo) => {
-				if (/favicon\.png$/.test(assetInfo.name ?? '')) {
-					return 'assets/images/[name][extname]'; // no hash
+		rollupOptions: {
+			output: {
+				assetFileNames: (assetInfo) => {
+					if (/favicon\.png$/.test(assetInfo.name ?? '')) {
+						return 'assets/images/[name][extname]'; // no hash
+					}
+					return 'assets/images/[name]-[hash][extname]'; // default
 				}
-				return 'assets/images/[name]-[hash][extname]'; // default
 			}
 		}
 	},

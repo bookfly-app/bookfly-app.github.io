@@ -2,6 +2,7 @@
 	import type { User } from "../api/userapi";
 	import DeveloperIcon from "../assets/images/icons/DeveloperIcon.svelte";
 	import EditIcon from "../assets/images/icons/EditIcon.svelte";
+	import HeartIcon from "../assets/images/icons/HeartIcon.svelte";
 	import SproutIcon from "../assets/images/icons/SproutIcon.svelte";
 	import WrenchIcon from "../assets/images/icons/WrenchIcon.svelte";
 
@@ -10,7 +11,7 @@
 
 {#if forUser.tags.length > 0}
 	<span class="badges" style:gap="{size / 3.5}rem">
-		{#if forUser.tags.includes("dev")}
+		{#if forUser.tags.includes("dev") && forUser.showDeveloperBadge}
 			<a
 				style:width="{size * 1.5}rem"
 				style:height="{size * 1.5}rem"
@@ -22,7 +23,7 @@
 				<DeveloperIcon stroke="var(--crust)" style="width: {size}rem;" />
 			</a>
 		{/if}
-		{#if forUser.tags.includes("author")}
+		{#if forUser.tags.includes("author") && forUser.showAuthorBadge}
 			<a
 				style:width="{size * 1.5}rem"
 				style:height="{size * 1.5}rem"
@@ -34,7 +35,19 @@
 				<EditIcon stroke="var(--crust)" style="width: {size}rem;" />
 			</a>
 		{/if}
-		{#if forUser.tags.includes("mod")}
+		{#if forUser.tags.includes("love")}
+			<a
+				style:width="{size * 1.5}rem"
+				style:height="{size * 1.5}rem"
+				style:border-radius="{size / 2}rem"
+				href="/settings/account"
+				title="{forUser.displayName} is loved by @vi <3"
+				class="badge love"
+			>
+				<HeartIcon fill="var(--crust)" stroke="var(--crust)" style="width: {size}rem;" />
+			</a>
+		{/if}
+		{#if forUser.tags.includes("mod") && forUser.showModeratorBadge}
 			<a
 				style:width="{size * 1.5}rem"
 				style:height="{size * 1.5}rem"
@@ -46,7 +59,7 @@
 				<WrenchIcon stroke="var(--crust)" style="width: {size * 0.8}rem;" />
 			</a>
 		{/if}
-		{#if Date.now() - forUser.birthmoment < 1000 * 60 * 60 * 24 * 7}
+		{#if Date.now() - forUser.birthmoment < 1000 * 60 * 60 * 24 * 7 && forUser.showNewbieBadge}
 			<a
 				style:width="{size * 1.5}rem"
 				style:height="{size * 1.5}rem"
@@ -86,5 +99,9 @@
 
 	.new {
 		background-image: linear-gradient(to bottom right, var(--yellow), var(--green));
+	}
+
+	.love {
+		background-image: linear-gradient(to bottom right, var(--pink), var(--red));
 	}
 </style>

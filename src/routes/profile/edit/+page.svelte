@@ -2,7 +2,11 @@
 	import { goto } from "$app/navigation";
 	import { getFile } from "../../../api/storageapi";
 	import { awaitUser, usernameErrors } from "../../../api/userapi";
+	import AuthorIcon from "../../../assets/images/icons/AuthorIcon.svelte";
+	import DeveloperIcon from "../../../assets/images/icons/DeveloperIcon.svelte";
 	import EditIcon from "../../../assets/images/icons/EditIcon.svelte";
+	import SproutIcon from "../../../assets/images/icons/SproutIcon.svelte";
+	import WrenchIcon from "../../../assets/images/icons/WrenchIcon.svelte";
 	import { updateUser, usernameIsTaken } from "../../../backend/auth.svelte";
 	import BackButton from "../../../components/BackButton.svelte";
 	import CharacterLimitMeter from "../../../components/CharacterLimitMeter.svelte";
@@ -35,8 +39,6 @@
 		...(username ? [] : ["Username can't be empty"])
 	]);
 
-	// svelte-ignore non_reactive_update
-	let usernameInput: HTMLInputElement;
 	let usernameTaken = $state(false);
 
 	function onInput() {
@@ -126,7 +128,6 @@
 					enterkeyhint="done"
 					oninput={onInput}
 					bind:value={username}
-					bind:this={usernameInput}
 				/>
 				<CharacterLimitMeter padding="0.31rem" limit={20} bind:text={username} />
 			</div>
@@ -149,12 +150,26 @@
 
 			<span class="radio-input">
 				<label for="display-pronouns">Display pronouns on your profile</label>
-				<RadioInput id="display-pronouns" size={0.7} />
+				<RadioInput 
+					id="display-pronouns" 
+					size={0.6} 
+					bind:value={
+						() => currentUser.showPronounsOnProfile,
+						(value) => updateUser({ showPronounsOnProfile: value })
+					}
+				/>
 			</span>
 
 			<span class="radio-input">
 				<label for="display-post-pronouns">Display pronouns on your posts</label>
-				<RadioInput id="display-post-pronouns" size={0.7} />
+				<RadioInput 
+					id="display-post-pronouns" 
+					size={0.6} 
+					bind:value={
+						() => currentUser.showPronounsOnPosts,
+						(value) => updateUser({ showPronounsOnPosts: value })
+					}
+				/>
 			</span>
 
 			<!-- Bio -->
@@ -171,23 +186,65 @@
 
 			<hr />
 
-			<h2>Badges</h2>
+			<span class="badge-title">Badges</span>
 			{#if currentUser.tags.includes("dev")}
 				<span class="badge-line">
+					<div class="developer badge">
+						<DeveloperIcon stroke="var(--crust)" style="width: 1rem; height: 1rem;" />
+					</div>
 					Show developer badge
-					<RadioInput size={0.6} />
+					<RadioInput 
+						size={0.6}
+						bind:value={
+							() => currentUser.showDeveloperBadge,
+							(value) => updateUser({ showDeveloperBadge: value })
+						}
+					/>
 				</span>
 			{/if}
 			{#if currentUser.tags.includes("mod")}
 				<span class="badge-line">
+					<div class="moderator badge">
+						<WrenchIcon stroke="var(--crust)" style="width: 1rem; height: 1rem;" />
+					</div>
 					Show moderator badge
-					<RadioInput size={0.6} />
+					<RadioInput 
+						size={0.6}
+						bind:value={
+							() => currentUser.showModeratorBadge,
+							(value) => updateUser({ showModeratorBadge: value })
+						}
+					/>
 				</span>
 			{/if}
-			{#if currentUser.tags.includes("developer")}
+			{#if currentUser.tags.includes("author")}
 				<span class="badge-line">
-					Show moderator badge
-					<RadioInput size={0.6} />
+					<div class="author badge">
+						<AuthorIcon stroke="var(--crust)" style="width: 1rem; height: 1rem;" />
+					</div>
+					Show author badge
+					<RadioInput 
+						size={0.6}
+						bind:value={
+							() => currentUser.showAuthorBadge,
+							(value) => updateUser({ showAuthorBadge: value })
+						}
+					/>
+				</span>
+			{/if}
+			{#if Date.now() - currentUser.birthmoment < 1000 * 60 * 60 * 24 * 7}
+				<span class="badge-line">
+					<div class="newbie badge">
+						<SproutIcon stroke="var(--crust)" style="width: 1rem; height: 1rem;" />
+					</div>
+					Show newbie badge
+					<RadioInput 
+						size={0.6}
+						bind:value={
+							() => currentUser.showNewbieBadge,
+							(value) => updateUser({ showNewbieBadge: value })
+						}
+					/>
 				</span>
 			{/if}
 		</div>
@@ -209,13 +266,49 @@
 		position: relative;
 	}
 
+	.badge-title {
+		margin-left: 2rem;
+		color: var(--overlay-1);
+		font-size: 0.85rem;
+		margin-bottom: 0.5rem;
+	}
+
 	.badge-line {
 		display :flex;
 		margin-left: 2rem;
 		align-items: center;
-		justify-content: space-between;
 		margin-right: 2rem;
 		font-size: 0.85rem;
+		gap: 0.75rem;
+
+		:global(> *:last-child) {
+			margin-left: auto;
+		}
+	}
+
+	.badge {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: 0.5rem;
+
+		&.developer {
+			background-image: linear-gradient(to bottom right, var(--green), var(--teal));
+		}
+
+		&.moderator {
+			background-image: linear-gradient(to bottom right, var(--pink), var(--lavender));
+		}
+
+		&.newbie {
+			background-image: linear-gradient(to bottom right, var(--yellow), var(--green));
+		}
+
+		&.author {
+			background-image: linear-gradient(to bottom right, var(--peach), var(--red));
+		}
 	}
 
 	span {

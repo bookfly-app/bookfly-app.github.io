@@ -6,6 +6,13 @@
 		ondisable = () => {},
 		onchange = (_value: boolean) => {},
 		...rest 
+	}: {
+		value: boolean,
+		size?: number,
+		onenable?: () => void,
+		ondisable?: () => void,
+		onchange?: (value: boolean) => void,
+		[key: string]: unknown
 	} = $props();
 
 	let state = $state(value);

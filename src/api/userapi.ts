@@ -21,6 +21,12 @@ export type User = {
 	links: {}[];
 	currentBook: string | null;
 	pronouns: string;
+	showDeveloperBadge: boolean;
+	showModeratorBadge: boolean
+	showPronounsOnProfile: boolean;
+	showPronounsOnPosts: boolean;
+	showNewbieBadge: boolean;
+	showAuthorBadge: boolean;
 
 	/** The timestamp, in epoch milliseconds, that this user's account was created. */
 	birthmoment: number;

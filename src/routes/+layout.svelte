@@ -9,7 +9,7 @@
 		if (!document.startViewTransition) return;
 
 		const newIndex = getTabIndex(new URL(navigation.to?.url ?? location.href));
-		if (newIndex === -1 || currentIndex === -1) {
+		if (newIndex === -1 || currentIndex === -1 || newIndex === currentIndex) {
 			document.documentElement.dataset.direction = "none";
 			currentIndex = newIndex;
 		} else {
@@ -68,6 +68,13 @@
 			if (term === "books") return 201;
 			if (term === "authors") return 202;
 			if (term === "people") return 203;
+			return -1;
+		}
+
+		if (url.pathname.startsWith("/author")) {
+			const view = url.searchParams.get("view") ?? "info";
+			if (view === "info") return 250;
+			if (view === "discussion") return 251;
 			return -1;
 		}
 

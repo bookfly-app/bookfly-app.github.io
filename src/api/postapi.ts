@@ -266,6 +266,12 @@ export async function getShares(post: InternalPost): Promise<User[]> {
 	).docs.map(doc => doc.data() as User);
 }
 
+export async function getSaves(post: InternalPost): Promise<User[]> {
+	return (
+		await getDocs(query(collection(db, "users"), where("saved", "array-contains", post.id)))
+	).docs.map(doc => doc.data() as User);
+}
+
 /**
  * A regular expression matching (most) links. This is a modified version of the expression
  * provided [here](https://stackoverflow.com/a/3809435), with some minor tweaks to fix some
@@ -384,7 +390,7 @@ export async function likePost(post: InternalPost): Promise<void> {
 }
 
 export async function sharePost(post: InternalPost): Promise<void> {
-	await updateDoc(doc(collection(db, "users"), user()!.id), {
+	await updateUser({
 		shares: [...new Set([...user()!.shares, post.id])],
 	});
 }

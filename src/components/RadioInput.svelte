@@ -15,12 +15,8 @@
 		[key: string]: unknown
 	} = $props();
 
-	let state = $state(value);
-
-
 	function toggle() {
-		state = !state;
-		value = state;
+		value = !value;
 		if (value) onenable();
 		else ondisable();
 		onchange(value);
@@ -31,10 +27,10 @@
 	{...rest}
 	aria-label="radio"
 	onclick={toggle}
-	style:background={state ? "linear-gradient(to bottom right, var(--lavender), var(--blue)" : "var(--overlay-1)"}
+	style:background={value ? "linear-gradient(to bottom right, var(--lavender), var(--blue))" : "var(--overlay-1)"}
 	style="width: {4 * size}rem; height: {2 * size}rem; padding: {0.2 * size}rem;"
 >
-	<div style:margin-left={state ? `${size * 2}rem` : "0px"}></div>
+	<div style:margin-left={value ? `${size * 2}rem` : "0px"}></div>
 </button>
 
 <style>

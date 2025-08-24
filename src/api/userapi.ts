@@ -34,6 +34,7 @@ export type User = {
 	views: PostId[];
 	likes: PostId[];
 	shares: PostId[];
+	saved: PostId[];
 
 	readingList: ISBN[];
 

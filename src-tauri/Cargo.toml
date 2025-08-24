@@ -1,17 +1,15 @@
 [package]
-name = "app"
+name = "wallflower_land"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
-repository = ""
+description = "A social media client for readers and writers."
+authors = ["Violet Iapalucci"]
+license = "All Rights Reserved"
+repository = "https://github.com/wallflower-land/wallflower-land.github.io"
 edition = "2021"
 rust-version = "1.77.2"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [lib]
-name = "app_lib"
+name = "wallflower_land_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

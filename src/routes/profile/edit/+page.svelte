@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
+	import { onMount } from "svelte";
 	import { getFile } from "../../../api/storageapi";
 	import { awaitUser, usernameErrors } from "../../../api/userapi";
 	import AuthorIcon from "../../../assets/images/icons/AuthorIcon.svelte";
@@ -65,9 +66,16 @@
 		await goto("/profile");
 		location.reload();
 	}
+
+	function onkeydown(event: KeyboardEvent) {
+		if (event.key === "s" && event.ctrlKey) {
+			event.preventDefault();
+			update();
+		}
+	}
 </script>
 
-<Page type="profile">
+<Page type="profile" {onkeydown}>
 	<BackButton style="position: absolute; top: 0.5rem; left: 0.5rem;"/>
 	{#await awaitUser then currentUser}
 		<!-- Banner -->

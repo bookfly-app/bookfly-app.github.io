@@ -11,6 +11,7 @@
 	import Sidebar from "../../components/Sidebar.svelte";
 	import BookCover from "../../components/BookCover.svelte";
 	import Header from "../../components/Header.svelte";
+	import { searchAuthors, type Author } from "../../api/authorapi";
 
 	type View = "posts" | "books" | "people" | "authors";
 
@@ -31,6 +32,7 @@
 
 		if (view === "posts") posts = searchPosts(searchTerm);
 		else if (view === "books") books = searchBooks(searchTerm);
+		else if (view === "authors") authors = searchAuthors(searchTerm);
 		else if (view === "people") users = searchUsers(searchTerm);
 	}
 
@@ -51,6 +53,7 @@
 
 	let posts: Promise<InternalPost[]> = $state(Promise.resolve([]));
 	let books: Promise<Promise<Book>[]> = $state(Promise.resolve([]));
+	let authors: Promise<Promise<Author>[]> = $state(Promise.resolve([]));
 	let users: Promise<User[]> = $state(Promise.resolve([]));
 
 	function setView(viewName: View) {
@@ -116,54 +119,102 @@
 			{/each}
 		{/await}
 	{:else if view === "books"}
-		{#await books}
+		{#if searchTerm == ""}
 			<div class="loading">
-				<h1>Loading books...</h1>
-				<p>We promise Wallflower will be faster soon.</p>
-				<Loading />
+				<h1>Search for a book</h1>
+				<p>
+					Enter your search term to find relevant books.
+				</p>
 			</div>
-		{:then books}
+		{:else}
+			{#await books}
+				<div class="loading">
+					<h1>Loading books...</h1>
+					<p>We promise Wallflower will be faster soon.</p>
+					<Loading />
+				</div>
+			{:then books}
+				{#if books.length === 0}
+					<div class="loading">
+						<h1>No books found</h1>
+						<p>
+							No books were found relating to your search term. Make sure you spelled everything right!
+						</p>
+					</div>
+				{/if}
+				<div class="books">
+					{#each books as book}
+						{#await book}
+							<div class="book">
+								<div class="book-info">
+									<div class="loading-title"></div>
+									<div class="loading-authors"></div>
+								</div>
+								<div class="loading-cover"></div>
+							</div>
+						{:then book}
+							<a href={`/book/${book.isbn}`} class="book">
+								<div class="book-info">
+									<h1>
+										{book.title}
+									</h1>
+									<h2>
+										{book.authors.join(", ")}
+									</h2>
+								</div>
+								{#if book.cover}
+									<BookCover {book} style="width: 3.5rem; margin-left: auto;" />
+								{:else}
+									<div class="loading-cover"></div>
+								{/if}
+							</a>
+						{/await}
+					{/each}
+				</div>
+			{/await}
+		{/if}
+	{:else if view === "authors"}
+		{#await authors}
+			<div class="loading">
+				<h1>Loading authors...</h1>
+				<p>We promise Wallflower will be faster soon.</p>
+			</div>
+		{:then authors}
 			{#if searchTerm == ""}
 				<div class="loading">
-					<h1>Search for a book</h1>
+					<h1>Search for an author</h1>
 					<p>
-						Enter your search term to find relevant books.
+						Enter your search term to find relevant authors.
 					</p>
 				</div>
-			{:else if books.length === 0}
+			{:else if authors.length === 0}
 				<div class="loading">
-					<h1>No books found</h1>
+					<h1>No users found</h1>
 					<p>
-						No books were found relating to your search term. Make sure you spelled everything right!
+						No users were found relating to your search term. Make sure you spelled everything right!
 					</p>
 				</div>
 			{/if}
-			<div class="books">
-				{#each books as book}
-					{#await book}
-						<div class="book">
-							<div class="book-info">
-								<div class="loading-title"></div>
-								<div class="loading-authors"></div>
-							</div>
-							<div class="loading-cover"></div>
-						</div>
-					{:then book}
-						<a href={`/book/${book.isbn}`} class="book">
-							<div class="book-info">
-								<h1>
-									{book.title}
-								</h1>
-								<h2>
-									{book.authors.join(", ")}
-								</h2>
-							</div>
-							{#if book.cover}
-								<BookCover {book} style="width: 3.5rem; margin-left: auto;" />
-							{:else}
-								<div class="loading-cover"></div>
-							{/if}
-						</a>
+			<div class="authors">
+				{#each authors as author}
+					{#await author then author}
+						{#if author.picture}
+							<a href={`/author/${author.id}`} class="book">
+								<div class="author-info">
+									<h1>
+										{author.name}
+									</h1>
+									<h2>
+										Born {author.birthday}
+									</h2>
+								</div>
+								{#if author.picture}
+									<img class="author-image" src={author.picture} />
+								{:else}
+									<div class="loading-cover"></div>
+								{/if}
+							</a>
+						{/if}
 					{/await}
 				{/each}
 			</div>
@@ -326,5 +377,34 @@
 		background-color: var(--base);
 		font-size: 1rem;
 		color: var(--subtext-1);
+
+		&::placeholder {
+			color: var(--surface-2);
+		}
+	}
+
+	.author-info {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+
+		h1 {
+			color: var(--subtext-1);
+			font-weight: normal;
+			font-size: 1rem;
+		}
+
+		h2 {
+			font-weight: normal;
+			color: var(--overlay-1);
+			font-size: 0.85rem;
+		}
+	}
+
+	.author-image {
+		width: 3rem;
+		height: 4.5rem;
+		border-radius: 0.25rem;
+		margin-left: 1rem;
 	}
 </style>

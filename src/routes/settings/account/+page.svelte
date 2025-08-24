@@ -25,6 +25,7 @@
 	let newPassword = $state("");
 	let newPassword2 = $state("");
 	let deleteUsername = $state("");
+	let emailPassword = $state("");
 	let showOldPassword = $state(false);
 	let showNewPassword = $state(false);
 	let showNewPassword2 = $state(false);
@@ -65,7 +66,7 @@
 
 	async function submitChangeEmail() {
 		changeEmailVisible = false;
-		await changeEmail(email);
+		await changeEmail(email, emailPassword);
 	}
 
 	async function requestAuthorVerification() {
@@ -94,10 +95,17 @@
 		<div class="popup">
 			<span class="title">Change Email</span>
 			<p>Your current email is <span>{user()?.email}</span>.</p>
-			<input placeholder="new@example.com" type="text" bind:value={email} enterkeyhint="done" />
+			<div class="section">
+				<span>New Email</span>
+				<input placeholder="new@example.com" type="text" bind:value={email} enterkeyhint="done" />
+			</div>
+			<div class="section">
+				<span>Password</span>
+				<input placeholder="password" type="password" bind:value={emailPassword} enterkeyhint="done" />
+			</div>
 			<div class="buttons">
 				<button class="cancel" onclick={() => changeEmailVisible = false}>Cancel</button>
-				<button class="submit" onclick={submitChangePassword}>Change</button>
+				<button disabled={!email || !emailPassword} class="submit" onclick={submitChangeEmail}>Change</button>
 			</div>
 			<button class="close" onclick={() => changeEmailVisible = false}>
 				<CloseIcon stroke="var(--red)" style="width: 1rem; height: 1rem;" />
@@ -172,7 +180,7 @@
 			{/if}
 			<div class="buttons">
 				<button class="cancel" onclick={() => changePasswordVisible = false}>Cancel</button>
-				<button disabled={!canChangePassword} class="submit" onclick={submitChangeEmail}>Change</button>
+				<button disabled={!canChangePassword} class="submit" onclick={submitChangePassword}>Change</button>
 			</div>
 			<button class="close" onclick={() => changePasswordVisible = false}>
 				<CloseIcon stroke="var(--red)" style="width: 1rem; height: 1rem;" />
@@ -430,6 +438,7 @@
 			padding: 0.5rem;
 			border-radius: 0.5rem;
 			width: 15rem;
+			border: 1px solid var(--surface-0);
 		}
 	}
 

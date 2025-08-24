@@ -2,7 +2,7 @@ NPM := "$(shell command -v bun 2>/dev/null || command -v pnpm 2>/dev/null || com
 TAURI := "$(shell command -v cargo-tauri 2>/dev/null)"
 TAURI ?= $(NPM) tauri
 
-.PHONY: all build-site deploy dev-site dev-native-app build-linux-app clean build-exe build-all
+.PHONY: all build-site deploy dev-site dev-native-app build-linux-app clean build-exe build-all bump-patch-version bump-minor-version
 
 # Runs the website in develop mode
 dev-site:
@@ -33,6 +33,18 @@ clean:
 	rm build -rf
 	rm src-tauri/target -rf
 	$(NPM) install
+
+# Increment patch version
+bump-patch-version:
+	sed -i -E 's/"version": *"([0-9]+)\.([0-9]+)\.([0-9]+)"/"version": "\1.\2.\3 + 1"/e' src/tauri.conf.json
+	sed -i -E 's/"version": *"([0-9]+)\.([0-9]+)\.([0-9]+)"/"version": "\1.\2.\3 + 1"/e' package.json
+	sed -i -E 's/^version = "([0-9]+)\.([0-9]+)\.([0-9]+)"/version = "\1.\2.$((\3+1))"/e' Cargo.toml
+
+# Increment minor version
+bump-minor-version:
+	sed -i -E 's/"version": *"([0-9]+)\.([0-9]+)\.[0-9]+"/"version": "\1.$((\2+1)).0"/e' src/tauri.conf.json
+	sed -i -E 's/"version": *"([0-9]+)\.([0-9]+)\.[0-9]+"/"version": "\1.$((\2+1)).0"/e' package.conf.json
+	sed -i -E 's/^version = "([0-9]+)\.([0-9]+)\.[0-9]+"/version = "\1.$((\2+1)).0"/e' Cargo.toml
 
 # Build all possible targets
 build-all: build-site build-linux-app

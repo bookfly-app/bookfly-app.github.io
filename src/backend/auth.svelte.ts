@@ -7,10 +7,10 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 	updateEmail,
-	updatePassword, 
+	updatePassword,
 	reauthenticateWithCredential,
 	EmailAuthProvider,
-	deleteUser
+	deleteUser,
 } from "firebase/auth";
 import {
 	collection,
@@ -103,11 +103,6 @@ export async function updateUser(userInfo: Partial<User>) {
 	await updateDoc(doc(db, "users", user()!.id), userInfo);
 }
 
-export async function changeEmail(email: string) {
-	await updateEmail(auth.currentUser, email);
-	updateUser({ email });
-}
-
 export async function signUp(
 	email: string,
 	password: string,
@@ -143,6 +138,7 @@ export async function signUp(
 			uiScale,
 			views: [],
 			shares: [],
+			saved: [],
 			requestedAuthorVerification: false,
 			birthmoment: Date.now(),
 		};
@@ -181,6 +177,14 @@ export async function changePassword(oldPassword: string, newPassword: string) {
 	const credential = EmailAuthProvider.credential(auth.currentUser, oldPassword);
 	await reauthenticateWithCredential(auth.currentUser, credential);
 	await updatePassword(user, newPassword);
+}
+
+export async function changeEmail(email: string, password: string) {
+	const credential = EmailAuthProvider.credential(auth.currentUser, password);
+	await reauthenticateWithCredential(auth.currentUser, credential);
+	await updatePassword(user, newPassword);
+	await updateEmail(auth.currentUser, email);
+	await updateUser({ email });
 }
 
 export async function deleteAccount(password: string) {

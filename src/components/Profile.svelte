@@ -157,7 +157,7 @@
 				<!-- Badges -->
 				<Badges forUser={profileUser} size={1} />
 
-				{#if profileUser.pronouns}
+				{#if profileUser.pronouns && profileUser.showPronounsOnProfile}
 					<div class="dot"></div>
 					<h2 class="pronouns">{profileUser.pronouns}</h2>
 				{/if}
@@ -344,7 +344,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 1rem;
+		padding: 0.5rem 1rem 0.5rem 1rem;
 		border-bottom: 1px solid var(--surface-0);
 		position: sticky;
 		top: 0px;
@@ -366,8 +366,8 @@
 	}
 
 	.dot {
-		width: 0.25rem;
-		height: 0.25rem;
+		width: 0.2rem;
+		height: 0.2rem;
 		border-radius: 50%;
 		background-color: var(--surface-2);
 	}
@@ -452,17 +452,6 @@
 			padding-bottom: 0.5rem;
 			padding-left: 2rem;
 			padding-right: 2rem;
-		}
-	}
-
-	.bio {
-		padding-left: 1rem;
-		font-size: 0.85rem;
-		white-space: pre-wrap;
-		color: var(--overlay-1);
-
-		:global(a) {
-			color: cornflowerblue;
 		}
 	}
 

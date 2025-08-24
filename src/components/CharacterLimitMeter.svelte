@@ -32,7 +32,7 @@
 		position: absolute;
 		right: 0.5rem;
 		bottom: 0.5rem;
-		font-size: 0.85rem;
+		font-size: 0.75rem;
 		height: 70%;
 		aspect-ratio: 1;
 		color: var(--color);

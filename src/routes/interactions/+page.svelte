@@ -19,6 +19,7 @@
 	let viewed: InternalPost[] = $state([]);
 	let liked: InternalPost[] = $state([]);
 	let shared: InternalPost[] = $state([]);
+	let saved: InternalPost[] = $state([]);
 	let replies: Promise<InternalPost[]> = $state(Promise.resolve([]));
 
 	$effect(() => {
@@ -30,20 +31,26 @@
 			liked = (await Promise.all(user()!.likes.map(post => getPostFromId(post))))
 				.map(post => post!)
 				.filter(post => post)
-				.toSorted((post1, post2) => post2.timestamp - post1.timestamp);
+				.toReversed()
 		}
 		if (view === "viewed") {
 			viewed = (await Promise.all(user()!.views.map(post => getPostFromId(post))))
 				.filter(post => post)
 				.map(post => post!)
-				.toSorted((post1, post2) => post2.timestamp - post1.timestamp);
+				.toReversed()
 		}
 		if (view === "replies") replies = getUserReplies(user()!);
 		if (view === "shared") {
 			shared = (await Promise.all(user()!.shares.map(post => getPostFromId(post))))
 				.filter(post => post)
 				.map(post => post!)
-				.toSorted((post1, post2) => post2.timestamp - post1.timestamp);
+				.toReversed()
+		}
+		if (view === "saved") {
+			saved = (await Promise.all(user()!.saved.map(post => getPostFromId(post))))
+				.filter(post => post)
+				.map(post => post!)
+				.toReversed()
 		}
 	}
 
@@ -102,6 +109,14 @@
 				<AnyPost post={reply} />
 			{/each}
 		{/await}
+	{:else if view === "saved"}
+		{#each saved as savedPost}
+			<AnyPost post={savedPost} />
+		{/each}
+	{:else if view === "shared"}
+		{#each shared as sharedPost}
+			<AnyPost post={sharedPost} />
+		{/each}
 	{/if}
 </Page>
 

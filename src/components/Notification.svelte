@@ -28,7 +28,6 @@
 		padding-bottom: 1rem;
 		border-radius: 0.75rem;
 		box-shadow: 0px 0px 10px black;
-		font-weight: 600;
 		left: 50%;
 		transform: translateX(-50%);
 		transition: bottom 0.2s;

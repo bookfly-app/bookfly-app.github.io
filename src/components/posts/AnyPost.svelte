@@ -5,12 +5,10 @@
 		deletePost,
 		didComment,
 		didLike,
-		didShare,
 		getLikes,
 		getPostFromId,
 		getPostViews,
 		getReplies,
-		getShares,
 		likePost,
 		sharePost,
 		unlikePost,
@@ -22,8 +20,7 @@
 	import DotMenuIcon from "../../assets/images/icons/DotMenuIcon.svelte";
 	import EyeIcon from "../../assets/images/icons/EyeIcon.svelte";
 	import HeartIcon from "../../assets/images/icons/HeartIcon.svelte";
-	import ShareIcon from "../../assets/images/icons/ShareIcon.svelte";
-	import { user } from "../../backend/auth.svelte";
+	import { updateUser, user } from "../../backend/auth.svelte";
 	import Badges from "../Badges.svelte";
 	import ContextMenu from "../ContextMenu.svelte";
 	import ImageCarousel from "../ImageCarousel.svelte";
@@ -147,15 +144,12 @@
 	let likes = $state(getLikes(post).then(likes => likes.length));
 	/** The number of replies on the post */
 	let comments = $state(getReplies(post).then(replies => replies.length));
-	/** The number of shares on the post */
-	let shares = $state(getShares(post).then(shares => shares.length + ((!user() && didShare(post)) ? 1 : 0)));
 
 	/** Whether the current user liked the post. */
 	let liked = $state(didLike(post));
-	/** Whether the current user shared the post. */
-	let shared = $state(didShare(post));
 	/** Whether the current user replied to the post. */
 	let commented = $state(didComment(post));
+	let saved = $derived(user() ? user()!.saved.includes(post.id) : false);
 
 	/**
 	 * Toggles whether the user has liked this post. This is called when the user
@@ -198,8 +192,9 @@
 		await deletePost(post);
 	}
 
-	// svelte-ignore non_reactive_update
-	let shareNotification: Notification;
+	let shareNotification: Notification = $state(null!);
+	let saveNotification: Notification = $state(null!);
+	let unsaveNotification: Notification = $state(null!);
 
 	/**
 	 * Called when the share button on a post is clicked.
@@ -214,10 +209,9 @@
 	 * reflect the shared post. The This needn't be awaited to update the UI.
 	 */
 	async function share() {
+		actionsMenu.close();
 		navigator.clipboard.writeText(`https://wallflower.land/post/${post.id}`);
 		shareNotification.show();
-		if (!shared) shares = shares.then(shares => shares + 1);
-		shared = true;
 
 		if (!user()) {
 			let shared = localStorage.getItem("shared-posts");
@@ -228,6 +222,18 @@
 		}
 
 		await sharePost(post);
+	}
+
+	async function save() {
+		actionsMenu.close();
+		saveNotification.show();
+		await updateUser({ saved: [...user()!.saved, post.id] });
+	}
+
+	async function unsave() {
+		actionsMenu.close();
+		unsaveNotification.show();
+		await updateUser({ saved: user()!.saved.filter(id => id !== post.id) });
 	}
 
 	const poster = getUserFromId(post.poster);
@@ -268,10 +274,19 @@
 			</span>
 		{:then poster}
 			<span class="user">
-				<a href="/profile/{poster.username}" class="display-name">{poster.displayName}</a>
-				<a href="/profile/{poster.username}" class="username">{`@${poster.username}`}</a>
+				<div class="name">
+					<a href="/@{poster.username}" class="display-name">{poster.displayName}</a>
+					<a href="/@{poster.username}" class="username">{`@${poster.username}`}</a>
+				</div>
 
 				<Badges forUser={poster} size={0.7} />
+
+				{#if poster.pronouns && poster.showPronounsOnProfile}
+					<div class="pronouns">
+						<div class="dot"></div>
+						<h2 class="pronouns">{poster.pronouns}</h2>
+					</div>
+				{/if}
 
 				<button class="timestamp" onclick={toggleTimeFormat}>
 					{elapsedTime}
@@ -351,30 +366,32 @@
 				</button>
 			{/await}
 
-			<!-- Share Button -->
-				<button style:color={shared ? "#BB99FF" : "var(--surface-2)"} onclick={share}>
-					<ShareIcon stroke={shared ? "#BB99FF" : "var(--surface-2)"} style="width: 0.85rem;" />
-					{#await shares}
-						0
-					{:then shares}
-						{shares}
-					{/await}
-					<Notification message="Link copied!" bind:this={shareNotification} />
-				</button>
+			<Notification message="Saved" bind:this={saveNotification} />
+			<Notification message="Unsaved" bind:this={unsaveNotification} />
+			<Notification message="Link copied!" bind:this={shareNotification} />
 
 			<!-- Post Actions Button -->
 			<button onclick={event => actionsMenu.open(event)}>
 				<DotMenuIcon stroke="var(--overlay-1)" style="width: 1.25rem;" />
-				<ContextMenu bind:this={actionsMenu}>
-					{#if isCurrentUser}
-						<button onclick={deleteAndUpdate}>
-							Delete Post
-						</button>
-					{:else}
-						<button>Report</button>
-					{/if}
-				</ContextMenu>
 			</button>
+
+			<ContextMenu bind:this={actionsMenu}>
+				{#if user()}
+					{#if saved}
+						<button onclick={unsave}>Unsave</button>
+					{:else}
+						<button onclick={save}>Save</button>
+					{/if}
+				{/if}
+				<button onclick={share}>Share</button>
+				{#if isCurrentUser}
+					<button onclick={deleteAndUpdate}>
+						Delete Post
+					</button>
+				{:else}
+					<button>Report</button>
+				{/if}
+			</ContextMenu>
 		</div>
 	</div>
 </section>
@@ -409,11 +426,6 @@
 			border-radius: 100vmax;
 			background-color: var(--surface-0);
 		}
-
-		a {
-			text-decoration: none;
-			color: var(--blue);
-		}
 	}
 
 	section {
@@ -424,6 +436,12 @@
 		cursor: pointer;
 		width: 100%;
 		top: 0px;
+	}
+
+	.name {
+		display: flex;
+		gap: 0.5rem;
+		max-width: 50%;
 	}
 
 	.content-outer {
@@ -465,13 +483,16 @@
 		.display-name {
 			font-size: 1rem;
 			color: var(--text);
+			font-size: 0.85rem;
 		}
 
 		.username {
 			color: var(--surface-2);
+			font-size: 0.85rem;
+			text-overflow: ellipsis;
+			overflow: hidden;
 		}
 
-		.username,
 		button {
 			font-weight: normal;
 			font-size: 1rem;
@@ -489,6 +510,29 @@
 			margin-left: auto;
 			cursor: pointer;
 			color: var(--surface-2);
+			white-space: nowrap;
+			max-width: 25%;
+		}
+	}
+
+	.pronouns {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		max-width: 25%;
+
+		.dot {
+			width: 0.2rem;
+			height: 0.2rem;
+			border-radius: 50%;
+			background-color: var(--surface-2);
+		}
+
+		h2 {
+			color: var(--surface-2);
+			font-size: 0.85rem;
+			font-weight: normal;
+			white-space: nowrap;
 		}
 	}
 </style>

@@ -41,15 +41,20 @@
 		border: 1px solid var(--surface-0);
 		box-shadow: 0px 0px 0.5rem black;
 		width: 10rem;
+		background-color: var(--crust);
+		z-index: 9999;
 
 		:global(> *) {
 			padding: 0.5rem 1rem 0.5rem 1rem;
-			background: #11111b;
 			width: 100%;
 			display: flex;
 			align-items: center;
 			color: #cdd6f4;
 			font-size: 0.85rem;
+
+			&:hover {
+				background: rgba(150, 150, 255, 8%);
+			}
 
 			&:not(:last-child) {
 				border-bottom-style: solid;

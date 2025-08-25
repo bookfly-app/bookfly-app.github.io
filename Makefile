@@ -157,10 +157,10 @@ deploy-site:
 	@echo -e "    \e[1;32mDone!\e[0m Website written to \e[1;36m/build/web\e[0m"
 	@echo ""
 	@echo -en "    \e[1;32mDeploying\e[0m to GitHub..."
-	git add . &>cache/build.log
-	git commit -m "New build deployment" &>cache/build.log
-	git push &>cache/build.log
-	git push origin `git subtree split --prefix build/web main`:gh-pages --force &>cache/build.log
+	@git add . &>cache/build.log
+	@git commit -m "New build deployment" &>cache/build.log
+	@git push &>cache/build.log
+	@git push origin `git subtree split --prefix build/web main`:gh-pages --force &>cache/build.log
 	@echo -e "\e[1;32mDone!\e[0m"
 	@echo -e "\e[1;32mDone!\e[0m Website deployed to GitHub pages."
 	@echo ""

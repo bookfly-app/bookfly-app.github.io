@@ -287,7 +287,7 @@
 					</span>
 					<span style:color="var(--overlay-1)">
 						<label for="change-rating-sort">{ratingSortName}</label>
-						<button onclick={event => ratingSortMenu.open(event)} id="change-rating-sort">
+						<button onclick={event => ratingSortMenu.toggle(event)} id="change-rating-sort">
 							<SortIcon stroke="var(--overlay-1)" style="width: 1.5rem; height: 1.5rem;" />
 						</button>
 					</span>

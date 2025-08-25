@@ -6,12 +6,19 @@
 	export function open(event: MouseEvent) {
 		menu.style.left = `${event.clientX - menu.clientWidth}px`;
 		menu.style.top = `${event.clientY}px`;
-		menu.style.visibility = "visible";
+		visible = true;
 		menu.focus();
 	}
 
+	let visible = $state(false);
+
 	export function close() {
-		menu.style.visibility = "hidden";
+		visible = false;
+	}
+
+	export function toggle(event: MouseEvent) {
+		if (visible) close();
+		else open(event);
 	}
 
 	let { children } = $props();
@@ -26,7 +33,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-<section tabindex="0" bind:this={menu} class="contextmenu">
+<section tabindex="0" bind:this={menu} class="contextmenu" style:scale={visible ? 1 : 0}>
 	{@render children()}
 </section>
 
@@ -35,7 +42,6 @@
 		display: flex;
 		flex-direction: column;
 		position: fixed;
-		visibility: hidden;
 		overflow: hidden;
 		border-radius: 0.5rem;
 		border: 1px solid var(--surface-0);
@@ -43,6 +49,8 @@
 		width: 10rem;
 		background-color: var(--crust);
 		z-index: 9999;
+		transition: scale 0.1s;
+		transform-origin: top right;
 
 		:global(> *) {
 			padding: 0.5rem 1rem 0.5rem 1rem;

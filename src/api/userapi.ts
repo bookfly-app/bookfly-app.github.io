@@ -22,7 +22,7 @@ export type User = {
 	currentBook: string | null;
 	pronouns: string;
 	showDeveloperBadge: boolean;
-	showModeratorBadge: boolean
+	showModeratorBadge: boolean;
 	showPronounsOnProfile: boolean;
 	showPronounsOnPosts: boolean;
 	showNewbieBadge: boolean;

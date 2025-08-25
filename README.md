@@ -2,6 +2,18 @@
 
 All rights reserved. See [the license](./LICENSE.md) for details.
 
+## Installation
+
+### Building From Source
+
+You can build wallflower.land from source:
+
+```bash
+git clone https://github.com/wallflower-land/wallflower-land.github.io.git
+cd wallflower-land.github.io
+make build-from-source
+```
+
 ## Contributing
 
 ### Prerequisites

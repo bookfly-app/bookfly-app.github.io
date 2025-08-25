@@ -10,3 +10,5 @@ vite.config.ts.timestamp-*
 src/env.json
 /firebase
 !/src/env.json
+/cache
+/build/**/*/source/

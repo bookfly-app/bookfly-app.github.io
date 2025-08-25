@@ -1,0 +1,9 @@
+[Desktop Entry]
+Categories=
+Comment=A social media client for readers and writers.
+Exec=wallflower_land
+StartupWMClass=wallflower_land
+Icon=wallflower_land
+Name=wallflower
+Terminal=false
+Type=Application
